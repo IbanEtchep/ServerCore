@@ -60,9 +60,6 @@ public class AccountProvider {
 				ps.setString(1, uuid.toString());
 				try(ResultSet rs = ps.executeQuery()){
 					if(rs.next()) {
-						long exp = rs.getLong("exp");
-						account.setExp(exp);
-
 						long lastseen = rs.getLong("lastseen");
 						account.setLastSeen(lastseen);
 
@@ -88,7 +85,6 @@ public class AccountProvider {
 			try(PreparedStatement ps = connection.prepareStatement("INSERT INTO sc_players (uuid, name, exp, lastseen, maxclaims) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), exp=VALUES(exp), lastseen=VALUES(lastseen), maxclaims=VALUES(maxclaims), allowpvp=VALUES(allowpvp)")){
 				ps.setString(1, uuid.toString());
 				ps.setString(2, (account.getName() == null ? "NonDefini" : account.getName()));
-				ps.setLong(3, account.getExp());
 				ps.setLong(4, account.getLastSeen());
 				ps.setInt(5, account.getMaxClaims());
 				ps.executeUpdate();

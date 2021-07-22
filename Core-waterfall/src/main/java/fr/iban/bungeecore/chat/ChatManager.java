@@ -57,7 +57,7 @@ public class ChatManager {
 				return;
 			}
 
-			msg = translateColors(HexColor.translateHexColorCodes("#", "", "§7[" + account.getLevel() + "§7] " + getSuffix(player) + getPrefix(player)+ " " + player.getName() + getSuffix(player) + " ➤ §r")) + msg;
+			msg = translateColors(HexColor.translateHexColorCodes("#", "", getSuffix(player) + getPrefix(player)+ " " + player.getName() + getSuffix(player) + " ➤ §r")) + msg;
 			
 			//Envoi du message à chaque joueur
 			for (ProxiedPlayer p: ProxyServer.getInstance().getPlayers()) {

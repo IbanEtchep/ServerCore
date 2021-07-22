@@ -21,7 +21,6 @@ public class Account {
 
 	private UUID uuid;
 	private String name;
-	private long exp = 0;
 	private short maxClaims = 1;
 	private long lastSeen = 0;
 	private boolean bypass = false;
@@ -82,24 +81,6 @@ public class Account {
 		if(maxClaims < 0) maxClaims = 0;
 	}
 
-	/*
-	 * LEVELS
-	 */
-	public short getLevel() {
-		return (short) (Math.floor(25 + Math.sqrt(625 + 100 * exp)) / 50);
-	}
-
-	public long getExp() {
-		return exp;
-	}
-
-	public void setExp(long exp) {
-		this.exp = exp;
-	}
-
-	public void addExp(int amount) {
-		this.exp += amount;
-	}
 
 	public Set<Integer> getBlackListedAnnounces() {
 		if(blackListedAnnounces == null) {
