@@ -10,7 +10,7 @@
 		<version>1.0</version>
 	</parent>
 
-	<artifactId>Core-paper</artifactId>
+	<artifactId>CorePaper</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Core Paper</name>
@@ -67,7 +67,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.iban</groupId>
-			<artifactId>Core-common</artifactId>
+			<artifactId>CoreCommon</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>

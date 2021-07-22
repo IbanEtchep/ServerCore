@@ -5,9 +5,9 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountProvider;
 import fr.iban.common.utils.ArrayUtils;
-import fr.iban.spartacube.data.Account;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

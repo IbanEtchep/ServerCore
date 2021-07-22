@@ -1,8 +1,8 @@
 package fr.iban.bungeecore.commands;
 
+import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
-import fr.iban.spartacube.data.Account;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;

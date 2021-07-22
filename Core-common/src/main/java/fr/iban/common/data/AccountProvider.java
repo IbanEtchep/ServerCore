@@ -21,7 +21,6 @@ import org.redisson.api.RedissonClient;
 
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.sql.DbAccess;
-import fr.iban.spartacube.data.Account;
 
 public class AccountProvider {
 

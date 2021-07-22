@@ -7,8 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 import fr.iban.bukkitcore.utils.ItemBuilder;
 import fr.iban.bukkitcore.utils.Options;
+import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountProvider;
-import fr.iban.spartacube.data.Account;
 
 public class OptionsMenu extends PaginatedMenu{
 

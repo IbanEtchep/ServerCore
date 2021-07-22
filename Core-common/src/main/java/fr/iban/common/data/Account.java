@@ -1,4 +1,4 @@
-package fr.iban.spartacube.data;
+package fr.iban.common.data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-
-import fr.iban.common.data.Boost;
-import fr.iban.common.data.Option;
 
 public class Account {
 

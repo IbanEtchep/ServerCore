@@ -6,7 +6,6 @@ import fr.iban.common.data.Option;
 
 public enum Options {
 	
-	PVP("Activer le PVP", new ItemStack(Head.PVP.get()), Option.PVP),
 	DEATH("Afficher les messages de morts", new ItemStack(Head.DEATH.get()), Option.DEATH_MESSAGE),
 	JOIN("Afficher les messages de connexions", new ItemStack(Head.PLUS.get()), Option.JOIN_MESSAGE),
 	LEAVE("Afficher les messages de déconnexions", new ItemStack(Head.MOINS.get()), Option.LEAVE_MESSAGE),

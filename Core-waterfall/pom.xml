@@ -10,7 +10,7 @@
 		<version>1.0</version>
 	</parent>
 
-	<artifactId>Core-waterfall</artifactId>
+	<artifactId>CoreWaterfall</artifactId>
 	<packaging>jar</packaging>
 
 	<name>Core Waterfall</name>
@@ -58,7 +58,7 @@
 		</dependency>
 		<dependency>
 			<groupId>fr.iban</groupId>
-			<artifactId>Core-common</artifactId>
+			<artifactId>CoreCommon</artifactId>
 			<version>${project.version}</version>
 			<scope>compile</scope>
 		</dependency>
