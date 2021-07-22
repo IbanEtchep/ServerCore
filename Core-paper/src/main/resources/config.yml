@@ -1,0 +1,41 @@
+redis:
+  host: 172.18.0.1
+  port: 6379
+  password: null
+  clientName: Serveur_mc
+
+database:
+  host: 172.18.0.1
+  port: 3306
+  user: user
+  dbname: dbname
+  password: password
+  
+tabcomplete:
+  global:
+    - sethome
+    - delhome
+    - spawn
+    - warp
+    - warps
+    - lands
+    - land
+    - classement
+    - niveau
+    - level
+    - kit
+    - kits
+    - vote
+    - map
+    - boutique
+    - site
+    - discord
+    - repair
+    - ec
+  moderation:
+    - mod
+    - ban
+    - tempban
+    - mute
+    - tempmute
+    - kick
