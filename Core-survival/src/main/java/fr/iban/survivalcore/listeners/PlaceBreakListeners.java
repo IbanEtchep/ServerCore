@@ -43,7 +43,7 @@ public class PlaceBreakListeners implements Listener {
 		Chunk chunk = block.getChunk();
 		Land land = landManager.getLandAt(chunk);
 
-		if(!landManager.isWilderness(land) && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
+		if(!land.isWilderness() && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
 
 		//Pioche 3x3
 		if(SpecialTools.is3x3Pickaxe(itemInHand)) {
@@ -51,7 +51,7 @@ public class PlaceBreakListeners implements Listener {
 			for(Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)){
 				Chunk c = b.getChunk();
 				Land l = landManager.getLandAt(c);
-				if(!landManager.isWilderness(l) && !l.isBypassing(player, Action.BLOCK_BREAK)) 
+				if(!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK)) 
 					continue;
 
 				b.breakNaturally(itemInHand);
@@ -64,7 +64,7 @@ public class PlaceBreakListeners implements Listener {
 			for(Block b : SpecialTools.getSurroundingBlocksShovel(player, block)){
 				Chunk c = b.getChunk();
 				Land l = landManager.getLandAt(c);
-				if(!landManager.isWilderness(l) && !l.isBypassing(player, Action.BLOCK_BREAK)) 
+				if(!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK)) 
 					continue;
 
 				b.breakNaturally(itemInHand);

@@ -1,10 +1,7 @@
 package fr.iban.common.data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -28,7 +25,6 @@ public class Account {
 	private Set<UUID> ignoredPlayers = new HashSet<>();
 	private Map<Option, Boolean> options = new HashMap<>();
 	private String ip;
-	private List<Boost> boosts;
 
 	public Account(UUID uuid) {
 		this.uuid = uuid;
@@ -143,35 +139,5 @@ public class Account {
 	public void setIp(String ip) {
 		this.ip = ip;
 	}
-	
-	public int getLastId() {
-		int valeur = 0;
-		Iterator<Boost> it = getBoosts().iterator();
-		while(it.hasNext()){
-		     Boost boost = it.next();
-		     valeur = boost.getId();
-		}
-		return valeur;
-	}
-	
-	public long getLastEnd() {
-		long end = 0;
-		Iterator<Boost> it = getBoosts().iterator();
-		while(it.hasNext()){
-		     Boost boost = it.next();
-		     end = boost.getEnd();
-		}
-		return end;
-	}
 
-	public List<Boost> getBoosts() {
-		if(boosts == null) {
-			boosts = new ArrayList<>();
-		}
-		return boosts;
-	}
-	
-	public void setBoosts(List<Boost> boosts) {
-		this.boosts = boosts;
-	}
 }

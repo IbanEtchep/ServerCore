@@ -42,7 +42,6 @@ import fr.iban.bungeecore.teleport.EventAnnounceListener;
 import fr.iban.bungeecore.teleport.TeleportManager;
 import fr.iban.bungeecore.teleport.TpToSLocListener;
 import fr.iban.bungeecore.utils.AnnoncesManager;
-import fr.iban.common.data.GlobalBoosts;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
@@ -95,8 +94,6 @@ public final class CoreBungeePlugin extends Plugin {
 		announceManager = new AnnoncesManager();
 		chatManager = new ChatManager(this);
 		teleportManager = new TeleportManager(this);
-		GlobalBoosts globalBoosts = new GlobalBoosts();
-		globalBoosts.getGlobalBoostsFromDB();
 
 		getProxy().registerChannel("proxy:chat");
 		getProxy().registerChannel(RANKUP_CHANNEL);

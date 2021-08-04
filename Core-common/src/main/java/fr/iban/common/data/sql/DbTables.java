@@ -12,7 +12,6 @@ public class DbTables {
 		createplayersTable();
 		createAnnounceBLTable();
 		createIpTable();
-		createBoostsTable();
 	}
 
 	/*
@@ -25,24 +24,12 @@ public class DbTables {
 					"  name        varchar(16)  not null," +
 					"  date_created timestamp default now()," +
 					"  lastseen       bigint DEFAULT 0," +
-					"  exp bigint DEFAULT 0," +
 					"  maxclaims smallint DEFAULT 1," +
 					"  CONSTRAINT  UC_sc_players" +
 					"  UNIQUE (id)," +
 					"  CONSTRAINT UC_sc_players_uuid" +
 					"  UNIQUE (uuid)" +
 					") engine = InnoDB;");
-	}
-	
-	private static void createBoostsTable() {
-		createTable("CREATE TABLE IF NOT EXISTS sc_boosts ("
-				+ " id int,"
-				+ " owner varchar(255), "
-				+ " end bigint, "
-				+ " value int, "
-				+ " CONSTRAINT PRIMARY KEY (id, owner)"
-				+ ");"
-				);
 	}
 	
 	private static void createOptionsTable() {

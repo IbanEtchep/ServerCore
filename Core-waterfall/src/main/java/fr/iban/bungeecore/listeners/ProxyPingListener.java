@@ -1,9 +1,7 @@
 package fr.iban.bungeecore.listeners;
 
-import fr.iban.common.utils.ArrayUtils;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.ServerPing.Players;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
@@ -41,8 +39,8 @@ public class ProxyPingListener implements Listener {
 		ServerPing serverPing = e.getResponse();
 		Players players = serverPing.getPlayers();
 		players.setMax(100);
-		serverPing.setDescriptionComponent(new TextComponent("§6✷ §cSpΛrta§6Cube §c✷ §e" + ArrayUtils.getRandomFromArray(messages)));
-		serverPing.setPlayers(players);
+//		serverPing.setDescriptionComponent(new TextComponent("§6✷ §cSpΛrta§6Cube §c✷ §e" + ArrayUtils.getRandomFromArray(messages)));
+//		serverPing.setPlayers(players);
 	}
 
 }

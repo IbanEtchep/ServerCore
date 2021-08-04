@@ -4,10 +4,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -73,7 +71,6 @@ public class AccountProvider {
 			account.setOptions(getOptionsFromDB(connection));
 			account.setIgnoredPlayers(getIgnoredPlayersFromDB(connection));
 			account.setBlackListedAnnounces(getBlackListedAnnouncesFromDB(connection));
-			account.setBoosts(getBoostsFromDB(connection));
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}		
@@ -82,17 +79,16 @@ public class AccountProvider {
 
 	public void sendAccountToDB(Account account) {
 		try (Connection connection = DbAccess.getDataSource().getConnection()){
-			try(PreparedStatement ps = connection.prepareStatement("INSERT INTO sc_players (uuid, name, exp, lastseen, maxclaims) VALUES (?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), exp=VALUES(exp), lastseen=VALUES(lastseen), maxclaims=VALUES(maxclaims), allowpvp=VALUES(allowpvp)")){
+			try(PreparedStatement ps = connection.prepareStatement("INSERT INTO sc_players (uuid, name, lastseen, maxclaims) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE name=VALUES(name), lastseen=VALUES(lastseen), maxclaims=VALUES(maxclaims)")){
 				ps.setString(1, uuid.toString());
 				ps.setString(2, (account.getName() == null ? "NonDefini" : account.getName()));
-				ps.setLong(4, account.getLastSeen());
-				ps.setInt(5, account.getMaxClaims());
+				ps.setLong(3, account.getLastSeen());
+				ps.setInt(4, account.getMaxClaims());
 				ps.executeUpdate();
 			}
 			saveOptionsToDB(account.getOptions(), connection);
 			deleteOptionsFromDB(account.getOptions(), connection);
 			saveBlackListedAnnouncesToDB(account.getBlackListedAnnounces(), connection);
-			saveBoostsToDB(connection, account.getBoosts());
 			if(account.getIp() != null) {
 				saveIpToDB(account.getIp(), connection);
 			}
@@ -237,18 +233,6 @@ public class AccountProvider {
 		ps.close();
 	}
 
-	public void saveBoostsToDB(Connection connection, List<Boost> boosts) throws SQLException {
-		final String INSERT_SQL = "INSERT INTO sc_boosts(id, owner, end, value) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE id=VALUES(id);";
-		for(Boost boost : boosts) {
-			PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
-			ps.setInt(1, boost.getId());
-			ps.setString(2, uuid.toString());
-			ps.setLong(3, boost.getEnd());
-			ps.setInt(4, boost.getValue());
-			ps.executeUpdate();
-			ps.close();
-		}
-	}
 
 	public void deleteBoostFromDB(Integer id, Long end, Integer value) {
 		DataSource ds = DbAccess.getDataSource();
@@ -277,22 +261,6 @@ public class AccountProvider {
 		}catch (SQLException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public List<Boost> getBoostsFromDB(Connection connection) throws SQLException{
-		List<Boost> boosts = new ArrayList<>();
-		try(PreparedStatement ps = 
-				connection.prepareStatement(
-						"SELECT * FROM sc_boosts WHERE owner = ? "
-						)){
-			ps.setString(1, uuid.toString());
-			try(ResultSet rs = ps.executeQuery()){
-				while(rs.next()) {
-					boosts.add(new Boost(rs.getInt("id"), rs.getInt("value"), rs.getLong("end")));
-				}
-			}
-		}
-		return boosts;
 	}
 
 	public boolean hasPlayedBefore() {
