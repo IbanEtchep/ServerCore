@@ -113,19 +113,11 @@ public class Account {
 	}
 	
 	public void setOption(Option option, boolean value) {
-		if(!options.containsKey(option)) {
-			options.put(option, true);
-		}
-		this.options.put(option, value);
+		options.put(option, value);
 	}
-	
 
 	public void toggleOption(Option option) {
-		if(options.containsKey(option) && !options.get(option)) {
-			options.put(option, true);
-		} else {
-			options.put(option, false);
-		}
+		options.put(option, !getOption(option));
 	}
 	
 	public boolean getOption(Option option) {
