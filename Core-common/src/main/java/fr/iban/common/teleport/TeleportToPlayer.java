@@ -6,12 +6,18 @@ public class TeleportToPlayer {
 	
 	private UUID uuid;
 	private UUID target;
+	private int delay;
 	
 	public TeleportToPlayer() {}
-	
-	public TeleportToPlayer(UUID uuid, UUID target) {
+
+	public TeleportToPlayer(UUID uuid, UUID target, int delay) {
 		this.uuid = uuid;
 		this.setTarget(target);
+		this.delay = delay;
+	}
+	
+	public TeleportToPlayer(UUID uuid, UUID target) {
+		this(uuid, target, 0);
 	}
 
 	public UUID getUuid() {
@@ -29,6 +35,12 @@ public class TeleportToPlayer {
 	public void setTarget(UUID target) {
 		this.target = target;
 	}
-	
-	
+
+	public int getDelay() {
+		return delay;
+	}
+
+	public void setDelay(int delay) {
+		this.delay = delay;
+	}
 }

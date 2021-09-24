@@ -3,14 +3,20 @@ package fr.iban.bukkitcore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
+import fr.iban.bukkitcore.commands.teleport.*;
+import fr.iban.bukkitcore.listeners.*;
+import fr.iban.common.teleport.TeleportToLocation;
+import fr.iban.common.teleport.TeleportToPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.redisson.api.RMap;
+import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 
 import com.earth2me.essentials.Essentials;
@@ -22,20 +28,12 @@ import fr.iban.bukkitcore.commands.RecompensesCMD;
 import fr.iban.bukkitcore.commands.RessourceCMD;
 import fr.iban.bukkitcore.commands.ServeurCMD;
 import fr.iban.bukkitcore.commands.SurvieCMD;
-import fr.iban.bukkitcore.listeners.AsyncChatListener;
-import fr.iban.bukkitcore.listeners.CommandsListener;
-import fr.iban.bukkitcore.listeners.DeathListener;
-import fr.iban.bukkitcore.listeners.HeadDatabaseListener;
-import fr.iban.bukkitcore.listeners.InventoryListener;
-import fr.iban.bukkitcore.listeners.JoinQuitListeners;
-import fr.iban.bukkitcore.listeners.PlayerMoveListener;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.teleport.TeleportManager;
 import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
 import fr.iban.bukkitcore.teleport.TeleportToPlayerListener;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
-import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
@@ -90,7 +88,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         		new JoinQuitListeners(this),
         		new PlayerMoveListener(),
         		new DeathListener(this),
-        		new CommandsListener(this)
+        		new CommandsListener(this),
+				new AsyncTabCompleteListener(this)
         		);
         
         getCommand("serveur").setExecutor(new ServeurCMD());
@@ -103,13 +102,23 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         getCommand("recompenses").setTabCompleter(new RecompensesCMD());
         getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
 
-        setupEconomy();
+		getCommand("tp").setExecutor(new TpCMD(this));
+		getCommand("tpa").setExecutor(new TpaCMD(this));
+		getCommand("tpahere").setExecutor(new TpahereCMD(this));
+		getCommand("tpyes").setExecutor(new TpyesCMD(this));
+		getCommand("tpno").setExecutor(new TpnoCMD(this));
+		getCommand("tphere").setExecutor(new TphereCMD(this));
+
+
+		setupEconomy();
         
         PluginMessageHelper.registerChannels(this);
         
     	redisClient = RedisAccess.getInstance().getRedissonClient();
-        redisClient.getTopic("TeleportToPlayer").addListener(new TeleportToPlayerListener());
-        redisClient.getTopic("TeleportToLocation").addListener(new TeleportToLocationListener());
+		RTopic<TeleportToPlayer> teleportToPlayerRTopic = redisClient.getTopic("TeleportToPlayer");
+		teleportToPlayerRTopic.addListener(new TeleportToPlayerListener());
+		RTopic<TeleportToLocation> teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
+        teleportToLocationRTopic.addListener(new TeleportToLocationListener());
         
         if(!Bukkit.getOnlinePlayers().isEmpty()) {
         	for(Player player : Bukkit.getOnlinePlayers()) {
@@ -179,4 +188,17 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		return essentials;
 	}
 
+	public RMap<String, String> getProxyPlayers(){
+		return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
+	}
+
+	public CompletableFuture<UUID> getProxiedPlayerUUID(String name){
+		return CompletableFuture.supplyAsync(() -> {
+			String uuidString = getProxyPlayers().get(name);
+			if(uuidString == null){
+				return null;
+			}
+			return UUID.fromString(uuidString);
+		});
+	}
 }

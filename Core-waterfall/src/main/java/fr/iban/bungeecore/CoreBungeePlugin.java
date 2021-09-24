@@ -6,8 +6,15 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import fr.iban.bungeecore.teleport.*;
+import fr.iban.common.teleport.TeleportToLocation;
+import fr.iban.common.teleport.TeleportToPlayer;
+import fr.iban.common.teleport.TpRequest;
+import org.redisson.api.RMap;
+import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 
 import fr.iban.bungeecore.chat.ChatManager;
@@ -25,22 +32,12 @@ import fr.iban.bungeecore.commands.SocialSpyCMD;
 import fr.iban.bungeecore.commands.StaffChatToggle;
 import fr.iban.bungeecore.commands.SudoCMD;
 import fr.iban.bungeecore.commands.TabCompleteCMD;
-import fr.iban.bungeecore.commands.TpCMD;
-import fr.iban.bungeecore.commands.TpaCMD;
-import fr.iban.bungeecore.commands.TpahereCMD;
-import fr.iban.bungeecore.commands.TphereCMD;
-import fr.iban.bungeecore.commands.TpnoCMD;
 import fr.iban.bungeecore.commands.TptoggleCMD;
-import fr.iban.bungeecore.commands.TpyesCMD;
 import fr.iban.bungeecore.listeners.CommandListener;
 import fr.iban.bungeecore.listeners.PluginMessageListener;
 import fr.iban.bungeecore.listeners.ProxyJoinQuitListener;
 import fr.iban.bungeecore.listeners.ProxyPingListener;
 import fr.iban.bungeecore.runnables.SaveAccounts;
-import fr.iban.bungeecore.teleport.DeathLocationListener;
-import fr.iban.bungeecore.teleport.EventAnnounceListener;
-import fr.iban.bungeecore.teleport.TeleportManager;
-import fr.iban.bungeecore.teleport.TpToSLocListener;
 import fr.iban.bungeecore.utils.AnnoncesManager;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
@@ -120,12 +117,6 @@ public final class CoreBungeePlugin extends Plugin {
 				new SudoCMD("sudo", "spartacube.sudo"),
 				new SocialSpyCMD("socialspy", "spartacube.socialspy"),
 				new MsgToggleCMD("msgtoggle", "spartacube.msgtoggle"),
-				new TpCMD("tp", "spartacube.tp", teleportManager),
-				new TphereCMD("tphere", "spartacube.tp", "s", teleportManager),
-				new TpaCMD("tpa", "spartacube.tpa", teleportManager),
-				new TpahereCMD("tpahere", "spartacube.tpa", teleportManager),
-				new TpnoCMD("tpno", "spartacube.tpa", "tpdeny", teleportManager),
-				new TpyesCMD("tpyes", "spartacube.tpa", "tpaccept", teleportManager),
 				new BackCMD("back", "spartacube.back.death", teleportManager),
 				new JoinEventCMD("joinevent", this),
 				new TabCompleteCMD("baddtabcomplete", "spartacube.addtabcomplete", this),
@@ -137,7 +128,13 @@ public final class CoreBungeePlugin extends Plugin {
 		RedissonClient redisClient = RedisAccess.getInstance().getRedissonClient();
 		redisClient.getTopic("DeathLocation").addListener(new DeathLocationListener(this));
         redisClient.getTopic("EventAnnounce").addListener(new EventAnnounceListener(this));
-        redisClient.getTopic("TeleportToSLoc").addListener(new TpToSLocListener(this));
+		redisClient.getTopic("TeleportToSLoc");
+		RTopic<TeleportToLocation> tpToSlocTopic = redisClient.getTopic("TpToSLoc");
+        tpToSlocTopic.addListener(new TpToSLocListener(this));
+		RTopic<TeleportToPlayer> tpToPlayerTopic = redisClient.getTopic("TpToPlayer");
+		tpToPlayerTopic.addListener(new TpToPlayerListener(this));
+		RTopic<TpRequest> tpRequestTopic = redisClient.getTopic("TpRequest");
+		tpRequestTopic.addListener(new TpRequestListener(this));
 
 	}
 
@@ -219,5 +216,9 @@ public final class CoreBungeePlugin extends Plugin {
 	
 	public Map<String, SLocation> getCurrentEvents() {
 		return currentEvents;
+	}
+
+	public RMap<String, UUID> getProxyPlayer(){
+		return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
 	}
 }

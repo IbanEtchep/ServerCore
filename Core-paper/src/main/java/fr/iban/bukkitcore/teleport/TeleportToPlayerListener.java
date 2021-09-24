@@ -8,12 +8,10 @@ import org.redisson.api.listener.MessageListener;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.common.teleport.TeleportToPlayer;
 
-public class TeleportToPlayerListener implements MessageListener<Object> {
+public class TeleportToPlayerListener implements MessageListener<TeleportToPlayer> {
 
 	@Override
-	public void onMessage(String channel, Object msg) {
-		if(msg instanceof TeleportToPlayer) {
-			TeleportToPlayer ttp = (TeleportToPlayer)msg;
+	public void onMessage(String channel, TeleportToPlayer ttp) {
 			Player target = Bukkit.getPlayer(ttp.getTargetId());
 
 			if(target == null) {
@@ -40,7 +38,6 @@ public class TeleportToPlayerListener implements MessageListener<Object> {
 					
 				}
 			}.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
-		}
 	}
 
 	private void tp(Player player, Player target) {

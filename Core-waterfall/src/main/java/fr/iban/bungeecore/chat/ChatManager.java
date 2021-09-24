@@ -15,6 +15,7 @@ import net.luckperms.api.model.user.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -74,6 +75,8 @@ public class ChatManager {
 				if(!account2.getIgnoredPlayers().contains(player.getUniqueId())){
 					p.sendMessage(TextComponent.fromLegacyText(pmessage));
 				}
+				
+				new ComponentBuilder().append(TextComponent.fromLegacyText(pmessage)).create();
 			}
 			
 			//Envoi du message à la console

@@ -32,6 +32,10 @@ tabcomplete:
     - discord
     - repair
     - ec
+    - tpa
+    - tpyes
+    - tpno
+    - tpahere
   moderation:
     - mod
     - ban
@@ -39,3 +43,5 @@ tabcomplete:
     - mute
     - tempmute
     - kick
+    - s
+    - tp

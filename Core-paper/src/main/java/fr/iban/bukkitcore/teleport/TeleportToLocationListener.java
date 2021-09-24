@@ -10,13 +10,10 @@ import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.common.teleport.SLocation;
 import fr.iban.common.teleport.TeleportToLocation;
 
-public class TeleportToLocationListener implements MessageListener<Object> {
+public class TeleportToLocationListener implements MessageListener<TeleportToLocation> {
 
 	@Override
-	public void onMessage(String channel, Object msg) {
-		if(msg instanceof TeleportToLocation) {
-			TeleportToLocation ttl = (TeleportToLocation)msg;
-
+	public void onMessage(String channel, TeleportToLocation ttl) {
 			if(!ttl.getLocation().getServer().equals(CoreBukkitPlugin.getInstance().getServerName())) {
 				return;
 			}
@@ -46,7 +43,6 @@ public class TeleportToLocationListener implements MessageListener<Object> {
 
 				}
 			}.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
-		}
 	}
 
 

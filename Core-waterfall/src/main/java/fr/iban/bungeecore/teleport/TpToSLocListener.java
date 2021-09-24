@@ -6,7 +6,7 @@ import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.common.teleport.TeleportToLocation;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-public class TpToSLocListener implements MessageListener<Object> {
+public class TpToSLocListener implements MessageListener<TeleportToLocation> {
 
 	private CoreBungeePlugin plugin;
 
@@ -15,19 +15,15 @@ public class TpToSLocListener implements MessageListener<Object> {
 	}
 
 	@Override
-	public void onMessage(String channel, Object msg) {
-		if(msg instanceof TeleportToLocation) {
-			TeleportToLocation ttl = (TeleportToLocation)msg;
-			ProxiedPlayer player = plugin.getProxy().getPlayer(ttl.getUuid());
-			
-			if(player != null) {
-				if(ttl.getDelay() == 0) {
-					plugin.getTeleportManager().teleport(player, ttl.getLocation());
-				}else {
-					plugin.getTeleportManager().delayedTeleport(player, ttl.getLocation(), Math.abs(ttl.getDelay()));
-				}
+	public void onMessage(String channel, TeleportToLocation ttl) {
+		ProxiedPlayer player = plugin.getProxy().getPlayer(ttl.getUuid());
+
+		if(player != null) {
+			if(ttl.getDelay() == 0) {
+				plugin.getTeleportManager().teleport(player, ttl.getLocation());
+			}else {
+				plugin.getTeleportManager().delayedTeleport(player, ttl.getLocation(), Math.abs(ttl.getDelay()));
 			}
 		}
 	}
-
 }

@@ -15,3 +15,15 @@ commands:
   options:
   recompenses:
   addtabcomplete:
+  tp:
+  tpa:
+  tpno:
+    aliases:
+      - tpdeny
+  tpyes:
+    aliases:
+      - tpaccept
+  tphere:
+    aliases:
+      - s
+  tpahere:

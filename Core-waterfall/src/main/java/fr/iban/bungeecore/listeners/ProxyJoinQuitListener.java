@@ -80,6 +80,7 @@ public class ProxyJoinQuitListener implements Listener {
 				ProxyServer.getInstance().getPlayers().forEach( p -> p.sendMessage(welcomponent));
 				ProxyServer.getInstance().getLogger().info("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !");
 			}
+			RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers").fastPut(player.getName(), player.getUniqueId().toString());
 		});
 
 	}
@@ -134,7 +135,8 @@ public class ProxyJoinQuitListener implements Listener {
 			account.setLastSeen(System.currentTimeMillis());
 			accountProvider.sendAccountToDB(account);
 			accountProvider.removeAccountFromRedis();
-			RedisAccess.getInstance().getRedissonClient().getMap("PendingTeleports").fastRemove(player.getUniqueId());
+			RedisAccess.getInstance().getRedissonClient().getMap("PendingTeleports").fastRemove(player.getUniqueId().toString());
+			RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers").fastRemove(player.getName());
 		});
 	}
 

@@ -5,15 +5,13 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import fr.iban.common.teleport.*;
 import org.redisson.api.RList;
 import org.redisson.api.RedissonClient;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.utils.ChatUtils;
 import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.teleport.SLocation;
-import fr.iban.common.teleport.TeleportToLocation;
-import fr.iban.common.teleport.TeleportToPlayer;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -74,6 +72,11 @@ public class TeleportManager {
 		ProxyServer proxy = instance.getProxy();
 		ServerInfo targetServer = target.getServer().getInfo();
 
+		if(target == null){
+			player.sendMessage(TextComponent.fromLegacyText("§cLe joueur auquel vous souhaitez vous téléporter n'est pas en ligne."));
+			return;
+		}
+
 		if(targetServer.getName().equals(player.getServer().getInfo().getName())) {
 			redis.getTopic("TeleportToPlayer").publish(new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
 		}else {
@@ -91,7 +94,7 @@ public class TeleportManager {
 		if(isTeleportWaiting(player)) {
 			player.sendMessage(TextComponent.fromLegacyText("§cUne seule téléportation à la fois !"));
 			return;
-		}		
+		}
 
 		redis.getMap("PendingTeleports").fastPut(player.getUniqueId(), Boolean.TRUE);
 
@@ -120,7 +123,7 @@ public class TeleportManager {
 			getTpRequests(to).remove(req);
 		}
 		
-		redis.getListMultimap("TeleportRequests").put(to.getUniqueId(), new TpRequest(from.getUniqueId(), RequestType.TP));
+		redis.getListMultimap("TeleportRequests").put(to.getUniqueId(), new TpRequest(from.getUniqueId(), to.getUniqueId(), RequestType.TP));
 		
 		instance.getProxy().getScheduler().schedule(instance, () ->{
 			TpRequest req2 = getTpRequestFrom(from, to);
@@ -149,7 +152,7 @@ public class TeleportManager {
 			getTpRequests(to).remove(req);
 		}
 		
-		redis.getListMultimap("TeleportRequests").put(to.getUniqueId(), new TpRequest(from.getUniqueId(), RequestType.TPHERE));
+		redis.getListMultimap("TeleportRequests").put(to.getUniqueId(), new TpRequest(from.getUniqueId(), to.getUniqueId(), RequestType.TPHERE));
 		
 		instance.getProxy().getScheduler().schedule(instance, () ->{
 			TpRequest req2 = getTpRequestFrom(to, from);
@@ -171,7 +174,7 @@ public class TeleportManager {
 	public TpRequest getTpRequestFrom(ProxiedPlayer player, ProxiedPlayer from) {
 		for (Object object : getTpRequests(player)) {
 			TpRequest request = (TpRequest)object;
-			if(request.getPlayerID().equals(from.getUniqueId())) {
+			if(request.getPlayerFrom().equals(from.getUniqueId())) {
 				return request;
 			}
 		}

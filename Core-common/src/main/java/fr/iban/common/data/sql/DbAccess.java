@@ -14,7 +14,7 @@ public class DbAccess {
 		hikariConfig.setJdbcUrl(credentials.toURI());
 		hikariConfig.setUsername(credentials.getUser());
 		hikariConfig.setPassword(credentials.getPass());
-		hikariConfig.setMaximumPoolSize(10);
+		hikariConfig.setMaximumPoolSize(5);
 		hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
 		hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
 		hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
