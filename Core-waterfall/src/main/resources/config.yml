@@ -11,6 +11,9 @@ database:
   dbname: dbname
   password: password
 
+motd: "&2&lPrimal&a&lCraft &8&l> &f&lServeur survie 1.17.1&r\n&7Claims &8● &7Shops &8● &7Shops joueurs &8●&7 Métiers &8● &7Warps joueurs"
+chat-format: "%premium% %lp_suffix% %lp_prefix% %player% %lp_suffix% ➤"
+
 tabcomplete:
   global:
     - sethome

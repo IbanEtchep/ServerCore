@@ -1,16 +1,15 @@
 package fr.iban.survivalcore.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import fr.iban.bukkitcore.utils.ChatUtils;
+import fr.iban.survivalcore.SurvivalCorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import fr.iban.survivalcore.SurvivalCorePlugin;
-import fr.iban.survivalcore.utils.ChatUtils;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ActionBarCMD implements CommandExecutor {
 	

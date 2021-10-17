@@ -1,5 +1,7 @@
 package fr.iban.bungeecore.utils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,12 +19,8 @@ public enum HexColor {
 	FLAT_LIGHT_RED("#ff7675"),
 	FLAT_RED("#d63031"),
 	FLAT_PINK("#e84393"),
-	GOLD("#f9d186"),
-	GOLD_FLAT("#e19506"),
-	LIGHT_RED("#ff5353"),
 	FLAT_GREEN("#00b894"),
 	FLAT_LIGHT_GREEN("#55efc4"),
-	GRAY("#5c575a"),
 	FLAT_BLUE2("#3742fa");
 
 	private String hex;
@@ -31,6 +29,7 @@ public enum HexColor {
 	private HexColor(String hex) {
 		this.hex = hex;
 	}
+
 
 	public String getHex() {
 		return hex;
@@ -41,7 +40,7 @@ public enum HexColor {
 	}
 
 
-	public static String translateHexColorCodes(String startTag, String endTag, String message)
+	public static String translateColorCodes(String startTag, String endTag, String message)
 	{
 		final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
 		Matcher matcher = hexPattern.matcher(message);
@@ -53,9 +52,23 @@ public enum HexColor {
 					+ COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
 					+ COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
 					+ COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
-					);
+			);
 		}
-		return matcher.appendTail(buffer).toString();
+		return ChatColor.translateAlternateColorCodes('&', matcher.appendTail(buffer).toString());
+	}
+
+	public static String translateColorCodes(String message)
+	{
+		return translateColorCodes("#", "", message);
+	}
+
+	public static List<String> translateColorCodes(List<String> message)
+	{
+		List<String> translated = new ArrayList<>();
+		for(String msg : message) {
+			translated.add(translateColorCodes(msg));
+		}
+		return translated;
 	}
 
 

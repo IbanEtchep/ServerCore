@@ -24,7 +24,7 @@ public class DbTables {
 					"  name        varchar(16)  not null," +
 					"  date_created timestamp default now()," +
 					"  lastseen       bigint DEFAULT 0," +
-					"  maxclaims smallint DEFAULT 1," +
+					"  maxclaims smallint DEFAULT 5," +
 					"  CONSTRAINT  UC_sc_players" +
 					"  UNIQUE (id)," +
 					"  CONSTRAINT UC_sc_players_uuid" +

@@ -10,6 +10,12 @@ database:
   user: user
   dbname: dbname
   password: password
+
+messages:
+  site: "url du site"
+  vote: "url pour voter"
+  discord: "url du discord"
+  grades: "url des info sur les grades"
   
 tabcomplete:
   global:

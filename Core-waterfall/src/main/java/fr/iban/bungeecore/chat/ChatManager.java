@@ -36,7 +36,7 @@ public class ChatManager {
 			String msg = message;
 
 			if(player.hasPermission("spartacube.colors")) {
-				msg = translateColors(HexColor.translateHexColorCodes("#", "", msg));
+				msg = HexColor.translateColorCodes(msg);
 			}
 
 			//vérif si le message est un message staff
@@ -52,14 +52,21 @@ public class ChatManager {
 			AccountProvider ap = new AccountProvider(uuid);
 			Account account = ap.getAccount();
 
+			String prefix =  plugin.getConfiguration().getString("chat-format");
+			prefix = prefix.replace("%player%", player.getName());
+			prefix = prefix.replace("%lp_prefix%", getPrefix(player));
+			prefix = prefix.replace("%lp_suffix%", getSuffix(player));
+			prefix = prefix.replace("%premium%", getPremiumString(player));
+			prefix = HexColor.translateColorCodes(prefix);
+
+			msg = prefix+msg;
+
 			if(!account.getOption(Option.TCHAT)) {
 				player.sendMessage(TextComponent.fromLegacyText("§cVous ne pouvez pas envoyer ce message car votre tchat est désactivé"));
-				ProxyServer.getInstance().getLogger().info(translateColors(HexColor.translateHexColorCodes("#", "", "§8[§CDÉSACTIVÉ§8]§r " + getSuffix(player) + getPrefix(player)+ " " + player.getName() + getSuffix(player) + " ➤ §r")) + msg);
+				ProxyServer.getInstance().getLogger().info(translateColors(HexColor.translateColorCodes("§8[§CDÉSACTIVÉ§8]§r " + msg)));
 				return;
 			}
 
-			msg = translateColors(HexColor.translateHexColorCodes("#", "", getSuffix(player) + getPrefix(player)+ " " + player.getName() + getSuffix(player) + " ➤ §r")) + msg;
-			
 			//Envoi du message à chaque joueur
 			for (ProxiedPlayer p: ProxyServer.getInstance().getPlayers()) {
 				String pmessage = msg;
@@ -75,10 +82,10 @@ public class ChatManager {
 				if(!account2.getIgnoredPlayers().contains(player.getUniqueId())){
 					p.sendMessage(TextComponent.fromLegacyText(pmessage));
 				}
-				
+
 				new ComponentBuilder().append(TextComponent.fromLegacyText(pmessage)).create();
 			}
-			
+
 			//Envoi du message à la console
 			ProxyServer.getInstance().getLogger().info(msg);
 
@@ -94,7 +101,7 @@ public class ChatManager {
 			return;
 		}
 
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(translateColors(HexColor.translateHexColorCodes("#", "", "#f07e71§lAnnonce de #fbb29e§l"+ player.getName() + " #f07e71➤ #7bc8fe§l" + message))));
+		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(HexColor.translateColorCodes("#f07e71§lAnnonce de #fbb29e§l"+ player.getName() + " #f07e71➤ #7bc8fe§l" + message)));
 	}
 
 	public void sendRankup(UUID uuid, String group) {
@@ -119,13 +126,13 @@ public class ChatManager {
 
 	private void sendStaffMessage(ProxiedPlayer sender, String message) {
 		ProxyServer.getInstance().getPlayers().forEach( p -> {
-			if(p.hasPermission("spartacube.staffchat")) { 
+			if(p.hasPermission("spartacube.staffchat")) {
 				if (!StaffChatToggle.sc.contains(p)) {
-					p.sendMessage(TextComponent.fromLegacyText(translateColors(HexColor.translateHexColorCodes("#", "" , "§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getName() + " §8§l➤ " + getSuffix(sender) + "§l" + message))));
+					p.sendMessage(TextComponent.fromLegacyText(HexColor.translateColorCodes("§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getName() + " §8§l➤ " + getSuffix(sender) + "§l" + message)));
 				}
 			}
 		});
-		ProxyServer.getInstance().getLogger().info(translateColors(HexColor.translateHexColorCodes("#", "" , "§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getName() + " §8§l➤ " + getSuffix(sender) + "§l" + message)));
+		ProxyServer.getInstance().getLogger().info(HexColor.translateColorCodes("§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getName() + " §8§l➤ " + getSuffix(sender) + "§l" + message));
 	}
 
 	public void toggleChat(CommandSender sender) {
@@ -145,7 +152,7 @@ public class ChatManager {
 
 	private User loadUser(ProxiedPlayer player) {
 		if (!player.isConnected())
-			throw new IllegalStateException("Player is offline!"); 
+			throw new IllegalStateException("Player is offline!");
 		return luckapi.getUserManager().getUser(player.getUniqueId());
 	}
 
@@ -161,6 +168,14 @@ public class ChatManager {
 	private String getSuffix(ProxiedPlayer player) {
 		String suffix = playerMeta(player).getSuffix();
 		return (suffix != null) ? suffix : "";
+	}
+
+	private String getPremiumString(ProxiedPlayer player){
+		if(player.hasPermission("premium")){
+			return "✮ ";
+		}else{
+			return "";
+		}
 	}
 
 }

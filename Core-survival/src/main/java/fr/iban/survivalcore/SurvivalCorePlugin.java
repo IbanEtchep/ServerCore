@@ -1,13 +1,11 @@
 package fr.iban.survivalcore;
 
+import com.earth2me.essentials.Essentials;
+import fr.iban.bukkitcore.utils.PluginMessageHelper;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.earth2me.essentials.Essentials;
-
-import fr.iban.survivalcore.utils.PluginMessageHelper;
-import net.milkbowl.vault.economy.Economy;
 
 public final class SurvivalCorePlugin extends JavaPlugin {
 

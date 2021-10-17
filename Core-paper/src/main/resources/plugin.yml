@@ -7,6 +7,10 @@ depend: [Vault]
 softdepend: [Essentials]
 
 commands:
+  site:
+  discord:
+  vote:
+  grades:
   serveur:
   survie:
   ressource:

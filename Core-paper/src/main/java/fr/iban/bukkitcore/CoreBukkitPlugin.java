@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
 import fr.iban.common.teleport.TeleportToLocation;
@@ -21,13 +22,6 @@ import org.redisson.api.RedissonClient;
 
 import com.earth2me.essentials.Essentials;
 
-import fr.iban.bukkitcore.commands.AddTabCompleteCMD;
-import fr.iban.bukkitcore.commands.AnnonceCMD;
-import fr.iban.bukkitcore.commands.OptionsCMD;
-import fr.iban.bukkitcore.commands.RecompensesCMD;
-import fr.iban.bukkitcore.commands.RessourceCMD;
-import fr.iban.bukkitcore.commands.ServeurCMD;
-import fr.iban.bukkitcore.commands.SurvieCMD;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.teleport.TeleportManager;
 import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
@@ -101,6 +95,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         getCommand("recompenses").setExecutor(new RecompensesCMD());
         getCommand("recompenses").setTabCompleter(new RecompensesCMD());
         getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
+		getCommand("site").setExecutor(new SimpleCommands(this));
+		getCommand("discord").setExecutor(new SimpleCommands(this));
+		getCommand("vote").setExecutor(new SimpleCommands(this));
 
 		getCommand("tp").setExecutor(new TpCMD(this));
 		getCommand("tpa").setExecutor(new TpaCMD(this));

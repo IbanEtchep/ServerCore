@@ -99,7 +99,7 @@ public final class CoreBungeePlugin extends Plugin {
 		
 		registerEvents(
 				new ProxyJoinQuitListener(this),
-				new ProxyPingListener(),
+				new ProxyPingListener(this),
 				new PluginMessageListener(),
 				new CommandListener(this)
 				);
@@ -143,7 +143,6 @@ public final class CoreBungeePlugin extends Plugin {
 		new SaveAccounts().run();
 		RedisAccess.close();
 		DbAccess.closePool();
-		saveConfig();
 		getProxy().unregisterChannel("proxy:chat");
 		getProxy().unregisterChannel("proxy:annonce");
 		getProxy().unregisterChannel("proxy:send");

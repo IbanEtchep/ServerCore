@@ -13,14 +13,8 @@ commands:
   vote:
   map:
   abbc:
-  tutoriel:
-    aliases: [tuto]
   stoptuto:
-  boutique:
-  level:
-    aliases: [niveau]
   addhomes:
-  pvp:
   grades:
   boost:
   feed:
@@ -28,5 +22,3 @@ commands:
   givetools:
   dolphin:
     aliases: [dophin]
-  classement:
-    aliases: [toplevels]

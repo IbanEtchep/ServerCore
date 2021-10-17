@@ -43,7 +43,7 @@ public class MessageCMD extends Command implements TabExecutor {
 					ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
 						String message = msg;
 						if(player.hasPermission("spartacube.colors")) {
-							message = translateColors(HexColor.translateHexColorCodes("#", "", message));
+							message = HexColor.translateColorCodes(message);
 						}
 						Account account = new AccountProvider(target.getUniqueId()).getAccount();
 						if (account.getOption(Option.MSG) || player.hasPermission("spartacube.msgtogglebypass")) {

@@ -18,7 +18,7 @@ public class Account {
 
 	private UUID uuid;
 	private String name;
-	private short maxClaims = 1;
+	private short maxClaims = 5;
 	private long lastSeen = 0;
 	private boolean bypass = false;
 	private Set<Integer> blackListedAnnounces = new HashSet<>();
