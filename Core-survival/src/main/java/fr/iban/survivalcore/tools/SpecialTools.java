@@ -81,7 +81,7 @@ public class SpecialTools {
 		ItemStack hades = new ItemStack(Material.NETHERITE_HOE);
 
 		ItemMeta cus = hades.getItemMeta();
-		cus.setDisplayName("§e§lHoue de Déméter");
+		cus.setDisplayName("§e§lHoue du fermier");
 		cus.setLore(Arrays.asList("§e§l-------------","§e§lCette houe permet de replanter","§e§lautomatiquement vos récoltes.","§e§l-------------","§c§l[ITEM LEGENDAIRE]"));
 		hades.setItemMeta(cus);
 		return hades;	
@@ -90,8 +90,8 @@ public class SpecialTools {
 	public static ItemStack getXpSword() {
 		ItemStack xpsword = new ItemStack(Material.NETHERITE_SWORD);
 		ItemMeta cus = xpsword.getItemMeta();
-		cus.setDisplayName("§e§lEpée d'Héphaïstos");
-		cus.setLore(Arrays.asList("§e§l-------------","§e§lCette épée, forgée par Héphaïstos en personne","§e§lpermet de récolter §c§l50%§e§l d'XP supplémentaire.","§e§l-------------","§c§l[ITEM LEGENDAIRE]"));
+		cus.setDisplayName("§e§lEpée magique");
+		cus.setLore(Arrays.asList("§e§l-------------","§e§lCette épée permet de récolter","§e§l§c§l50%§e§l d'XP supplémentaire !","§e§l-------------","§c§l[ITEM LEGENDAIRE]"));
 		xpsword.setItemMeta(cus);
 		return xpsword;	
 	}

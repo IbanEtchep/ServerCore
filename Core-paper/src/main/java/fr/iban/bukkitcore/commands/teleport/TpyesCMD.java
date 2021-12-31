@@ -53,9 +53,9 @@ public class TpyesCMD implements CommandExecutor {
             }else if(args.length == 0 && !teleportManager.getTpRequests(player).isEmpty()) {
                 TpRequest request = (TpRequest)teleportManager.getTpRequests(player).get(teleportManager.getTpRequests(player).size() - 1);
                 if(request.getRequestType() == RequestType.TP) {
-                    teleportManager.teleport(request.getPlayerTo(), request.getPlayerFrom(), 3);
-                }else if(request.getRequestType() == RequestType.TPHERE) {
                     teleportManager.teleport(request.getPlayerFrom(), request.getPlayerTo(), 3);
+                }else if(request.getRequestType() == RequestType.TPHERE) {
+                    teleportManager.teleport(request.getPlayerTo(), request.getPlayerFrom(), 3);
                 }
                 player.sendMessage("§aDemande de téléportation acceptée.");
                 teleportManager.getTpRequests(player).remove(request);

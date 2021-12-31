@@ -9,18 +9,32 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 
 import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
 import fr.iban.survivalcore.SurvivalCorePlugin;
+import org.bukkit.inventory.ItemStack;
 
 public class EntityDeathListener implements Listener {
 
+//	@EventHandler
+//	public void onEntityDeath(EntityDeathEvent e){
+//		if(e.getEntityType() == EntityType.IRON_GOLEM && e.getEntity().fromMobSpawner()){
+//			e.getDrops().clear();
+//			for (int i = 0; i < e.getDrops().size(); i++) {
+//				ItemStack itemStack = e.getDrops().get(i);
+//				if(itemStack.getType() == Material.IRON_INGOT){
+//					e.getDrops().remove(i);
+//					e.getDrops().add(new ItemStack(Material.IRON_INGOT, 1));
+//				}
+//			}
+//		}
+//	}
 
 	@EventHandler
 	public void onPlayerDeath(PlayerDeathEvent e) {
-		// ☠ 
 		e.deathMessage(null);
 		Player killer = e.getEntity().getKiller();
 		Player player = e.getEntity();
@@ -62,7 +76,7 @@ public class EntityDeathListener implements Listener {
 			if (killer != null)
 				message += "s'est fait sniper par " + killer.getName() + " !";
 			else
-				message += "s'est prit une flêche dans le crâne.";
+				message += "s'est pris une flèche dans le crâne.";
 			break;
 		case STARVATION:
 			message += "est mort de faim.";
@@ -71,7 +85,7 @@ public class EntityDeathListener implements Listener {
 			message += "a suffoqué dans un mur.";
 			break;
 		case VOID:
-			message += "a disparru dans le néant...";
+			message += "a disparu dans le néant...";
 			break;
 		case FALL:
 			message += "a fait une terrible chute !";

@@ -2,10 +2,17 @@ package fr.iban.survivalcore;
 
 import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
+import fr.iban.survivalcore.commands.*;
+import fr.iban.survivalcore.listeners.*;
+import fr.iban.survivalcore.utils.HourlyReward;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.UUID;
 
 public final class SurvivalCorePlugin extends JavaPlugin {
 
@@ -13,29 +20,43 @@ public final class SurvivalCorePlugin extends JavaPlugin {
 	 * Classe principale du plugin.
 	 */
 	private static SurvivalCorePlugin instance;
-		
+
+	private HourlyReward hourlyReward;
 	public static Essentials ess = (Essentials) Bukkit.getServer().getPluginManager().getPlugin("Essentials");
-    private static Economy econ = null;
-
-
-	private Registrar registrar;
+    private Economy econ = null;
 
 	@Override
 	public void onEnable() {
 		instance = this;
         PluginMessageHelper.registerChannels(this);
-
 		
 		saveDefaultConfig();
-		this.registrar = new Registrar(this);
-		
-        //Vault setup
-        if (!setupEconomy() ) {
-            getLogger().severe(String.format("[%s] - Disabled due to no Vault dependency found!", getDescription().getName()));
-            getServer().getPluginManager().disablePlugin(this);
-            return;
-        }
+        setupEconomy();
 
+		registerEvent(new ServerListPingListener());
+		registerEvent(new InventoryListener());
+		registerEvent(new PlayerFishListener());
+		registerEvent(new EntityDeathListener());
+		registerEvent(new CommandListener());
+		registerEvent(new VillagerEvents());
+		registerEvent(new RaidTriggerListener());
+		registerEvent(new PortalListeners());
+		registerEvent(new PlaceBreakListeners());
+		registerEvent(new DamageListeners());
+		registerEvent(new InteractListeners(this));
+		registerEvent(new PrepareResultListener());
+
+		getCommand("addhomes").setExecutor(new HomesManageCMD());
+		getCommand("dolphin").setExecutor(new DolphinCMD());
+		getCommand("feed").setExecutor(new FeedCMD());
+		getCommand("givetools").setExecutor(new GiveSpecialToolsCMD());
+		getCommand("repair").setExecutor(new RepairCMD());
+		getCommand("annonce").setExecutor(new AnnonceCMD(this));
+		getCommand("pvp").setExecutor(new PvPCMD());
+		getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());
+
+		this.hourlyReward = new HourlyReward(this);
+		this.hourlyReward.startTask();
 	}
 	
 	@Override
@@ -46,11 +67,7 @@ public final class SurvivalCorePlugin extends JavaPlugin {
 		return instance;
 	}
 
-	public Registrar getRegistrar() {
-		return registrar;
-	}
-	
-    public static Economy getEconomy() {
+    public Economy getEconomy() {
         return econ;
     }
 	
@@ -65,5 +82,10 @@ public final class SurvivalCorePlugin extends JavaPlugin {
         econ = rsp.getProvider();
         return econ != null;
     }
+
+	private void registerEvent(Listener listener) {
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(listener, this);
+	}
 
 }

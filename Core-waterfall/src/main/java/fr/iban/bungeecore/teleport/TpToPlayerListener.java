@@ -16,10 +16,9 @@ public class TpToPlayerListener implements MessageListener<TeleportToPlayer> {
 
 	@Override
 	public void onMessage(String channel, TeleportToPlayer ttp) {
-		plugin.getLogger().info("TpToPlayer");
 		ProxiedPlayer player = plugin.getProxy().getPlayer(ttp.getUuid());
 		if(player != null) {
-			if(ttp.getDelay() == 0) {
+			if(ttp.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
 				plugin.getTeleportManager().teleport(player, plugin.getProxy().getPlayer(ttp.getTargetId()));
 			}else {
 				plugin.getTeleportManager().delayedTeleport(player, plugin.getProxy().getPlayer(ttp.getTargetId()), Math.abs(ttp.getDelay()));

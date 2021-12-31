@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import net.md_5.bungee.api.event.ServerConnectedEvent;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
@@ -49,12 +51,17 @@ public class ProxyJoinQuitListener implements Listener {
 		this.plugin = plugin;
 	}
 
+
 	@SuppressWarnings("deprecation")
 	@EventHandler
 	public void onProxyJoin(PostLoginEvent e) {
 		ProxiedPlayer player = e.getPlayer();
 		UUID uuid = player.getUniqueId();
-		ProxyServer.getInstance().getScheduler().runAsync(plugin, () -> {
+		ProxyServer proxy = ProxyServer.getInstance();
+		if(player.hasPermission("premium")){
+			proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player "+player.getName()+" tabsuffix #feca57 ✮");
+		}
+		proxy.getScheduler().runAsync(plugin, () -> {
 			AccountProvider accountProvider = new AccountProvider(uuid);
 			Account account = accountProvider.getAccount();
 			account.setName(player.getName());
@@ -80,9 +87,14 @@ public class ProxyJoinQuitListener implements Listener {
 				ProxyServer.getInstance().getPlayers().forEach( p -> p.sendMessage(welcomponent));
 				ProxyServer.getInstance().getLogger().info("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !");
 			}
-			RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers").fastPut(player.getName(), player.getUniqueId().toString());
 		});
 
+	}
+
+	@EventHandler
+	public void onServerConnect(ServerConnectedEvent e){
+		ProxiedPlayer player = e.getPlayer();
+		RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers").fastPut(player.getName(), player.getUniqueId().toString());
 	}
 
 	//	@EventHandler
@@ -117,6 +129,10 @@ public class ProxyJoinQuitListener implements Listener {
 	@EventHandler
 	public void onDisconnect(PlayerDisconnectEvent e) {
 		ProxiedPlayer player = e.getPlayer();
+
+		ProxyServer proxy = ProxyServer.getInstance();
+		proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player "+player.getName()+" remove");
+
 		ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
 			AccountProvider accountProvider = new AccountProvider(player.getUniqueId());
 			Account account = accountProvider.getAccount();

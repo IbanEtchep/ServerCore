@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Villager;
@@ -29,13 +30,16 @@ public class VillagerEvents implements Listener {
 
 		Iterator<MerchantRecipe> recipeIterator = recipes.iterator();
 		while(recipeIterator.hasNext()) {
+
 			MerchantRecipe recipe = recipeIterator.next();
+
 			if (recipe.getResult().getType().equals(Material.ENCHANTED_BOOK)) {
 				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) recipe.getResult().getItemMeta();
 
 				if (meta.hasStoredEnchant(Enchantment.MENDING)) {
 					recipe.setMaxUses(1);
-					recipe.setIngredients(Arrays.asList(new ItemStack(Material.EMERALD, 64)));
+					recipe.setIngredients(Arrays.asList(new ItemStack(Material.DIAMOND, 64)));
+					recipe.adjust(new ItemStack(Material.DIAMOND, 64));
 				}
 			}
 		}

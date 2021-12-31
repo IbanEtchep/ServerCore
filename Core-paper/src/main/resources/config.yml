@@ -16,7 +16,10 @@ messages:
   vote: "url pour voter"
   discord: "url du discord"
   grades: "url des info sur les grades"
-  
+
+servername: "Survie"
+ressources-servername: "ressources"
+
 tabcomplete:
   global:
     - sethome

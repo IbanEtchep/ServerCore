@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.utils;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
@@ -9,6 +10,8 @@ import com.google.common.io.ByteStreams;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.listeners.PluginMessageReceivedListener;
+
+import java.util.Optional;
 
 public class PluginMessageHelper {
 	
@@ -71,5 +74,16 @@ public class PluginMessageHelper {
         ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF("GetServer");
         player.sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
+	}
+
+	public static void broadcastMessage(String message){
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("Message");
+		out.writeUTF("ALL");
+		out.writeUTF(message);
+		Optional<Player> optionalPlayer = (Optional<Player>) Bukkit.getOnlinePlayers().stream().findFirst();
+		if(optionalPlayer.isPresent()){
+			optionalPlayer.get().sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
+		}
 	}
 }

@@ -10,38 +10,48 @@ database:
   user: user
   dbname: dbname
   password: password
+  tables-prefix: 'sc'
 
-motd: "&2&lPrimal&a&lCraft &8&l> &f&lServeur survie 1.17.1&r\n&7Claims &8● &7Shops &8● &7Shops joueurs &8●&7 Métiers &8● &7Warps joueurs"
-chat-format: "%premium% %lp_suffix% %lp_prefix% %player% %lp_suffix% ➤"
+motd:
+  - "motd"
+chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'
+ping-color: '#fdcb6e'
 
 tabcomplete:
   global:
-    - sethome
-    - delhome
-    - spawn
-    - warp
-    - warps
-    - lands
-    - land
-    - classement
-    - niveau
-    - level
-    - kit
-    - kits
-    - vote
-    - map
-    - boutique
-    - site
-    - discord
-    - repair
-    - ec
-    - tptoggle
-    - ignore
-    - ignorelist
+    - tpa
+    - tpahere
+    - tpyes
+    - tpaccept
+    - back
+    - msg
+    - r
+    - reply
+    - oab
+    - find
   moderation:
-    - mod
+    - tpa
+    - tpahere
+    - tpyes
+    - tpaccept
+    - back
+    - msg
+    - r
+    - reply
+    - oab
+    - tphere
     - ban
     - tempban
-    - mute
     - tempmute
+    - history
+    - warn
+    - tempwarn
+    - unban
+    - unmute
+    - tp
+    - s
+    - server
+    - sctoggle
     - kick
+    - announceevent
+    - chat

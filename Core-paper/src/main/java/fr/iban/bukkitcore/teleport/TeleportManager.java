@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.teleport;
 
+import com.earth2me.essentials.User;
 import fr.iban.bukkitcore.utils.ChatUtils;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.teleport.*;
@@ -68,18 +69,21 @@ public class TeleportManager {
 	 */
 	public void teleport(UUID uuid, UUID target, int delay) {
 		setLastLocation(uuid);
-		if (delay <= 0 || Bukkit.getPlayer(uuid).hasPermission("bungeeteleport.instant")) {
+		if (delay <= 0) {
 			plugin.getRedisClient().getTopic("TpToPlayer").publish(new TeleportToPlayer(uuid, target));
 		} else {
 			plugin.getRedisClient().getTopic("TpToPlayer").publish(new TeleportToPlayer(uuid, target, delay));
 		}
 	}
 
-	private void setLastLocation(UUID player){
+	private void setLastLocation(UUID uuid){
 		Essentials essentials = plugin.getEssentials();
 
 		if (essentials != null) {
-			essentials.getUser(player).setLastLocation();
+			User user = essentials.getUser(uuid);
+			if(user != null){
+				user.setLastLocation();
+			}
 		}
 	}
 
@@ -90,15 +94,6 @@ public class TeleportManager {
 	 */
 	public void sendTeleportRequest(UUID from, UUID to, RequestType type) {
 		plugin.getRedisClient().getTopic("TpRequest").publish(new TpRequest(from, to, type));
-	}
-
-	/**
-	 * Send teleport here request to player.
-	 * @param from
-	 * @param to
-	 */
-	public void sendTeleportHereRequest(UUID from, UUID to) {
-
 	}
 
 	public RList<Object> getTpRequests(Player player) {

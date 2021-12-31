@@ -3,22 +3,23 @@ version: ${project.version}
 main: fr.iban.bukkitcore.CoreBukkitPlugin
 api-version: 1.16
 authors: [ Iban ]
-depend: [Vault]
-softdepend: [Essentials]
+softdepend: [Essentials, Vault]
 
 commands:
   site:
   discord:
   vote:
   grades:
+  ressources:
   serveur:
-  survie:
-  ressource:
-  packetlog:
-  annonce:
   options:
+  survie:
+  core:
+    permission: servercore.papercore.reload
   recompenses:
   addtabcomplete:
+  abbc:
+    permission: servercore.abbc
   tp:
   tpa:
   tpno:
@@ -31,3 +32,7 @@ commands:
     aliases:
       - s
   tpahere:
+  bungeebroadcast:
+    aliases:
+      - bbc
+    permission: servercore.bbc

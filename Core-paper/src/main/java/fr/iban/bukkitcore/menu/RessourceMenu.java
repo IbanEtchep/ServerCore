@@ -11,6 +11,8 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.teleport.PlayerRTP;
 
+import java.util.HashMap;
+
 public class RessourceMenu extends Menu {
 
 	public RessourceMenu(Player player) {
@@ -49,11 +51,11 @@ public class RessourceMenu extends Menu {
 	
 	private void sendToWorld(String worldname) {
 		CoreBukkitPlugin plugin = CoreBukkitPlugin.getInstance();
-		if(plugin.getServerName().equalsIgnoreCase("ressources")) {
+		if(plugin.getServerName().equalsIgnoreCase(plugin.getConfig().getString("ressources-servername"))) {
 			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + worldname);
 		}else {
 			RedisAccess.getInstance().getRedissonClient().getTopic("PlayerRTP").publish(new PlayerRTP(player.getUniqueId(), worldname));
-			PluginMessageHelper.sendPlayerToServer(player, "Ressources");
+			PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("ressources-servername"));
 		}
 	}
 

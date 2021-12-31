@@ -23,7 +23,7 @@ public class AsyncTabCompleteListener implements Listener {
 
     @EventHandler
     public void onTabComplete(AsyncTabCompleteEvent e){
-        String buffer = e.getBuffer();
+        String buffer = e.getBuffer().toLowerCase();
         if(e.getSender() instanceof Player){
             Player player = (Player) e.getSender();
             if(e.isCommand()){

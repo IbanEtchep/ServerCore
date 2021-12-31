@@ -47,6 +47,18 @@
 			<id>papermc</id>
 			<url>https://papermc.io/repo/repository/maven-public/</url>
 		</repository>
+		<repository>
+			<id>krypton</id>
+			<url>https://repo.kryptonmc.org/releases</url>
+		</repository>
+		<repository>
+			<id>jitpack.io</id>
+			<url>https://jitpack.io</url>
+		</repository>
+		<repository>
+			<id>opencollab-snapshot</id>
+			<url>https://repo.opencollab.dev/maven-snapshots/</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -78,6 +90,7 @@
 			<groupId>com.github.ben-manes.caffeine</groupId>
 			<artifactId>caffeine</artifactId>
 			<version>2.9.0</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 </project>

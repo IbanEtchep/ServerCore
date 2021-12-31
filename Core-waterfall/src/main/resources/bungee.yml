@@ -2,3 +2,4 @@ name: Core
 version: ${project.version}
 main: fr.iban.bungeecore.CoreBungeePlugin
 author: Iban_
+softDepends: [TAB]

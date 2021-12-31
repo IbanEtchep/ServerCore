@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import fr.iban.bungeecore.commands.*;
 import fr.iban.bungeecore.teleport.*;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
@@ -18,21 +19,6 @@ import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 
 import fr.iban.bungeecore.chat.ChatManager;
-import fr.iban.bungeecore.commands.AnnounceCMD;
-import fr.iban.bungeecore.commands.AnnounceEventCMD;
-import fr.iban.bungeecore.commands.BackCMD;
-import fr.iban.bungeecore.commands.ChatCMD;
-import fr.iban.bungeecore.commands.IgnoreCMD;
-import fr.iban.bungeecore.commands.IgnoreListCMD;
-import fr.iban.bungeecore.commands.JoinEventCMD;
-import fr.iban.bungeecore.commands.MessageCMD;
-import fr.iban.bungeecore.commands.MsgToggleCMD;
-import fr.iban.bungeecore.commands.ReplyCMD;
-import fr.iban.bungeecore.commands.SocialSpyCMD;
-import fr.iban.bungeecore.commands.StaffChatToggle;
-import fr.iban.bungeecore.commands.SudoCMD;
-import fr.iban.bungeecore.commands.TabCompleteCMD;
-import fr.iban.bungeecore.commands.TptoggleCMD;
 import fr.iban.bungeecore.listeners.CommandListener;
 import fr.iban.bungeecore.listeners.PluginMessageListener;
 import fr.iban.bungeecore.listeners.ProxyJoinQuitListener;
@@ -86,7 +72,7 @@ public final class CoreBungeePlugin extends Plugin {
 			getProxy().stop();
 		}
 		
-		DbTables.createTables();
+		DbTables.createTables(getConfiguration().getString("database.tables-prefix"));
 		
 		announceManager = new AnnoncesManager();
 		chatManager = new ChatManager(this);
@@ -111,16 +97,17 @@ public final class CoreBungeePlugin extends Plugin {
 				new TptoggleCMD("tptoggle"),
 				new IgnoreCMD("ignore"),
 				new IgnoreListCMD("ignorelist"),
-				new StaffChatToggle("sctoggle", "spartacube.sctoggle", "staffchattoggle"),
-				new MessageCMD("msg", "spartacube.msg", "message", "m", "w", "tell", "t"),
-				new ReplyCMD("reply", "spartacube.reply", "r"),
-				new SudoCMD("sudo", "spartacube.sudo"),
-				new SocialSpyCMD("socialspy", "spartacube.socialspy"),
-				new MsgToggleCMD("msgtoggle", "spartacube.msgtoggle"),
-				new BackCMD("back", "spartacube.back.death", teleportManager),
+				new StaffChatToggle("sctoggle", "servercore.sctoggle", "staffchattoggle"),
+				new MessageCMD("msg", "servercore.msg", "message", "m", "w", "tell", "t"),
+				new ReplyCMD("reply", "servercore.reply", "r"),
+				new SudoCMD("sudo", "servercore.sudo"),
+				new SocialSpyCMD("socialspy", "servercore.socialspy"),
+				new MsgToggleCMD("msgtoggle", "servercore.msgtoggle"),
+				new BackCMD("back", "servercore.back.death", teleportManager),
 				new JoinEventCMD("joinevent", this),
-				new TabCompleteCMD("baddtabcomplete", "spartacube.addtabcomplete", this),
-				new AnnounceEventCMD("announceevent", this)
+				new TabCompleteCMD("baddtabcomplete", "servercore.addtabcomplete", this),
+				new AnnounceEventCMD("announceevent", this),
+				new CoreCMD("bcore", "servercore.reload", this)
 				);
 
 		ProxyServer.getInstance().getScheduler().schedule(this, new SaveAccounts(), 0, 10, TimeUnit.MINUTES);

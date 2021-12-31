@@ -1,20 +1,18 @@
 package fr.iban.bukkitcore;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
+import fr.iban.bukkitcore.teleport.AcceptTpRequestListener;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
@@ -32,18 +30,16 @@ import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
-import net.milkbowl.vault.economy.Economy;
 
 public final class CoreBukkitPlugin extends JavaPlugin {
 
 	private static CoreBukkitPlugin instance;
 	private TeleportManager teleportManager;
 	private RedissonClient redisClient;
-	private String serverName = "null";
+	private String serverName;
 	private Map<UUID, TextCallback> textInputs;
+	private List<UUID> tpWaiting;
 	private Essentials essentials;
-	
-	private Economy econ = null;
 
     @Override
     public void onEnable() {
@@ -67,11 +63,13 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     		getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
 			Bukkit.shutdown();
 		}
-        
+
+		this.serverName = getConfig().getString("servername");
         
         RewardsDAO.createTables();
         
         textInputs = new HashMap<>();
+		tpWaiting = new ArrayList<>();
         
         this.teleportManager = new TeleportManager(this);
         
@@ -80,24 +78,26 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         		new InventoryListener(),
         		new AsyncChatListener(this),
         		new JoinQuitListeners(this),
-        		new PlayerMoveListener(),
+        		new PlayerMoveListener(this),
         		new DeathListener(this),
         		new CommandsListener(this),
 				new AsyncTabCompleteListener(this)
         		);
-        
-        getCommand("serveur").setExecutor(new ServeurCMD());
 
-        getCommand("options").setExecutor(new OptionsCMD());
-        getCommand("annonce").setExecutor(new AnnonceCMD(this));
-        getCommand("survie").setExecutor(new SurvieCMD());
-        getCommand("ressource").setExecutor(new RessourceCMD());
+		getCommand("core").setExecutor(new CoreCMD(this));
+		getCommand("serveur").setExecutor(new ServeurCMD());
+		getCommand("survie").setExecutor(new SurvieCMD());
+		getCommand("ressources").setExecutor(new RessourcesCMD());
+
+		getCommand("abbc").setExecutor(new ActionBarCMD());
+		getCommand("options").setExecutor(new OptionsCMD());
         getCommand("recompenses").setExecutor(new RecompensesCMD());
         getCommand("recompenses").setTabCompleter(new RecompensesCMD());
         getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
 		getCommand("site").setExecutor(new SimpleCommands(this));
 		getCommand("discord").setExecutor(new SimpleCommands(this));
 		getCommand("vote").setExecutor(new SimpleCommands(this));
+		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
 
 		getCommand("tp").setExecutor(new TpCMD(this));
 		getCommand("tpa").setExecutor(new TpaCMD(this));
@@ -107,8 +107,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		getCommand("tphere").setExecutor(new TphereCMD(this));
 
 
-		setupEconomy();
-        
         PluginMessageHelper.registerChannels(this);
         
     	redisClient = RedisAccess.getInstance().getRedissonClient();
@@ -116,7 +114,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		teleportToPlayerRTopic.addListener(new TeleportToPlayerListener());
 		RTopic<TeleportToLocation> teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
         teleportToLocationRTopic.addListener(new TeleportToLocationListener());
-        
+
+		RTopic<String> acceptTpRequestTopic = redisClient.getTopic("AcceptTpRequest");
+		acceptTpRequestTopic.addListener(new AcceptTpRequestListener(this));
         if(!Bukkit.getOnlinePlayers().isEmpty()) {
         	for(Player player : Bukkit.getOnlinePlayers()) {
         		PluginMessageHelper.askServerName(player);
@@ -144,23 +144,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	public RedissonClient getRedisClient() {
 		return redisClient;
 	}
-	
-	private boolean setupEconomy() {
-		if (getServer().getPluginManager().getPlugin("Vault") == null) {
-			return false;
-		}
-		RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
-		if (rsp == null) {
-			return false;
-		}
-		econ = rsp.getProvider();
-		return econ != null;
-	}
 
-	public Economy getEcon() {
-		return econ;
-	}
-	
 	public static CoreBukkitPlugin getInstance() {
 		return instance;
 	}
@@ -187,6 +171,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
 	public RMap<String, String> getProxyPlayers(){
 		return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
+	}
+
+	public List<UUID> getTpWaiting() {
+		return tpWaiting;
 	}
 
 	public CompletableFuture<UUID> getProxiedPlayerUUID(String name){

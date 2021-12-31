@@ -23,10 +23,11 @@ public class ChatManager {
 
 	private CoreBungeePlugin plugin;
 	private boolean isMuted = false;
-	private ChatColor pingColor = ChatColor.of("#fdcb6e");
+	private ChatColor pingColor;
 
 	public ChatManager(CoreBungeePlugin plugin) {
 		this.plugin = plugin;
+		this.pingColor = ChatColor.of(plugin.getConfiguration().getString("ping-color"));
 	}
 
 	public void sendGlobalMessage(UUID uuid, String message) {
@@ -35,17 +36,17 @@ public class ChatManager {
 			ProxiedPlayer player = server.getPlayer(uuid);
 			String msg = message;
 
-			if(player.hasPermission("spartacube.colors")) {
+			if(player.hasPermission("servercore.colors")) {
 				msg = HexColor.translateColorCodes(msg);
 			}
 
 			//vérif si le message est un message staff
-			if(msg.startsWith("$") && player.hasPermission("spartacube.staffchat")) {
+			if(msg.startsWith("$") && player.hasPermission("servercore.staffchat")) {
 				sendStaffMessage(player, msg.substring(1));
 				return;
 			}
 
-			if(isMuted && !player.hasPermission("spartacube.chatmanage")) {
+			if(isMuted && !player.hasPermission("servercore.chatmanage")) {
 				return;
 			}
 
@@ -97,7 +98,7 @@ public class ChatManager {
 		ProxiedPlayer player = server.getPlayer(uuid);
 		String message = annonce;
 
-		if(isMuted && !player.hasPermission("spartacube.chatmanage")) {
+		if(isMuted && !player.hasPermission("servercore.chatmanage")) {
 			return;
 		}
 
@@ -126,7 +127,7 @@ public class ChatManager {
 
 	private void sendStaffMessage(ProxiedPlayer sender, String message) {
 		ProxyServer.getInstance().getPlayers().forEach( p -> {
-			if(p.hasPermission("spartacube.staffchat")) {
+			if(p.hasPermission("servercore.staffchat")) {
 				if (!StaffChatToggle.sc.contains(p)) {
 					p.sendMessage(TextComponent.fromLegacyText(HexColor.translateColorCodes("§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getName() + " §8§l➤ " + getSuffix(sender) + "§l" + message)));
 				}

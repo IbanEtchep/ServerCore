@@ -27,7 +27,7 @@ public class ServeurMenu extends Menu {
 	public void handleMenu(InventoryClickEvent e) {
 		if(e.getClickedInventory() == e.getView().getTopInventory()) {
 			if(e.getCurrentItem().getType() == Material.GRASS) {
-				PluginMessageHelper.sendPlayerToServer(player, "Survie");
+				PluginMessageHelper.sendPlayerToServer(player, "survie");
 			}else if (e.getCurrentItem().getType() == Material.IRON_PICKAXE) {
 				new RessourceMenu(player).open();
 			}

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import net.coreprotect.CoreProtect;
+import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -26,6 +28,9 @@ import fr.iban.lands.enums.Action;
 import fr.iban.lands.objects.Land;
 import fr.iban.survivalcore.SurvivalCorePlugin;
 import fr.iban.survivalcore.tools.SpecialTools;
+import org.bukkit.plugin.Plugin;
+
+import static org.bukkit.Bukkit.getServer;
 
 public class PlaceBreakListeners implements Listener {
 	
@@ -55,6 +60,10 @@ public class PlaceBreakListeners implements Listener {
 					continue;
 
 				b.breakNaturally(itemInHand);
+				CoreProtectAPI coreProtect = getCoreProtect();
+				if (coreProtect!=null){ //Ensure we have access to the API
+					coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+				}
 			}
 		}
 
@@ -68,6 +77,10 @@ public class PlaceBreakListeners implements Listener {
 					continue;
 
 				b.breakNaturally(itemInHand);
+				CoreProtectAPI coreProtect = getCoreProtect();
+				if (coreProtect!=null){ //Ensure we have access to the API
+					coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+				}
 			}
 		}
 
@@ -248,5 +261,26 @@ public class PlaceBreakListeners implements Listener {
 		}
 	}
 
+	private CoreProtectAPI getCoreProtect() {
+		Plugin plugin = getServer().getPluginManager().getPlugin("CoreProtect");
+
+		// Check that CoreProtect is loaded
+		if (plugin == null || !(plugin instanceof CoreProtect)) {
+			return null;
+		}
+
+		// Check that the API is enabled
+		CoreProtectAPI CoreProtect = ((CoreProtect) plugin).getAPI();
+		if (CoreProtect.isEnabled() == false) {
+			return null;
+		}
+
+		// Check that a compatible version of the API is loaded
+		if (CoreProtect.APIVersion() < 7) {
+			return null;
+		}
+
+		return CoreProtect;
+	}
 
 }
