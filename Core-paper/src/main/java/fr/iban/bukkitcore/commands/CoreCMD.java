@@ -1,5 +1,6 @@
-package fr.iban.bukkitcore;
+package fr.iban.bukkitcore.commands;
 
+import fr.iban.bukkitcore.CoreBukkitPlugin;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;

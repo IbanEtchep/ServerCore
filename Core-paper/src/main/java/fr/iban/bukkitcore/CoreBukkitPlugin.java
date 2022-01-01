@@ -40,8 +40,14 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private Map<UUID, TextCallback> textInputs;
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
+	private RTopic<TeleportToPlayer> teleportToPlayerRTopic;
+	private RTopic<TeleportToLocation> teleportToLocationRTopic;
+	private TeleportToPlayerListener teleportToPlayerListener;
+	private TeleportToLocationListener teleportToLocationListener;
+	private RTopic<String> acceptTpRequestTopic;
+	private AcceptTpRequestListener acceptTpRequestListener;
 
-    @Override
+	@Override
     public void onEnable() {
     	instance = this;
     	saveDefaultConfig();
@@ -110,19 +116,16 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         PluginMessageHelper.registerChannels(this);
         
     	redisClient = RedisAccess.getInstance().getRedissonClient();
-		RTopic<TeleportToPlayer> teleportToPlayerRTopic = redisClient.getTopic("TeleportToPlayer");
-		teleportToPlayerRTopic.addListener(new TeleportToPlayerListener());
-		RTopic<TeleportToLocation> teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
-        teleportToLocationRTopic.addListener(new TeleportToLocationListener());
+		teleportToPlayerRTopic = redisClient.getTopic("TeleportToPlayer");
+		teleportToPlayerListener = new TeleportToPlayerListener();
+		teleportToPlayerRTopic.addListener(teleportToPlayerListener);
+		teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
+		teleportToLocationListener = new TeleportToLocationListener();
+		teleportToLocationRTopic.addListener(teleportToLocationListener);
 
-		RTopic<String> acceptTpRequestTopic = redisClient.getTopic("AcceptTpRequest");
-		acceptTpRequestTopic.addListener(new AcceptTpRequestListener(this));
-        if(!Bukkit.getOnlinePlayers().isEmpty()) {
-        	for(Player player : Bukkit.getOnlinePlayers()) {
-        		PluginMessageHelper.askServerName(player);
-        		break;
-        	}
-        }
+		acceptTpRequestTopic = redisClient.getTopic("AcceptTpRequest");
+		acceptTpRequestListener = new AcceptTpRequestListener(this);
+		acceptTpRequestTopic.addListener(acceptTpRequestListener);
     }
 
     @Override
