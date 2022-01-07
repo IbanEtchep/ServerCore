@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.teleport;
 
+import fr.iban.bukkitcore.utils.SLocationUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -19,7 +20,7 @@ public class TeleportToLocationListener implements MessageListener<TeleportToLoc
 			}
 
 			SLocation sloc = ttl.getLocation();
-			Location loc = new Location(Bukkit.getWorld(sloc.getWorld()), sloc.getX(), sloc.getY(), sloc.getZ(), sloc.getYaw(), sloc.getPitch());
+			Location loc = SLocationUtils.getLocation(sloc);
 
 			new BukkitRunnable() {
 

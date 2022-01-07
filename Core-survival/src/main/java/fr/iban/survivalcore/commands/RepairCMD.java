@@ -63,8 +63,8 @@ public class RepairCMD implements CommandExecutor {
 	}
 
 	private boolean isRepairable(ItemStack item){
-		if (item == null || item.getType().isBlock() || item.getType().getMaxDurability() < 1 || item.getDurability() == 0 ||
-				SpecialTools.is3x3Pickaxe(item) || SpecialTools.is3x3Pickaxe(item)) {
+		if (item == null || item.getType().isBlock() || item.getType().getMaxDurability() < 1 || item.getDurability() == 0 || (
+				SpecialTools.is3x3Pickaxe(item) && !item.getItemMeta().getLore().contains("§c§l[ITEM LEGENDAIRE]"))) {
 			return false;
 		}
 		return true;

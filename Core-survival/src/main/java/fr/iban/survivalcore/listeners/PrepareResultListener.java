@@ -18,7 +18,7 @@ public class PrepareResultListener implements Listener {
             return;
         }
 
-        if(SpecialTools.is3x3Pickaxe(result)){
+        if(SpecialTools.is3x3Pickaxe(result) && !result.getItemMeta().getLore().contains("§c§l[ITEM LEGENDAIRE]")){
             e.setResult(new ItemStack(Material.AIR));
         }
     }

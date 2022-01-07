@@ -39,7 +39,6 @@ public class SpecialTools {
 
 	public static ItemStack get3x3Pickaxe() {
 		ItemStack hades = new ItemStack(Material.NETHERITE_PICKAXE);
-
 		ItemMeta cus = hades.getItemMeta();
 		cus.setDisplayName("§9§lMarteau du Dieu");
 		cus.setLore(Arrays.asList("§3|| §bMine du §93x3§3 ||","§c§l[ITEM LEGENDAIRE]"));

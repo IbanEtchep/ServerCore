@@ -58,6 +58,7 @@ public class TeleportManager {
 			return;
 		}
 
+		redis.getTopic("tpWaiting").publish(player.getName());
 		redis.getMap("PendingTeleports").fastPut(player.getUniqueId(), Boolean.TRUE);
 
 		instance.getProxy().getScheduler().schedule(instance, () -> {
@@ -96,7 +97,7 @@ public class TeleportManager {
 			return;
 		}
 
-		redis.getTopic("AcceptTpRequest").publish(player.getName());
+		redis.getTopic("tpWaiting").publish(player.getName());
 		redis.getMap("PendingTeleports").fastPut(player.getUniqueId(), Boolean.TRUE);
 
 		instance.getProxy().getScheduler().schedule(instance, () -> {

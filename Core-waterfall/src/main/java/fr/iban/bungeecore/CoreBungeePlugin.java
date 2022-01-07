@@ -115,7 +115,6 @@ public final class CoreBungeePlugin extends Plugin {
 		RedissonClient redisClient = RedisAccess.getInstance().getRedissonClient();
 		redisClient.getTopic("DeathLocation").addListener(new DeathLocationListener(this));
         redisClient.getTopic("EventAnnounce").addListener(new EventAnnounceListener(this));
-		redisClient.getTopic("TeleportToSLoc");
 		RTopic<TeleportToLocation> tpToSlocTopic = redisClient.getTopic("TpToSLoc");
         tpToSlocTopic.addListener(new TpToSLocListener(this));
 		RTopic<TeleportToPlayer> tpToPlayerTopic = redisClient.getTopic("TpToPlayer");

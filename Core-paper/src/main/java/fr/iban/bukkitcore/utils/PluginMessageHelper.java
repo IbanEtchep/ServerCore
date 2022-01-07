@@ -29,14 +29,6 @@ public class PluginMessageHelper {
 		if(!channel.equalsIgnoreCase(PluginMessageHelper.BUNGEECORD_CHANNEL)) {
 			return;
 		}
-		
-		final ByteArrayDataInput in = ByteStreams.newDataInput(bytes);
-		final String sub = in.readUTF();
-
-        if(sub.equals("GetServer")){
-            String name = in.readUTF();
-            CoreBukkitPlugin.getInstance().setServerName(name);
-        }
 	}
 	
 	public static void sendPlayerToServer(Player player , String serveur) {

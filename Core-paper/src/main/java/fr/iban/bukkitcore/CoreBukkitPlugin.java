@@ -1,16 +1,23 @@
 package fr.iban.bukkitcore;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-
+import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
-import fr.iban.bukkitcore.teleport.AcceptTpRequestListener;
+import fr.iban.bukkitcore.rewards.RewardsDAO;
+import fr.iban.bukkitcore.teleport.TeleportManager;
+import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
+import fr.iban.bukkitcore.teleport.TeleportToPlayerListener;
+import fr.iban.bukkitcore.teleport.TpWaitingListener;
+import fr.iban.bukkitcore.utils.PluginMessageHelper;
+import fr.iban.bukkitcore.utils.TextCallback;
+import fr.iban.common.data.redis.RedisAccess;
+import fr.iban.common.data.redis.RedisCredentials;
+import fr.iban.common.data.sql.DbAccess;
+import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,25 +25,14 @@ import org.redisson.api.RMap;
 import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 
-import com.earth2me.essentials.Essentials;
-
-import fr.iban.bukkitcore.rewards.RewardsDAO;
-import fr.iban.bukkitcore.teleport.TeleportManager;
-import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
-import fr.iban.bukkitcore.teleport.TeleportToPlayerListener;
-import fr.iban.bukkitcore.utils.PluginMessageHelper;
-import fr.iban.bukkitcore.utils.TextCallback;
-import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.data.redis.RedisCredentials;
-import fr.iban.common.data.sql.DbAccess;
-import fr.iban.common.data.sql.DbCredentials;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 public final class CoreBukkitPlugin extends JavaPlugin {
 
 	private static CoreBukkitPlugin instance;
 	private TeleportManager teleportManager;
 	private RedissonClient redisClient;
-	private String serverName;
 	private Map<UUID, TextCallback> textInputs;
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
@@ -44,8 +40,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private RTopic<TeleportToLocation> teleportToLocationRTopic;
 	private TeleportToPlayerListener teleportToPlayerListener;
 	private TeleportToLocationListener teleportToLocationListener;
-	private RTopic<String> acceptTpRequestTopic;
-	private AcceptTpRequestListener acceptTpRequestListener;
+	private RTopic<String> tpWaitingTopic;
+	private TpWaitingListener tpWaitingListener;
 
 	@Override
     public void onEnable() {
@@ -70,8 +66,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 			Bukkit.shutdown();
 		}
 
-		this.serverName = getConfig().getString("servername");
-        
         RewardsDAO.createTables();
         
         textInputs = new HashMap<>();
@@ -123,15 +117,18 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		teleportToLocationListener = new TeleportToLocationListener();
 		teleportToLocationRTopic.addListener(teleportToLocationListener);
 
-		acceptTpRequestTopic = redisClient.getTopic("AcceptTpRequest");
-		acceptTpRequestListener = new AcceptTpRequestListener(this);
-		acceptTpRequestTopic.addListener(acceptTpRequestListener);
+		tpWaitingTopic = redisClient.getTopic("tpWaiting");
+		tpWaitingListener = new TpWaitingListener(this);
+		tpWaitingTopic.addListener(tpWaitingListener);
     }
 
     @Override
     public void onDisable() {
         RedisAccess.close();
         DbAccess.closePool();
+		tpWaitingTopic.removeListener(tpWaitingListener);
+		teleportToLocationRTopic.removeListener(teleportToLocationListener);
+		teleportToPlayerRTopic.removeListener(teleportToPlayerListener);
     }
     
 	private void registerListeners(Listener... listeners) {
@@ -153,11 +150,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	}
 
 	public String getServerName() {
-		return serverName;
-	}
-
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
+		return getConfig().getString("servername");
 	}
 
 	public Map<UUID, TextCallback> getTextInputs() {

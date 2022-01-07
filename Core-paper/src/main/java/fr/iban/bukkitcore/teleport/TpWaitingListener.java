@@ -7,11 +7,11 @@ import org.redisson.api.listener.MessageListener;
 
 import java.util.UUID;
 
-public class AcceptTpRequestListener implements MessageListener<String> {
+public class TpWaitingListener implements MessageListener<String> {
 
     private CoreBukkitPlugin plugin;
 
-    public AcceptTpRequestListener(CoreBukkitPlugin coreBukkitPlugin) {
+    public TpWaitingListener(CoreBukkitPlugin coreBukkitPlugin) {
         this.plugin = coreBukkitPlugin;
     }
 
