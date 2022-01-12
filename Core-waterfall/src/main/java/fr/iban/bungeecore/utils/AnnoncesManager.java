@@ -41,7 +41,7 @@ public class AnnoncesManager {
 		annonces.put(0, getMessage(0, "§5≫ §dRejoignez-nous sur discord pour suivre toute l'actualité du serveur ! §5§l/discord§d !", "/discord"));
 		annonces.put(1, getMessage(1, "§5≫ §dPensez à voter régulièrement pour soutenir le serveur et gagner des récompenses ! §5§l/vote§d !", "/vote"));
 		annonces.put(2, getMessage(2, "§5≫ §dPensez à visiter notre site. Vous y trouverez le réglement, la boutique, la page de votes,...! §5§l/site§d !", "/site"));
-		annonces.put(4, getMessage(3, "§5≫ §dVous pouvez nous aider à financer le serveur en faisant des achats sur la boutique ! §5§l/boutique§d !", "/boutique"));
+		annonces.put(3, getMessage(3, "§5≫ §dVous pouvez nous aider à financer le serveur en faisant des achats sur la boutique ! §5§l/boutique§d !", "/boutique"));
 	}
 		
 	private void startAnnouncetask() {

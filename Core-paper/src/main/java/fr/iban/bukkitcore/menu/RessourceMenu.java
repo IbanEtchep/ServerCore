@@ -1,17 +1,12 @@
 package fr.iban.bukkitcore.menu;
 
-import org.bukkit.Bukkit;
+import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.manager.RessourcesWorldManager;
+import fr.iban.bukkitcore.utils.ItemBuilder;
+import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
-
-import fr.iban.bukkitcore.CoreBukkitPlugin;
-import fr.iban.bukkitcore.utils.ItemBuilder;
-import fr.iban.bukkitcore.utils.PluginMessageHelper;
-import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.teleport.PlayerRTP;
-
-import java.util.HashMap;
 
 public class RessourceMenu extends Menu {
 
@@ -27,12 +22,13 @@ public class RessourceMenu extends Menu {
 	@Override
 	public void handleMenu(InventoryClickEvent e) {
 		if(e.getClickedInventory() == e.getView().getTopInventory()) {
+			final RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
 			if(e.getCurrentItem().getType() == Material.GRASS_BLOCK) {
-				sendToWorld("resource_world");
+				ressourcesWorldManager.sendToRessourceWorld(player, "resource_world");
 			}else if (e.getCurrentItem().getType() == Material.NETHERRACK) {
-				sendToWorld("resource_nether");
+				ressourcesWorldManager.sendToRessourceWorld(player, "resource_nether");
 			}else if (e.getCurrentItem().getType() == Material.END_STONE) {
-				sendToWorld("resource_end");
+				ressourcesWorldManager.sendToRessourceWorld(player, "resource_end");
 			}
 		}
 	}
@@ -46,16 +42,6 @@ public class RessourceMenu extends Menu {
 		for(int i = 0 ; i < inventory.getSize() ; i++) {
 			if(inventory.getItem(i) == null)
 				inventory.setItem(i, FILLER_GLASS);
-		}
-	}
-	
-	private void sendToWorld(String worldname) {
-		CoreBukkitPlugin plugin = CoreBukkitPlugin.getInstance();
-		if(plugin.getServerName().equalsIgnoreCase(plugin.getConfig().getString("ressources-servername"))) {
-			Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + worldname);
-		}else {
-			RedisAccess.getInstance().getRedissonClient().getTopic("PlayerRTP").publish(new PlayerRTP(player.getUniqueId(), worldname));
-			PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("ressources-servername"));
 		}
 	}
 

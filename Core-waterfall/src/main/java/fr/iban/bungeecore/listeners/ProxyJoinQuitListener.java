@@ -58,7 +58,7 @@ public class ProxyJoinQuitListener implements Listener {
 		ProxiedPlayer player = e.getPlayer();
 		UUID uuid = player.getUniqueId();
 		ProxyServer proxy = ProxyServer.getInstance();
-		if(player.hasPermission("premium")){
+		if(player.hasPermission("premium") && !player.hasPermission("group.support")){
 			proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player "+player.getName()+" tabsuffix #feca57 ✮");
 		}
 		proxy.getScheduler().runAsync(plugin, () -> {

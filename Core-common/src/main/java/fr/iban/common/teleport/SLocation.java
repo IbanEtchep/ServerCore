@@ -1,5 +1,7 @@
 package fr.iban.common.teleport;
 
+import java.util.Objects;
+
 public class SLocation {
 	
 	private double x;
@@ -107,4 +109,16 @@ public class SLocation {
 		return server + " - " + world + " - " + x + " - " + y + " - " + z;
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		SLocation sLocation = (SLocation) o;
+		return Double.compare(sLocation.x, x) == 0 && Double.compare(sLocation.y, y) == 0 && Double.compare(sLocation.z, z) == 0 && Objects.equals(world, sLocation.world) && Objects.equals(server, sLocation.server);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(x, y, z, pitch, yaw, world, server);
+	}
 }

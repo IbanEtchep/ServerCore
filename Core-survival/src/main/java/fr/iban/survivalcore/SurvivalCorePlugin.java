@@ -38,7 +38,7 @@ public final class SurvivalCorePlugin extends JavaPlugin {
 		registerEvent(new PlayerFishListener());
 		registerEvent(new EntityDeathListener());
 		registerEvent(new CommandListener());
-		registerEvent(new VillagerEvents());
+		registerEvent(new VillagerEvents(this));
 		registerEvent(new RaidTriggerListener());
 		registerEvent(new PortalListeners());
 		registerEvent(new PlaceBreakListeners());

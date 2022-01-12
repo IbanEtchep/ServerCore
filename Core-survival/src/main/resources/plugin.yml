@@ -4,7 +4,7 @@ api-version: 1.16
 main: fr.iban.survivalcore.SurvivalCorePlugin
 authors: [Iban]
 description: Core du projet SpartaCube
-softdepend: [dynmap, Lands, Vault]
+softdepend: [dynmap, Lands, Vault, CoreProtect]
 depend: [LuckPerms, Essentials, Core]
 
 commands:

@@ -1,9 +1,8 @@
 package fr.iban.survivalcore.listeners;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import fr.iban.bukkitcore.utils.ItemBuilder;
+import fr.iban.survivalcore.SurvivalCorePlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -15,10 +14,17 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
-import com.google.common.collect.Lists;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 public class VillagerEvents implements Listener {
 
+	private SurvivalCorePlugin plugin;
+
+	public VillagerEvents(SurvivalCorePlugin plugin) {
+		this.plugin = plugin;
+	}
 
 	@EventHandler
 	public void onVillagerInteract(final PlayerInteractAtEntityEvent e){
@@ -38,8 +44,10 @@ public class VillagerEvents implements Listener {
 
 				if (meta.hasStoredEnchant(Enchantment.MENDING)) {
 					recipe.setMaxUses(1);
-					recipe.setIngredients(Arrays.asList(new ItemStack(Material.DIAMOND, 64)));
-					recipe.adjust(new ItemStack(Material.DIAMOND, 64));
+					int initialPrice = plugin.getConfig().getInt("mending-trade-price");
+					ItemStack diams = new ItemStack(Material.valueOf(plugin.getConfig().getString("mending-trade-material")), initialPrice);
+					recipe.setIngredients(Arrays.asList(diams));
+					recipe.setIgnoreDiscounts(true);
 				}
 			}
 		}

@@ -3,13 +3,10 @@ package fr.iban.bukkitcore.commands.teleport;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.teleport.TeleportManager;
 import fr.iban.common.teleport.RequestType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-
-import java.util.UUID;
 
 public class TpaCMD implements CommandExecutor {
 

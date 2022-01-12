@@ -1,5 +1,2 @@
-redis:
-  host: 172.18.0.1
-  port: 6379
-  password: null
-  clientName: Serveur_mc
+mending-trade-price: 64
+mending-trade-material: DIAMOND

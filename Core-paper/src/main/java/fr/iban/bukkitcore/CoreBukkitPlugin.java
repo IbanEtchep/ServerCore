@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
+import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.teleport.TeleportManager;
 import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
@@ -36,6 +37,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private Map<UUID, TextCallback> textInputs;
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
+	private RessourcesWorldManager ressourcesWorldManager;
 	private RTopic<TeleportToPlayer> teleportToPlayerRTopic;
 	private RTopic<TeleportToLocation> teleportToLocationRTopic;
 	private TeleportToPlayerListener teleportToPlayerListener;
@@ -72,7 +74,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		tpWaiting = new ArrayList<>();
         
         this.teleportManager = new TeleportManager(this);
-        
+        this.ressourcesWorldManager = new RessourcesWorldManager();
+
         registerListeners(
         		new HeadDatabaseListener(),
         		new InventoryListener(),
@@ -88,6 +91,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		getCommand("serveur").setExecutor(new ServeurCMD());
 		getCommand("survie").setExecutor(new SurvieCMD());
 		getCommand("ressources").setExecutor(new RessourcesCMD());
+		getCommand("ressources").setTabCompleter(new RessourcesCMD());
 
 		getCommand("abbc").setExecutor(new ActionBarCMD());
 		getCommand("options").setExecutor(new OptionsCMD());
@@ -167,6 +171,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
 	public RMap<String, String> getProxyPlayers(){
 		return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
+	}
+
+	public RessourcesWorldManager getRessourcesWorldManager() {
+		return ressourcesWorldManager;
 	}
 
 	public List<UUID> getTpWaiting() {
