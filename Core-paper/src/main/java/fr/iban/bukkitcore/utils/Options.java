@@ -12,6 +12,7 @@ public enum Options {
 	TP("Afficher les demandes de téléportations", new ItemStack(Head.ENDER_PEARL.get()), Option.TP),
 	CHAT("Afficher les message du tchat", new ItemStack(Head.TCHAT.get()), Option.TCHAT),
 	MENTION("Activer les mentions dans le tchat les message du tchat", new ItemStack(Head.AROBASE.get()), Option.MENTION),
+	BC_STREAM("Activer les messages de Streams", new ItemStack(Head.TWITCH.get()), Option.STREAM),
 	;
 	
 	

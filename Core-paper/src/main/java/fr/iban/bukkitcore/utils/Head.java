@@ -32,7 +32,8 @@ public enum Head {
 	ARROW("513"),
 	HOUSE("4449"),
 	NORMAL_CHEST("2970"),
-	FARMER_STEVE("30463")
+	FARMER_STEVE("30463"),
+	TWITCH("1768");
 	;
 	
 	private static HeadDatabaseAPI api;
