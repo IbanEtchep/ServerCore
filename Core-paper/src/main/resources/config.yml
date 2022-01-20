@@ -20,6 +20,9 @@ messages:
 servername: "Survie"
 ressources-servername: "ressources"
 
+cooldowns:
+  stream: 60
+
 tabcomplete:
   global:
     - sethome
