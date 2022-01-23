@@ -32,6 +32,10 @@
 
 	<repositories>
 		<repository>
+			<id>ariziel-repo</id>
+			<url>https://nexus.ariziel.fr/repository/maven-nexus-repo/</url>
+		</repository
+		<repository>
 			<id>papermc-repo</id>
 			<url>https://papermc.io/repo/repository/maven-public/</url>
 		</repository>
