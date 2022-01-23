@@ -27,7 +27,7 @@ public class RedisAccess {
 		getInstance().getRedissonClient().shutdown();
 	}
 	
-	public RedissonClient initRedisson(RedisCredentials credentials) {
+	public static RedissonClient initRedisson(RedisCredentials credentials) {
 		Config config = new Config();
 		config.setCodec(new JsonJacksonCodec());
 		config.setUseLinuxNativeEpoll(true);
