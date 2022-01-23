@@ -107,7 +107,8 @@ public final class CoreBungeePlugin extends Plugin {
 				new JoinEventCMD("joinevent", this),
 				new TabCompleteCMD("baddtabcomplete", "servercore.addtabcomplete", this),
 				new AnnounceEventCMD("announceevent", this),
-				new CoreCMD("bcore", "servercore.reload", this)
+				new CoreCMD("bcore", "servercore.reload", this),
+				new StreamCMD("stream", "sparta.stream", this)
 				);
 
 		ProxyServer.getInstance().getScheduler().schedule(this, new SaveAccounts(), 0, 10, TimeUnit.MINUTES);

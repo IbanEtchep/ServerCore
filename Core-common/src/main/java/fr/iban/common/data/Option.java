@@ -9,7 +9,8 @@ public enum Option {
 	TP(true),
 	TCHAT(true),
 	MENTION(true),
-	MSG(true);
+	MSG(true),
+	STREAM(true);
 	
 	private boolean defaultvalue;
 	
