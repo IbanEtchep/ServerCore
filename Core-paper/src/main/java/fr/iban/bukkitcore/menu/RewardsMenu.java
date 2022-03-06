@@ -54,7 +54,7 @@ public class RewardsMenu extends PaginatedMenu {
 		}
 
 		CoreBukkitPlugin core = CoreBukkitPlugin.getInstance();
-		if(reward.getServer().equals(core.getServerName())) {
+		if(reward.getServer().equalsIgnoreCase(core.getServerName())) {
 			if(rewards.contains(reward)) {
 				rewards.remove(reward);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("{player}", player.getName()));
