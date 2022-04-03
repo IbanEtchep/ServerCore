@@ -14,7 +14,7 @@ import fr.iban.common.teleport.TeleportToLocation;
 public class TeleportToLocationListener implements MessageListener<TeleportToLocation> {
 
 	@Override
-	public void onMessage(String channel, TeleportToLocation ttl) {
+	public void onMessage(CharSequence channel, TeleportToLocation ttl) {
 			if(!ttl.getLocation().getServer().equals(CoreBukkitPlugin.getInstance().getServerName())) {
 				return;
 			}
@@ -57,5 +57,4 @@ public class TeleportToLocationListener implements MessageListener<TeleportToLoc
 			}
 		});
 	}
-
 }

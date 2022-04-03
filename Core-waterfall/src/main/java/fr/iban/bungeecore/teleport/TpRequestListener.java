@@ -15,7 +15,7 @@ public class TpRequestListener implements MessageListener<TpRequest> {
     }
 
     @Override
-    public void onMessage(String channel, TpRequest request) {
+    public void onMessage(CharSequence channel, TpRequest request) {
         ProxiedPlayer from = plugin.getProxy().getPlayer(request.getPlayerFrom());
         ProxiedPlayer to = plugin.getProxy().getPlayer(request.getPlayerTo());
 

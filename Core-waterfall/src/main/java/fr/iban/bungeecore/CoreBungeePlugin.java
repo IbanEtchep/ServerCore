@@ -14,10 +14,7 @@ import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.data.sql.DbTables;
-import fr.iban.common.teleport.SLocation;
-import fr.iban.common.teleport.TeleportToLocation;
-import fr.iban.common.teleport.TeleportToPlayer;
-import fr.iban.common.teleport.TpRequest;
+import fr.iban.common.teleport.*;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
@@ -112,14 +109,14 @@ public final class CoreBungeePlugin extends Plugin {
         ProxyServer.getInstance().getScheduler().schedule(this, new SaveAccounts(), 0, 10, TimeUnit.MINUTES);
 
         RedissonClient redisClient = RedisAccess.getInstance().getRedissonClient();
-        redisClient.getTopic("DeathLocation").addListener(new DeathLocationListener(this));
-        redisClient.getTopic("EventAnnounce").addListener(new EventAnnounceListener(this));
-        RTopic<TeleportToLocation> tpToSlocTopic = redisClient.getTopic("TpToSLoc");
-        tpToSlocTopic.addListener(new TpToSLocListener(this));
-        RTopic<TeleportToPlayer> tpToPlayerTopic = redisClient.getTopic("TpToPlayer");
-        tpToPlayerTopic.addListener(new TpToPlayerListener(this));
-        RTopic<TpRequest> tpRequestTopic = redisClient.getTopic("TpRequest");
-        tpRequestTopic.addListener(new TpRequestListener(this));
+        redisClient.getTopic("DeathLocation").addListener(DeathLocation.class, new DeathLocationListener(this));
+        redisClient.getTopic("EventAnnounce").addListener(EventAnnouce.class, new EventAnnounceListener(this));
+        RTopic tpToSlocTopic = redisClient.getTopic("TpToSLoc");
+        tpToSlocTopic.addListener(TeleportToLocation.class, new TpToSLocListener(this));
+        RTopic tpToPlayerTopic = redisClient.getTopic("TpToPlayer");
+        tpToPlayerTopic.addListener(TeleportToPlayer.class, new TpToPlayerListener(this));
+        RTopic tpRequestTopic = redisClient.getTopic("TpRequest");
+        tpRequestTopic.addListener(TpRequest.class, new TpRequestListener(this));
 
     }
 

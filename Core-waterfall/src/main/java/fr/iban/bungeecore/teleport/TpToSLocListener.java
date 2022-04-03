@@ -15,7 +15,7 @@ public class TpToSLocListener implements MessageListener<TeleportToLocation> {
 	}
 
 	@Override
-	public void onMessage(String channel, TeleportToLocation ttl) {
+	public void onMessage(CharSequence channel, TeleportToLocation ttl) {
 		ProxiedPlayer player = plugin.getProxy().getPlayer(ttl.getUuid());
 
 		if(player != null) {

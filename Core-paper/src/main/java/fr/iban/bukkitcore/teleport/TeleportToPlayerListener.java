@@ -10,36 +10,6 @@ import fr.iban.common.teleport.TeleportToPlayer;
 
 public class TeleportToPlayerListener implements MessageListener<TeleportToPlayer> {
 
-	@Override
-	public void onMessage(String channel, TeleportToPlayer ttp) {
-			Player target = Bukkit.getPlayer(ttp.getTargetId());
-
-			if(target == null) {
-				return;
-			}
-
-			new BukkitRunnable() {
-								
-				@Override
-				public void run() {
-					
-					Player target = Bukkit.getPlayer(ttp.getTargetId());
-					Player player = Bukkit.getPlayer(ttp.getUuid());
-					
-					if(target == null) {
-						cancel();
-						return;
-					}
-					
-					if(player != null) {
-						tp(player, target);
-						cancel();
-					}
-					
-				}
-			}.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
-	}
-
 	private void tp(Player player, Player target) {
 		player.sendActionBar("§aChargement des chunks...");
 		player.teleportAsync(target.getLocation()).thenAccept(result -> {
@@ -51,4 +21,33 @@ public class TeleportToPlayerListener implements MessageListener<TeleportToPlaye
 		});
 	}
 
+	@Override
+	public void onMessage(CharSequence channel, TeleportToPlayer ttp) {
+		Player target = Bukkit.getPlayer(ttp.getTargetId());
+
+		if(target == null) {
+			return;
+		}
+
+		new BukkitRunnable() {
+
+			@Override
+			public void run() {
+
+				Player target = Bukkit.getPlayer(ttp.getTargetId());
+				Player player = Bukkit.getPlayer(ttp.getUuid());
+
+				if(target == null) {
+					cancel();
+					return;
+				}
+
+				if(player != null) {
+					tp(player, target);
+					cancel();
+				}
+
+			}
+		}.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+	}
 }

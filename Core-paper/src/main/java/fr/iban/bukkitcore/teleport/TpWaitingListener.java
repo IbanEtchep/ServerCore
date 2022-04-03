@@ -16,7 +16,7 @@ public class TpWaitingListener implements MessageListener<String> {
     }
 
     @Override
-    public void onMessage(String channel, String name) {
+    public void onMessage(CharSequence channel, String name) {
         Player player = Bukkit.getPlayer(name);
         if(player != null){
             UUID uuid = player.getUniqueId();

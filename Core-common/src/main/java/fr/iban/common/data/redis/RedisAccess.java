@@ -4,6 +4,7 @@ import org.redisson.Redisson;
 import org.redisson.api.RedissonClient;
 import org.redisson.codec.JsonJacksonCodec;
 import org.redisson.config.Config;
+import org.redisson.config.TransportMode;
 
 public class RedisAccess {
 	
@@ -30,7 +31,7 @@ public class RedisAccess {
 	public static RedissonClient initRedisson(RedisCredentials credentials) {
 		Config config = new Config();
 		config.setCodec(new JsonJacksonCodec());
-		config.setUseLinuxNativeEpoll(true);
+		config.setTransportMode(TransportMode.EPOLL);
 		config.setThreads(8);
 		config.setNettyThreads(8);
 		config.useSingleServer()

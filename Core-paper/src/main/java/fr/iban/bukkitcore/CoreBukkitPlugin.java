@@ -38,11 +38,11 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
 	private RessourcesWorldManager ressourcesWorldManager;
-	private RTopic<TeleportToPlayer> teleportToPlayerRTopic;
-	private RTopic<TeleportToLocation> teleportToLocationRTopic;
+	private RTopic teleportToPlayerRTopic;
+	private RTopic teleportToLocationRTopic;
 	private TeleportToPlayerListener teleportToPlayerListener;
 	private TeleportToLocationListener teleportToLocationListener;
-	private RTopic<String> tpWaitingTopic;
+	private RTopic tpWaitingTopic;
 	private TpWaitingListener tpWaitingListener;
 
 	@Override
@@ -116,14 +116,14 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     	redisClient = RedisAccess.getInstance().getRedissonClient();
 		teleportToPlayerRTopic = redisClient.getTopic("TeleportToPlayer");
 		teleportToPlayerListener = new TeleportToPlayerListener();
-		teleportToPlayerRTopic.addListener(teleportToPlayerListener);
+		teleportToPlayerRTopic.addListener(TeleportToPlayer.class, teleportToPlayerListener);
 		teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
 		teleportToLocationListener = new TeleportToLocationListener();
-		teleportToLocationRTopic.addListener(teleportToLocationListener);
+		teleportToLocationRTopic.addListener(TeleportToLocation.class, teleportToLocationListener);
 
 		tpWaitingTopic = redisClient.getTopic("tpWaiting");
 		tpWaitingListener = new TpWaitingListener(this);
-		tpWaitingTopic.addListener(tpWaitingListener);
+		tpWaitingTopic.addListener(String.class, tpWaitingListener);
     }
 
     @Override
@@ -190,4 +190,5 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 			return UUID.fromString(uuidString);
 		});
 	}
+
 }
