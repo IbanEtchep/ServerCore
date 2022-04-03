@@ -8,6 +8,10 @@ import fr.iban.bungeecore.utils.HexColor;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.placeholder.PlaceholderManager;
+import me.neznamy.tab.shared.features.PlaceholderManagerImpl;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedMetaData;
@@ -59,6 +63,13 @@ public class ChatManager {
 			prefix = prefix.replace("%lp_suffix%", getSuffix(player));
 			prefix = prefix.replace("%premium%", getPremiumString(player));
 			prefix = HexColor.translateColorCodes(prefix);
+
+			TabAPI tabAPI = TabAPI.getInstance();
+			TabPlayer tabPlayer = tabAPI.getPlayer(uuid);
+			PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
+			for (String placeholderIdentifier : placeholderManager.detectPlaceholders(prefix)) {
+				prefix = prefix.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));
+			}
 
 			msg = prefix+msg;
 
