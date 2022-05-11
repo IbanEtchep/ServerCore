@@ -33,15 +33,14 @@ public class RecompensesCMD implements CommandExecutor, TabCompleter {
 			switch (args[0].toLowerCase()) {
 			case "give":
 				if(args.length == 3) {
-					@SuppressWarnings("deprecation")
-					OfflinePlayer op = Bukkit.getOfflinePlayer(args[1]);
+					OfflinePlayer op = Bukkit.getOfflinePlayerIfCached(args[1]);
 					if(op != null) {
 						try {
 							int id = Integer.parseInt(args[2]);
 							RewardsDAO.getTemplateRewardsAsync().thenAccept(rewards -> {
 								for(Reward r : rewards) {
 									if(r.getId() == id) {
-										RewardsDAO.addRewardAsync(op.getUniqueId().toString(), r.getName(), r.getServer(), r.getCommand());			
+										RewardsDAO.addRewardAsync(op.getUniqueId().toString(), r.getName(), r.getServer(), r.getCommand());
 										if(op.isOnline()) {
 											Player p = (Player)op;
 											p.sendMessage("§aVous avez reçu une récompense (/recompenses).");
