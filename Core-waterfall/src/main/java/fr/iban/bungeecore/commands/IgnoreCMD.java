@@ -30,10 +30,10 @@ public class IgnoreCMD extends Command {
 						if(!account.getIgnoredPlayers().contains(ignoredPlayer)) {
 						  if(!ignored.hasPermission("spartacube.staff")) {
 							account.getIgnoredPlayers().add(ignoredPlayer);
-							player.sendMessage(new TextComponent("§aVous ignoré maintenant §7" + ignored.getName() + "§a."));
+							player.sendMessage(new TextComponent("§aVous ignorez maintenant §7" + ignored.getName() + "§a."));
 							ap.sendAccountToRedis(account);
 						  } else {
-							  player.sendMessage(new TextComponent("§cVous ne pouvez pas ignoré un membre du staff !")); 
+							  player.sendMessage(new TextComponent("§cVous ne pouvez pas ignorer un membre du staff !"));
 						  }
 						}else {
 							account.getIgnoredPlayers().remove(ignoredPlayer);
