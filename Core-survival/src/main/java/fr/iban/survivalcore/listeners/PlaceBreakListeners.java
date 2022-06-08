@@ -33,203 +33,204 @@ import org.bukkit.plugin.Plugin;
 import static org.bukkit.Bukkit.getServer;
 
 public class PlaceBreakListeners implements Listener {
-	
-
-	@EventHandler
-	public void onBlockBreak(BlockBreakEvent e) {
-		LandManager landManager = LandsPlugin.getInstance().getLandManager();
-		Player player = e.getPlayer();
-		Block block = e.getBlock();
-		ItemStack itemInHand = player.getInventory().getItemInMainHand();
-		Location loc = block.getLocation();
-
-		if (player.isSneaking()) return;
-
-		Chunk chunk = block.getChunk();
-		Land land = landManager.getLandAt(chunk);
-
-		if(!land.isWilderness() && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
-
-		//Pioche 3x3
-		if(SpecialTools.is3x3Pickaxe(itemInHand)) {
-			//Bukkit.broadcastMessage("pioche");
-			for(Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)){
-				Chunk c = b.getChunk();
-				Land l = landManager.getLandAt(c);
-				if(!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK)) 
-					continue;
-
-				b.breakNaturally(itemInHand);
-				CoreProtectAPI coreProtect = getCoreProtect();
-				if (coreProtect!=null){ //Ensure we have access to the API
-					coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
-				}
-			}
-		}
-
-		//Pelle 3x3
-		if(SpecialTools.is3x3Shovel(itemInHand)) {
-			//Bukkit.broadcastMessage("pelle");
-			for(Block b : SpecialTools.getSurroundingBlocksShovel(player, block)){
-				Chunk c = b.getChunk();
-				Land l = landManager.getLandAt(c);
-				if(!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK)) 
-					continue;
-
-				b.breakNaturally(itemInHand);
-				CoreProtectAPI coreProtect = getCoreProtect();
-				if (coreProtect!=null){ //Ensure we have access to the API
-					coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
-				}
-			}
-		}
-
-		//Hache bûcheron
-		if(SpecialTools.isLumberjackAxe(itemInHand)) {
-			//Bukkit.broadcastMessage("hache");
-			if (!isLog(block.getType())) {
-				return;
-			}
-			dropTree(block, itemInHand);
-		}
 
 
+    @EventHandler
+    public void onBlockBreak(BlockBreakEvent e) {
+        LandManager landManager = LandsPlugin.getInstance().getLandManager();
+        Player player = e.getPlayer();
+        Block block = e.getBlock();
+        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+        Location loc = block.getLocation();
 
-		//Pioche Hades
-		if(SpecialTools.isCutCleanPickaxe(itemInHand)) {
-			switch (block.getType()) {
-			case GOLD_ORE:
-			case DEEPSLATE_GOLD_ORE:
-				drop(e, Material.GOLD_INGOT, 1, loc, true);
-				break;
-			case IRON_ORE:
-			case DEEPSLATE_IRON_ORE:
-				drop(e, Material.IRON_INGOT, 0.7, loc, true);
-				break;
-			case ANCIENT_DEBRIS:
-				drop(e, Material.NETHERITE_SCRAP, 2, loc, false);
-				break;
-			case NETHER_GOLD_ORE:
-				drop(e, Material.GOLD_INGOT, 1, loc, false);
-				break;
-			case COPPER_ORE:
-			case DEEPSLATE_COPPER_ORE:
-				drop(e, Material.COPPER_INGOT, 0.7, loc, true);
-				break;
-			default:
-				break;
-			}
-		}
-	}
+        if (player.isSneaking()) return;
 
+        Chunk chunk = block.getChunk();
+        Land land = landManager.getLandAt(chunk);
 
-	private void drop(BlockBreakEvent e, Material newDrop, double xp, Location loc, boolean fortuneMultiply) {
-		drop(e, newDrop, xp, loc, fortuneMultiply, 1);
-	}
-	
-	private void drop(BlockBreakEvent e, Material newDrop, double xp, Location loc, boolean fortuneMultiply, int amountToDrop) {
-		Player player = e.getPlayer();
-		ItemStack toDrop = new ItemStack(newDrop);
-		int expToDrop = 0;
+        if (!land.isWilderness() && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
 
-		//Centre du bloc : 
-		loc.add(0.5, 0.5, 0.5);
+        //Pioche 3x3
+        if (SpecialTools.is3x3Pickaxe(itemInHand)) {
+            //Bukkit.broadcastMessage("pioche");
+            for (Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)) {
+                Chunk c = b.getChunk();
+                Land l = landManager.getLandAt(c);
+                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
+                    continue;
 
-		if(fortuneMultiply) {
-			int fortuneLevel = player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
-			amountToDrop = getMultiplier(fortuneLevel);
-			toDrop.setAmount(amountToDrop);
-		}
+                b.breakNaturally(itemInHand);
+                CoreProtectAPI coreProtect = getCoreProtect();
+                if (coreProtect != null) { //Ensure we have access to the API
+                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+                }
+            }
+        }
 
-		for (int i = 0; i < amountToDrop ; i++) {
-			if(xp >= 1) {
-				expToDrop += xp;
-			}else {
-				if(Math.random() <= xp) {
-					expToDrop++;
-				}
-			}
-		}
+        //Pelle 3x3
+        if (SpecialTools.is3x3Shovel(itemInHand)) {
 
-		e.setDropItems(false);
-		e.setExpToDrop(expToDrop);
-		player.getWorld().dropItem(loc, toDrop);
-		player.getWorld().spawnParticle(Particle.FLAME, loc, 10 ,0.3, 0.3, 0.3, 0.02);
-	}
+            for (Block b : SpecialTools.getSurroundingBlocksShovel(player, block)) {
+                Chunk c = b.getChunk();
+                Land l = landManager.getLandAt(c);
+                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
+                    continue;
 
-	private int getMultiplier(int fortunelevel) {
-		Random rand = new Random();
-		int alz2 = rand.nextInt(100 + 1);
-		switch(fortunelevel) {
+                b.breakNaturally(itemInHand);
 
-		case(3):
-			if(alz2 <= 20 && alz2 >= 1) {
-				return 2;
-			}else if(alz2 <= 40 && alz2 > 20) {
-				return 3;
-			}else if(alz2 <= 60 && alz2 > 40) {
-				return 4;
-			}else {
-				return 1;
-			}
-		case(2):
-			if(alz2 <= 25 && alz2 >= 1) {
-				return 2;
-			}else if(alz2 <= 50 && alz2 > 25) {
-				return 3;
-			}else {
-				return 1;
-			}
-		case(1):
-			if(alz2 <= 33 && alz2 >= 1) {
-				return 2;
-			}else {
-				return 1;
-			}
-		}
+                CoreProtectAPI coreProtect = getCoreProtect();
+                if (coreProtect != null) { //Ensure we have access to the API
+                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+                }
 
-		return 1;
-	}
+            }
+        }
+
+        //Hache bûcheron
+        if (SpecialTools.isLumberjackAxe(itemInHand)) {
+            //Bukkit.broadcastMessage("hache");
+            if (!isLog(block.getType())) {
+                return;
+            }
+            dropTree(block, itemInHand);
+        }
 
 
-	private void dropTree(final Block block, final ItemStack item) {
-		List<Block> blocks = new ArrayList<>();
-		//List<Block> leaves = new ArrayList<>();
+        //Pioche Hades
+        if (SpecialTools.isCutCleanPickaxe(itemInHand)) {
+            switch (block.getType()) {
+                case GOLD_ORE:
+                case DEEPSLATE_GOLD_ORE:
+                    drop(e, Material.GOLD_INGOT, 1, loc, true);
+                    break;
+                case IRON_ORE:
+                case DEEPSLATE_IRON_ORE:
+                    drop(e, Material.IRON_INGOT, 0.7, loc, true);
+                    break;
+                case ANCIENT_DEBRIS:
+                    drop(e, Material.NETHERITE_SCRAP, 2, loc, false);
+                    break;
+                case NETHER_GOLD_ORE:
+                    drop(e, Material.GOLD_INGOT, 1, loc, false);
+                    break;
+                case COPPER_ORE:
+                case DEEPSLATE_COPPER_ORE:
+                    drop(e, Material.COPPER_INGOT, 0.7, loc, true);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
 
-		for (Block _block = block; !_block.isEmpty(); _block = _block.getRelative(BlockFace.UP)) {
 
-			for (int k = -1; k <= 1; k++) {
-				for (int j = -1; j <= 1; j++) {
-					for (int l = -1; l <= 1; l++) {
-						final Block relativeBlock = _block.getRelative(j, k, l);
+    private void drop(BlockBreakEvent e, Material newDrop, double xp, Location loc, boolean fortuneMultiply) {
+        drop(e, newDrop, xp, loc, fortuneMultiply, 1);
+    }
 
-						if (isLog(relativeBlock.getType()))
-							blocks.add(relativeBlock);
-					}
-				}
-			}
-		}
-		
-		ItemMeta meta = item.getItemMeta();
-		Damageable itemDmg = (Damageable) meta;
+    private void drop(BlockBreakEvent e, Material newDrop, double xp, Location loc, boolean fortuneMultiply, int amountToDrop) {
+        Player player = e.getPlayer();
+        ItemStack toDrop = new ItemStack(newDrop);
+        int expToDrop = 0;
 
-		int count = 0;
-		for (final Block b : blocks) {
-			Bukkit.getScheduler().scheduleSyncDelayedTask(SurvivalCorePlugin.getInstance(), new Runnable() {
-				@Override
-				public void run() {
-					b.breakNaturally(item);
-				}
-			}, ++count);
-		}
-		
-		
-		int damage = blocks.size() / (meta.getEnchantLevel(Enchantment.DURABILITY)+1);
-				
-		itemDmg.setDamage(itemDmg.getDamage() + damage);
+        //Centre du bloc :
+        loc.add(0.5, 0.5, 0.5);
 
-		item.setItemMeta(meta);
-	}
+        if (fortuneMultiply) {
+            int fortuneLevel = player.getInventory().getItemInMainHand().getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
+            amountToDrop = getMultiplier(fortuneLevel);
+            toDrop.setAmount(amountToDrop);
+        }
+
+        for (int i = 0; i < amountToDrop; i++) {
+            if (xp >= 1) {
+                expToDrop += xp;
+            } else {
+                if (Math.random() <= xp) {
+                    expToDrop++;
+                }
+            }
+        }
+
+        e.setDropItems(false);
+        e.setExpToDrop(expToDrop);
+        player.getWorld().dropItem(loc, toDrop);
+        player.getWorld().spawnParticle(Particle.FLAME, loc, 10, 0.3, 0.3, 0.3, 0.02);
+    }
+
+    private int getMultiplier(int fortunelevel) {
+        Random rand = new Random();
+        int alz2 = rand.nextInt(100 + 1);
+        switch (fortunelevel) {
+
+            case (3):
+                if (alz2 <= 20 && alz2 >= 1) {
+                    return 2;
+                } else if (alz2 <= 40 && alz2 > 20) {
+                    return 3;
+                } else if (alz2 <= 60 && alz2 > 40) {
+                    return 4;
+                } else {
+                    return 1;
+                }
+            case (2):
+                if (alz2 <= 25 && alz2 >= 1) {
+                    return 2;
+                } else if (alz2 <= 50 && alz2 > 25) {
+                    return 3;
+                } else {
+                    return 1;
+                }
+            case (1):
+                if (alz2 <= 33 && alz2 >= 1) {
+                    return 2;
+                } else {
+                    return 1;
+                }
+        }
+
+        return 1;
+    }
+
+
+    private void dropTree(final Block block, final ItemStack item) {
+        List<Block> blocks = new ArrayList<>();
+        //List<Block> leaves = new ArrayList<>();
+
+        for (Block _block = block; !_block.isEmpty(); _block = _block.getRelative(BlockFace.UP)) {
+
+            for (int k = -1; k <= 1; k++) {
+                for (int j = -1; j <= 1; j++) {
+                    for (int l = -1; l <= 1; l++) {
+                        final Block relativeBlock = _block.getRelative(j, k, l);
+
+                        if (isLog(relativeBlock.getType()))
+                            blocks.add(relativeBlock);
+                    }
+                }
+            }
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        Damageable itemDmg = (Damageable) meta;
+
+        int count = 0;
+        for (final Block b : blocks) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(SurvivalCorePlugin.getInstance(), new Runnable() {
+                @Override
+                public void run() {
+                    b.breakNaturally(item);
+                }
+            }, ++count);
+        }
+
+
+        int damage = blocks.size() / (meta.getEnchantLevel(Enchantment.DURABILITY) + 1);
+
+        itemDmg.setDamage(itemDmg.getDamage() + damage);
+
+        item.setItemMeta(meta);
+    }
 
 //	private static boolean isLeaf(Material material) {
 //		switch (material) {
@@ -245,42 +246,44 @@ public class PlaceBreakListeners implements Listener {
 //		}
 //	}
 
-	private static boolean isLog(Material material) {
-		switch (material) {
-		case ACACIA_LOG:
-		case BIRCH_LOG:
-		case DARK_OAK_LOG:
-		case JUNGLE_LOG:
-		case OAK_LOG:
-		case SPRUCE_LOG:
-		case WARPED_STEM:
-		case CRIMSON_STEM:
-			return true;
-		default:
-			return false;
-		}
-	}
+    private static boolean isLog(Material material) {
+        switch (material) {
+            case ACACIA_LOG:
+            case BIRCH_LOG:
+            case DARK_OAK_LOG:
+            case JUNGLE_LOG:
+            case OAK_LOG:
+            case SPRUCE_LOG:
+            case WARPED_STEM:
+            case CRIMSON_STEM:
+                return true;
+            default:
+                return false;
+        }
+    }
 
-	private CoreProtectAPI getCoreProtect() {
-		Plugin plugin = getServer().getPluginManager().getPlugin("CoreProtect");
+    private CoreProtectAPI getCoreProtect() {
+        Plugin plugin = getServer().getPluginManager().getPlugin("CoreProtect");
 
-		// Check that CoreProtect is loaded
-		if (plugin == null || !(plugin instanceof CoreProtect)) {
-			return null;
-		}
+        // Check that CoreProtect is loaded
+        if (!(plugin instanceof CoreProtect)) {
+            return null;
+        }
 
-		// Check that the API is enabled
-		CoreProtectAPI CoreProtect = ((CoreProtect) plugin).getAPI();
-		if (CoreProtect.isEnabled() == false) {
-			return null;
-		}
+        // Check that the API is enabled
+        CoreProtectAPI CoreProtect = ((CoreProtect) plugin).getAPI();
+        if (!CoreProtect.isEnabled()) {
+            return null;
+        }
 
-		// Check that a compatible version of the API is loaded
-		if (CoreProtect.APIVersion() < 7) {
-			return null;
-		}
+        // Check that a compatible version of the API is loaded
+        if (CoreProtect.APIVersion() < 7) {
+            return null;
+        }
 
-		return CoreProtect;
-	}
+        return CoreProtect;
+    }
+
+
 
 }

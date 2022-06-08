@@ -3,12 +3,19 @@ package fr.iban.survivalcore.listeners;
 import java.util.EnumSet;
 import java.util.Set;
 
+import fr.iban.lands.LandManager;
+import fr.iban.lands.LandsPlugin;
+import fr.iban.lands.enums.Flag;
+import fr.iban.lands.objects.Land;
+import fr.iban.survivalcore.event.UseReplantHoeEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.block.data.BlockData;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -24,7 +31,7 @@ import fr.iban.survivalcore.tools.SpecialTools;
 
 public class InteractListeners implements Listener {
 	
-	private SurvivalCorePlugin plugin;
+	private final SurvivalCorePlugin plugin;
 	
 	private final Set<Material> cropList = EnumSet.of(
 			Material.WHEAT, Material.POTATOES, Material.CARROTS,
@@ -36,11 +43,11 @@ public class InteractListeners implements Listener {
 	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent e) {
+		Player player = e.getPlayer();
 		BlockFace bf = e.getBlockFace();
-		if(bf != null) {
-			SpecialTools.faces.put(e.getPlayer().getUniqueId(), bf);
-		}
-		
+		SpecialTools.faces.put(e.getPlayer().getUniqueId(), bf);
+		LandManager landManager = LandsPlugin.getInstance().getLandManager();
+
 		ItemStack item = e.getItem();
 		
 		if(e.getItem() != null) {
@@ -53,7 +60,12 @@ public class InteractListeners implements Listener {
 						Ageable age = (Ageable) bd;
 
 						if(age.getAge() == age.getMaximumAge()) {
-							
+							Land land = landManager.getLandAt(block.getChunk());
+							if (!land.isBypassing(player, fr.iban.lands.enums.Action.BLOCK_BREAK) && !land.hasFlag(Flag.AUTO_REPLANT)) {
+								return;
+							}
+
+							Bukkit.getPluginManager().callEvent(new UseReplantHoeEvent(player, block));
 							block.breakNaturally();
 							ItemMeta meta = item.getItemMeta();
 							Damageable itemDmg = (Damageable) meta;
@@ -66,15 +78,11 @@ public class InteractListeners implements Listener {
 
 								item.setItemMeta(meta);
 							}
-							
-//							e.getPlayer().sendMessage(rand+"");
-//							e.getPlayer().sendMessage(breakChance+"");
 
 							new BukkitRunnable() {
 
 								@Override
 								public void run() {
-
 									block.setType(material);
 								}
 							}.runTaskLater(plugin, 1L);

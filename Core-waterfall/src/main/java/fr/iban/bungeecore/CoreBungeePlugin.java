@@ -57,18 +57,22 @@ public final class CoreBungeePlugin extends Plugin {
         try {
             DbAccess.initPool(new DbCredentials(configuration.getString("database.host"), configuration.getString("database.user"), configuration.getString("database.password"), configuration.getString("database.dbname"), configuration.getInt("database.port")));
         } catch (Exception e) {
+            e.printStackTrace();
             getLogger().severe("Erreur lors de l'initialisation de la connexion sql.");
             getProxy().stop();
+            return;
         }
 
         try {
             RedisAccess.init(new RedisCredentials(configuration.getString("redis.host"), configuration.getString("redis.password"), configuration.getInt("redis.port"), configuration.getString("redis.clientName")));
         } catch (Exception e) {
+            e.printStackTrace();
             getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
             getProxy().stop();
+            return;
         }
 
-        DbTables.createTables(getConfiguration().getString("database.tables-prefix"));
+        DbTables.createTables();
 
         announceManager = new AnnoncesManager();
         chatManager = new ChatManager(this);

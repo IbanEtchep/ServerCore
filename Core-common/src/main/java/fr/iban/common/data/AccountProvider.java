@@ -1,9 +1,6 @@
 package fr.iban.common.data;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -90,7 +87,7 @@ public class AccountProvider {
 			deleteOptionsFromDB(account.getOptions(), connection);
 			saveBlackListedAnnouncesToDB(account.getBlackListedAnnounces(), connection);
 			if(account.getIp() != null) {
-				saveIpToDB(account.getIp(), connection);
+				saveLoginToDb(account, connection);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -224,43 +221,14 @@ public class AccountProvider {
 		}
 	}
 
-	public void saveIpToDB(String ip, Connection connection) throws SQLException {
-		final String INSERT_SQL = "INSERT INTO sc_players_ip(id, ip) VALUES ((SELECT id FROM sc_players WHERE uuid=?), HEX(INET6_ATON(?))) ON DUPLICATE KEY UPDATE id=VALUES(id);";
+	public void saveLoginToDb(Account account, Connection connection) throws SQLException {
+		final String INSERT_SQL = "INSERT INTO sc_logins(id, date_time, ip) VALUES ((SELECT id FROM sc_players WHERE uuid=?), ?, ?) ON DUPLICATE KEY UPDATE id=VALUES(id);";
 		PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
 		ps.setString(1, uuid.toString());
-		ps.setString(2, ip);
+		ps.setTimestamp(2, new Timestamp(account.getLastSeen()));
+		ps.setString(3, account.getIp());
 		ps.executeUpdate();
 		ps.close();
-	}
-
-
-	public void deleteBoostFromDB(Integer id, Long end, Integer value) {
-		DataSource ds = DbAccess.getDataSource();
-		final String DELETE_SQL = "DELETE FROM sc_boosts WHERE id = ? AND end = ? AND value = ?";
-		try (Connection connection = ds.getConnection()) {
-			try(PreparedStatement ps = connection.prepareStatement(DELETE_SQL)){
-				ps.setInt(1, id);
-				ps.setLong(2, end);
-				ps.setInt(3, value);
-				ps.executeUpdate();
-			}
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-
-	public void removeBoostFromDB(UUID uuid, Integer id) {
-		DataSource ds = DbAccess.getDataSource();
-		final String DELETE_SQL = "DELETE FROM sc_boosts WHERE id = ? AND owner = ?";
-		try (Connection connection = ds.getConnection()) {
-			try(PreparedStatement ps = connection.prepareStatement(DELETE_SQL)){
-				ps.setInt(1, id);
-				ps.setString(2, uuid.toString());
-				ps.executeUpdate();
-			}
-		}catch (SQLException e) {
-			e.printStackTrace();
-		}
 	}
 
 	public boolean hasPlayedBefore() {

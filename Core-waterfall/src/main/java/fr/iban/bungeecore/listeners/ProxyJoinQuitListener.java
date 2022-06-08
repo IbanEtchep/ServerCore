@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -61,6 +60,7 @@ public class ProxyJoinQuitListener implements Listener {
 		if(player.hasPermission("premium") && !player.hasPermission("group.support")){
 			proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player "+player.getName()+" tabsuffix #feca57 ✮");
 		}
+
 		proxy.getScheduler().runAsync(plugin, () -> {
 			AccountProvider accountProvider = new AccountProvider(uuid);
 			Account account = accountProvider.getAccount();

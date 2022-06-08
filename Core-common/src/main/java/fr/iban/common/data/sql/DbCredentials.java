@@ -21,7 +21,7 @@ public class DbCredentials {
 		final StringBuilder sb = new StringBuilder();
 		
 		
-		sb.append("jdbc:mysql://")
+		sb.append("jdbc:mariadb://")
 		.append(host)
 		.append(":")
 		.append(port)
@@ -38,5 +38,16 @@ public class DbCredentials {
 		return pass;
 	}
 
+	public int getPort() {
+		return port;
+	}
+
+	public String getHost() {
+		return host;
+	}
+
+	public String getDbName() {
+		return dbName;
+	}
 }
 

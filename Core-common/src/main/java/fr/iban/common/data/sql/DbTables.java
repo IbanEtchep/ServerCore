@@ -6,19 +6,19 @@ import java.sql.SQLException;
 
 public class DbTables {
 
-	public static void createTables(String prefix) {
-		createplayersTable(prefix);
-		createAnnounceBLTable(prefix);
-		createIpTable(prefix);
-		createOptionsTable(prefix);
-		createIgnoredPlayersTable(prefix);
+	public static void createTables() {
+		createplayersTable();
+		createAnnounceBLTable();
+		createIpTable();
+		createOptionsTable();
+		createIgnoredPlayersTable();
 	}
 
 	/*
 	 * Création de la table
 	 */
-	private static void createplayersTable(String prefix) {
-		createTable("CREATE TABLE IF NOT EXISTS "+prefix+"_players (" +
+	private static void createplayersTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_players (" +
 					"  id          int auto_increment PRIMARY KEY," +
 					"  uuid    varchar(36)  not null," +
 					"  name        varchar(16)  not null," +
@@ -32,8 +32,8 @@ public class DbTables {
 					") engine = InnoDB;");
 	}
 	
-	private static void createOptionsTable(String prefix) {
-		createTable("CREATE TABLE IF NOT EXISTS "+prefix+"_options (" +
+	private static void createOptionsTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_options (" +
 				"  id int," +
 				"  idOption varchar(16)," +
 				"  CONSTRAINT PK_sc_options" +
@@ -43,8 +43,8 @@ public class DbTables {
 		") engine = InnoDB;");
     }
 
-	private static void createAnnounceBLTable(String prefix) {
-		createTable("CREATE TABLE IF NOT EXISTS "+prefix+"_annonces_blacklist (" +
+	private static void createAnnounceBLTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_annonces_blacklist (" +
 							"  id int," +
 							"  idAnnonce int," +
 							"  CONSTRAINT PK_sc_annonces_blacklist" +
@@ -54,8 +54,8 @@ public class DbTables {
 					") engine = InnoDB;");
 	}
 	
-	private static void createIgnoredPlayersTable(String prefix) {
-		createTable("CREATE TABLE IF NOT EXISTS "+prefix+"_ignored_players (" +
+	private static void createIgnoredPlayersTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_ignored_players (" +
 							"  id int," +
 							"  uuidPlayer varchar(36) not null," +
 							"  CONSTRAINT PK_sc_ignored_players" +
@@ -65,13 +65,14 @@ public class DbTables {
 					") engine = InnoDB;");
 	}
 
-	private static void createIpTable(String prefix) {
-		createTable("CREATE TABLE IF NOT EXISTS "+prefix+"_players_ip (" +
+	private static void createIpTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_logins (" +
 							"  id int," +
-							"  ip VARBINARY(16)," +
-							"  CONSTRAINT PK_sc_players_ip" +
-							"  PRIMARY KEY (id, ip)," +
-							"  CONSTRAINT FK_sc_players_ip" +
+							"  date_time DATETIME," +
+							"  ip VARCHAR(45)," +
+							"  CONSTRAINT PK_sc_logins" +
+							"  PRIMARY KEY (id, date_time)," +
+							"  CONSTRAINT FK_sc_logins" +
 							"  FOREIGN KEY (id) REFERENCES sc_players(id)" +
 					") engine = InnoDB;");
 	}

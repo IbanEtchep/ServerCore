@@ -11,13 +11,11 @@ public class DbAccess {
 
 	public static void initPool(DbCredentials credentials) {
 		HikariConfig hikariConfig = new HikariConfig();
+		hikariConfig.setDriverClassName("org.mariadb.jdbc.Driver");
 		hikariConfig.setJdbcUrl(credentials.toURI());
 		hikariConfig.setUsername(credentials.getUser());
 		hikariConfig.setPassword(credentials.getPass());
 		hikariConfig.setMaximumPoolSize(5);
-		hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
-		hikariConfig.addDataSourceProperty("prepStmtCacheSize", "250");
-		hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
 		System.out.println("Tentative de connexion à la bdd " + credentials.toURI());
 		dataSource = new HikariDataSource(hikariConfig);
 		System.out.println("Connection effectuée.");

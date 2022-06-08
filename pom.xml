@@ -51,6 +51,7 @@
         <module>Core-common</module>
         <module>Core-paper</module>
         <module>Core-waterfall</module>
+        <module>Core-velocity</module>
         <module>Core-survival</module>
     </modules>
 </project>
