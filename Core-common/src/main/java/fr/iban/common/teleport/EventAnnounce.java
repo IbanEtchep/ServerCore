@@ -1,6 +1,8 @@
 package fr.iban.common.teleport;
 
-public class EventAnnouce {
+import com.google.gson.Gson;
+
+public class EventAnnounce {
 	
 	private String name;
 	private String desc;
@@ -8,9 +10,9 @@ public class EventAnnouce {
 	private String hostName;
 	private String arena;
 	
-	public EventAnnouce() {}
+	public EventAnnounce() {}
 	
-	public EventAnnouce(String name, String arena, String desc, SLocation location, String hostName) {
+	public EventAnnounce(String name, String arena, String desc, SLocation location, String hostName) {
 		this.arena = arena;
 		this.name = name;
 		this.desc = desc;
@@ -52,6 +54,10 @@ public class EventAnnouce {
 	
 	public void setArena(String arena) {
 		this.arena = arena;
+	}
+
+	public String toJson() {
+		return new Gson().toJson(this);
 	}
 
 }

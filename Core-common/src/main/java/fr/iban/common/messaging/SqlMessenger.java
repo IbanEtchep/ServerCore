@@ -9,11 +9,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
-public class SqlMessenger {
+public abstract class SqlMessenger extends AbstractMessenger {
 
     private DataSource ds = DbAccess.getDataSource();
     private long lastId;
+
+    public SqlMessenger() {
+        CompletableFuture.runAsync(this::init).thenRun(() -> {
+           startPollTask();
+           startCleanUpTask();
+        });
+    }
+
+    public abstract void startPollTask();
+
+    public abstract void startCleanUpTask();
 
     public void init() {
         try (Connection connection = ds.getConnection()) {
@@ -58,7 +70,7 @@ public class SqlMessenger {
         }
     }
 
-    public List<Message> getNewMessages() {
+    public void readNewMessages() {
         String selectStatement = "SELECT id, serverFrom, channel, msg FROM sc_messenger WHERE id > ? AND (NOW() - createdAt < 30) ";
         List<Message> messages = new ArrayList<>();
 
@@ -73,14 +85,13 @@ public class SqlMessenger {
                         String channel = rs.getString("channel");
                         String serverFrom = rs.getString("serverFrom");
                         String message = rs.getString("msg");
-                        messages.add(new Message(channel, serverFrom, message));
+                        messageConsumer.accept(new Message(channel, serverFrom, message));
                     }
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return messages;
     }
 
     public void cleanOldMessages() {

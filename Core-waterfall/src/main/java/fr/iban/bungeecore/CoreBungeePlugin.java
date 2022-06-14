@@ -2,11 +2,8 @@ package fr.iban.bungeecore;
 
 import fr.iban.bungeecore.chat.ChatManager;
 import fr.iban.bungeecore.commands.*;
-import fr.iban.bungeecore.listeners.CommandListener;
-import fr.iban.bungeecore.listeners.PluginMessageListener;
-import fr.iban.bungeecore.listeners.ProxyJoinQuitListener;
-import fr.iban.bungeecore.listeners.ProxyPingListener;
-import fr.iban.bungeecore.messaging.BungeeMessagingManager;
+import fr.iban.bungeecore.event.CoreMessageEvent;
+import fr.iban.bungeecore.listeners.*;
 import fr.iban.bungeecore.runnables.SaveAccounts;
 import fr.iban.bungeecore.teleport.*;
 import fr.iban.bungeecore.utils.AnnoncesManager;
@@ -15,6 +12,9 @@ import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.data.sql.DbTables;
+import fr.iban.common.messaging.AbstractMessenger;
+import fr.iban.common.messaging.RedisMessenger;
+import fr.iban.common.messaging.SqlMessenger;
 import fr.iban.common.teleport.*;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Command;
@@ -43,7 +43,7 @@ public final class CoreBungeePlugin extends Plugin {
     private static CoreBungeePlugin instance;
     private Configuration configuration;
     private AnnoncesManager announceManager;
-    private BungeeMessagingManager messagingManager;
+    private AbstractMessenger messenger;
     private ChatManager chatManager;
     private TeleportManager teleportManager;
 
@@ -76,7 +76,8 @@ public final class CoreBungeePlugin extends Plugin {
 
         DbTables.createTables();
 
-        messagingManager = new BungeeMessagingManager(this);
+        startMessenger();
+
         announceManager = new AnnoncesManager();
         chatManager = new ChatManager(this);
         teleportManager = new TeleportManager(this);
@@ -90,7 +91,8 @@ public final class CoreBungeePlugin extends Plugin {
                 new ProxyJoinQuitListener(this),
                 new ProxyPingListener(this),
                 new PluginMessageListener(),
-                new CommandListener(this)
+                new CommandListener(this),
+                new CoreMessageListener(this)
         );
 
         registerCommands(
@@ -117,7 +119,7 @@ public final class CoreBungeePlugin extends Plugin {
 
         RedissonClient redisClient = RedisAccess.getInstance().getRedissonClient();
         redisClient.getTopic("DeathLocation").addListener(DeathLocation.class, new DeathLocationListener(this));
-        redisClient.getTopic("EventAnnounce").addListener(EventAnnouce.class, new EventAnnounceListener(this));
+        redisClient.getTopic("EventAnnounce").addListener(EventAnnounce.class, new EventAnnounceListener(this));
         RTopic tpToSlocTopic = redisClient.getTopic("TpToSLoc");
         tpToSlocTopic.addListener(TeleportToLocation.class, new TpToSLocListener(this));
         RTopic tpToPlayerTopic = redisClient.getTopic("TpToPlayer");
@@ -186,6 +188,37 @@ public final class CoreBungeePlugin extends Plugin {
         }
     }
 
+    private void startMessenger() {
+        switch (configuration.getString("messenger", "redis").toLowerCase()) {
+            case "redis" -> {
+                messenger = new RedisMessenger();
+                messenger.setOnMessageListener(message -> {
+                    if(!message.getServerFrom().equals("bungee")) {
+                        getProxy().getPluginManager().callEvent(new CoreMessageEvent(message));
+                    }
+                });
+            }
+            case "sql" -> {
+                messenger = new SqlMessenger() {
+                    @Override
+                    public void startPollTask() {
+                        getProxy().getScheduler().schedule(instance, this::readNewMessages, 50L, 50L, TimeUnit.MILLISECONDS);
+                    }
+
+                    @Override
+                    public void startCleanUpTask() {
+                        getProxy().getScheduler().schedule(instance, this::readNewMessages, 1L, 1L, TimeUnit.MINUTES);
+                    }
+                };
+                messenger.setOnMessageListener(message -> {
+                    if(!message.getServerFrom().equals("bungee")) {
+                        getProxy().getPluginManager().callEvent(new CoreMessageEvent(message));
+                    }
+                });
+            }
+        }
+    }
+
     public AnnoncesManager getAnnounceManager() {
         return announceManager;
     }
@@ -206,8 +239,8 @@ public final class CoreBungeePlugin extends Plugin {
         return currentEvents;
     }
 
-    public BungeeMessagingManager getMessagingManager() {
-        return messagingManager;
+    public AbstractMessenger getMessenger() {
+        return messenger;
     }
 
     public RMap<String, UUID> getProxyPlayer() {

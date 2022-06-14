@@ -12,6 +12,8 @@ public class Message {
         this.message = message;
     }
 
+    public Message() {}
+
     public String getChannel() {
         return channel;
     }

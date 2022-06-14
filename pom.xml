@@ -39,6 +39,12 @@
                             </goals>
                             <configuration>
                                 <createDependencyReducedPom>false</createDependencyReducedPom>
+                                <relocations>
+                                    <relocation>
+                                        <pattern>com.zaxxer</pattern>
+                                        <shadedPattern>fr.iban.libs.com.zaxxer</shadedPattern>
+                                    </relocation>
+                                </relocations>
                             </configuration>
                         </execution>
                     </executions>

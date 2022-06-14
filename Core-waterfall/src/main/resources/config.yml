@@ -11,6 +11,9 @@ database:
   dbname: dbname
   password: password
 
+#sql or redis
+messanging: redis
+
 motd:
   - "motd"
 chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'

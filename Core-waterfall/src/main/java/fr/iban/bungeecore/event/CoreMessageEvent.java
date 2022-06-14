@@ -1,4 +1,4 @@
-package fr.iban.bungeecore.messaging;
+package fr.iban.bungeecore.event;
 
 import fr.iban.common.messaging.Message;
 import net.md_5.bungee.api.plugin.Event;

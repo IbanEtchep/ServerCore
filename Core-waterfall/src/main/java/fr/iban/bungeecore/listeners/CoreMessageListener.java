@@ -1,23 +1,47 @@
-package fr.iban.bungeecore.teleport;
+package fr.iban.bungeecore.listeners;
 
+import com.google.gson.Gson;
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.bungeecore.event.CoreMessageEvent;
+import fr.iban.common.messaging.Message;
+import fr.iban.common.teleport.DeathLocation;
 import fr.iban.common.teleport.EventAnnounce;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ClickEvent.Action;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
-import org.redisson.api.listener.MessageListener;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.event.EventHandler;
 
-public class EventAnnounceListener implements MessageListener<EventAnnounce> {
+public class CoreMessageListener implements Listener {
 
-    private CoreBungeePlugin plugin;
+    private final CoreBungeePlugin plugin;
+    private final Gson gson = new Gson();
 
-    public EventAnnounceListener(CoreBungeePlugin coreBungeePlugin) {
-        this.plugin = coreBungeePlugin;
+    public CoreMessageListener(CoreBungeePlugin plugin) {
+        this.plugin = plugin;
     }
 
-    @Override
-    public void onMessage(CharSequence channel, EventAnnounce announce) {
+    @EventHandler
+    public void onCoreMessage(CoreMessageEvent e) {
+        Message message = e.getMessage();
+
+        if (message.getServerFrom().equalsIgnoreCase("bungee")) {
+            return;
+        }
+
+        switch (e.getMessage().getChannel()) {
+            case "EventAnnounce" -> consumeAnnounceMessage(message);
+            case "DeathLocation" -> consumeDeathLocationMessage(message);
+        }
+    }
+
+    private void consumeDeathLocationMessage(Message message) {
+        DeathLocation deathLocation = gson.fromJson(message.getMessage(), DeathLocation.class);
+        plugin.getTeleportManager().getDeathLocations().put(deathLocation.getUuid(), deathLocation.getLocation());
+    }
+
+    private void consumeAnnounceMessage(Message message) {
+        EventAnnounce announce = gson.fromJson(message.getMessage(), EventAnnounce.class);
         String key = announce.getName() + ":" + announce.getArena();
 
         if (announce.getLocation() == null) {
@@ -36,9 +60,14 @@ public class EventAnnounceListener implements MessageListener<EventAnnounce> {
         plugin.getProxy().broadcast(new ComponentBuilder(getCentered("§f §5§l" + announce.getName() + " ", 30)).create());
         plugin.getProxy().broadcast(TextComponent.fromLegacyText(announce.getDesc()));
         plugin.getProxy().broadcast(TextComponent.fromLegacyText("§fArene : " + announce.getArena()));
-        plugin.getProxy().broadcast(new ComponentBuilder("§d§lCliquez pour rejoindre").event(new ClickEvent(Action.RUN_COMMAND, "/joinevent " + key)).create());
+        plugin.getProxy().broadcast(new ComponentBuilder("§d§lCliquez pour rejoindre").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinevent " + key)).create());
         plugin.getProxy().broadcast(new ComponentBuilder(getLine(30)).create());
     }
+
+
+    /*
+    UTILS
+     */
 
     private String getLine(int length) {
         StringBuilder sb = new StringBuilder("§8§m");

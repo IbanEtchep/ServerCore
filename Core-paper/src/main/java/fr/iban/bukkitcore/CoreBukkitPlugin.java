@@ -4,7 +4,7 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
-import fr.iban.bukkitcore.manager.BukkitMessagingManager;
+import fr.iban.bukkitcore.manager.MessagingManager;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.teleport.TeleportManager;
@@ -17,6 +17,7 @@ import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
+import fr.iban.common.messaging.AbstractMessenger;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import org.bukkit.Bukkit;
@@ -38,8 +39,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private Map<UUID, TextCallback> textInputs;
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
-	private BukkitMessagingManager messagingManager;
 	private RessourcesWorldManager ressourcesWorldManager;
+	private MessagingManager messagingManager;
 	private RTopic teleportToPlayerRTopic;
 	private RTopic teleportToLocationRTopic;
 	private TeleportToPlayerListener teleportToPlayerListener;
@@ -71,14 +72,13 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		}
 
         RewardsDAO.createTables();
-
-		messagingManager = new BukkitMessagingManager(this);
         
         textInputs = new HashMap<>();
 		tpWaiting = new ArrayList<>();
         
         this.teleportManager = new TeleportManager(this);
         this.ressourcesWorldManager = new RessourcesWorldManager();
+		this.messagingManager = new MessagingManager(this);
 
         registerListeners(
         		new HeadDatabaseListener(),
@@ -195,4 +195,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		});
 	}
 
+	public MessagingManager getMessagingManager() {
+		return messagingManager;
+	}
 }
