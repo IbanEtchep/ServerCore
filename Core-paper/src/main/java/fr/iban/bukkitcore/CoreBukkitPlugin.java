@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
+import fr.iban.bukkitcore.manager.BukkitMessagingManager;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.teleport.TeleportManager;
@@ -37,6 +38,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private Map<UUID, TextCallback> textInputs;
 	private List<UUID> tpWaiting;
 	private Essentials essentials;
+	private BukkitMessagingManager messagingManager;
 	private RessourcesWorldManager ressourcesWorldManager;
 	private RTopic teleportToPlayerRTopic;
 	private RTopic teleportToLocationRTopic;
@@ -49,7 +51,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     public void onEnable() {
     	instance = this;
     	saveDefaultConfig();
-    	
+
 		if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
 			essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
 		}
@@ -69,6 +71,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		}
 
         RewardsDAO.createTables();
+
+		messagingManager = new BukkitMessagingManager(this);
         
         textInputs = new HashMap<>();
 		tpWaiting = new ArrayList<>();

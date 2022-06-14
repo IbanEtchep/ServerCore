@@ -1,104 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+		 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<modelVersion>4.0.0</modelVersion>
 
-	<parent>
+<parent>
+	<groupId>fr.iban</groupId>
+	<artifactId>Core</artifactId>
+	<version>1.0</version>
+</parent>
+
+<artifactId>CoreWaterfall</artifactId>
+<packaging>jar</packaging>
+
+<name>Core Waterfall</name>
+
+<build>
+	<plugins>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-compiler-plugin</artifactId>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-shade-plugin</artifactId>
+		</plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-dependency-plugin</artifactId>
+			<version>3.0.1</version>
+			<executions>
+				<execution>
+					<id>copy-installed</id>
+					<phase>package</phase>
+					<goals>
+						<goal>copy</goal>
+					</goals>
+					<configuration>
+						<artifactItems>
+							<artifactItem>
+								<groupId>${project.groupId}</groupId>
+								<artifactId>${project.artifactId}</artifactId>
+								<version>${project.version}</version>
+								<type>${project.packaging}</type>
+							</artifactItem>
+						</artifactItems>
+						<outputDirectory>../libs/</outputDirectory>
+					</configuration>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+	<resources>
+		<resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+		</resource>
+	</resources>
+</build>
+
+<repositories>
+	<repository>
+		<id>sonatype</id>
+		<url>https://oss.sonatype.org/content/groups/public/</url>
+	</repository>
+	<repository>
+		<id>destroystokyo-repo</id>
+		<url>https://repo.destroystokyo.com/repository/maven-public/</url>
+	</repository>
+	<repository>
+		<id>papermc</id>
+		<url>https://papermc.io/repo/repository/maven-public/</url>
+	</repository>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
+	<repository>
+		<id>opencollab-snapshot</id>
+		<url>https://repo.opencollab.dev/maven-snapshots/</url>
+	</repository>
+	<repository>
+		<id>krypton</id>
+		<url>https://repo.kryptonmc.org/releases</url>
+	</repository>
+	<!-- Libby (AlessioDP) Repository -->
+	<repository>
+		<id>AlessioDP</id>
+		<url>https://repo.alessiodp.com/releases/</url>
+	</repository>
+</repositories>
+
+<dependencies>
+	<dependency>
+		<groupId>io.github.waterfallmc</groupId>
+		<artifactId>waterfall-api</artifactId>
+		<version>1.17-R0.1-SNAPSHOT</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
 		<groupId>fr.iban</groupId>
-		<artifactId>Core</artifactId>
-		<version>1.0</version>
-	</parent>
-
-	<artifactId>CoreWaterfall</artifactId>
-	<packaging>jar</packaging>
-
-	<name>Core Waterfall</name>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-			</plugin>
-		</plugins>
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-			</resource>
-		</resources>
-	</build>
-
-	<repositories>
-		<repository>
-			<id>sonatype</id>
-			<url>https://oss.sonatype.org/content/groups/public/</url>
-		</repository>
-		<repository>
-			<id>destroystokyo-repo</id>
-			<url>https://repo.destroystokyo.com/repository/maven-public/</url>
-		</repository>
-		<repository>
-			<id>papermc</id>
-			<url>https://papermc.io/repo/repository/maven-public/</url>
-		</repository>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-		<repository>
-			<id>opencollab-snapshot</id>
-			<url>https://repo.opencollab.dev/maven-snapshots/</url>
-		</repository>
-		<repository>
-			<id>krypton</id>
-			<url>https://repo.kryptonmc.org/releases</url>
-		</repository>
-	</repositories>
-
-	<dependencies>
-		<dependency>
-			<groupId>io.github.waterfallmc</groupId>
-			<artifactId>waterfall-api</artifactId>
-			<version>1.17-R0.1-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>fr.iban</groupId>
-			<artifactId>CoreCommon</artifactId>
-			<version>${project.version}</version>
-			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>net.luckperms</groupId>
-			<artifactId>api</artifactId>
-			<version>5.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.ocpsoft.prettytime</groupId>
-			<artifactId>prettytime</artifactId>
-			<version>4.0.1.Final</version>
-			<scope>compile</scope>
-		</dependency>
-		<!-- TAB -->
-		<dependency>
-			<groupId>me.neznamy</groupId>
-			<artifactId>tab-api</artifactId>
-			<version>3.0.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<!-- TAB -->
-		<dependency>
-			<groupId>me.neznamy</groupId>
-			<artifactId>tab-shared</artifactId>
-			<version>3.0.2</version>
-			<scope>provided</scope>
-		</dependency>
-	</dependencies>
+		<artifactId>CoreCommon</artifactId>
+		<version>${project.version}</version>
+		<scope>compile</scope>
+	</dependency>
+	<dependency>
+		<groupId>net.luckperms</groupId>
+		<artifactId>api</artifactId>
+		<version>5.2</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>org.ocpsoft.prettytime</groupId>
+		<artifactId>prettytime</artifactId>
+		<version>4.0.1.Final</version>
+		<scope>compile</scope>
+	</dependency>
+	<!-- TAB -->
+	<dependency>
+		<groupId>me.neznamy</groupId>
+		<artifactId>tab-api</artifactId>
+		<version>3.0.2</version>
+		<scope>provided</scope>
+	</dependency>
+	<!-- TAB -->
+	<dependency>
+		<groupId>me.neznamy</groupId>
+		<artifactId>tab-shared</artifactId>
+		<version>3.0.2</version>
+		<scope>provided</scope>
+	</dependency>
+</dependencies>
 </project>
+

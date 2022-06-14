@@ -22,9 +22,7 @@ public class TpWaitingListener implements MessageListener<String> {
             UUID uuid = player.getUniqueId();
             plugin.getTpWaiting().add(uuid);
             Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                if(plugin.getTpWaiting().contains(uuid)){
-                    plugin.getTpWaiting().remove(uuid);
-                }
+                plugin.getTpWaiting().remove(uuid);
             }, 200L);
         }
     }

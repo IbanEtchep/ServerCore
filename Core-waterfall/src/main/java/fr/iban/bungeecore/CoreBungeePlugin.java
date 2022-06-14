@@ -6,6 +6,7 @@ import fr.iban.bungeecore.listeners.CommandListener;
 import fr.iban.bungeecore.listeners.PluginMessageListener;
 import fr.iban.bungeecore.listeners.ProxyJoinQuitListener;
 import fr.iban.bungeecore.listeners.ProxyPingListener;
+import fr.iban.bungeecore.messaging.BungeeMessagingManager;
 import fr.iban.bungeecore.runnables.SaveAccounts;
 import fr.iban.bungeecore.teleport.*;
 import fr.iban.bungeecore.utils.AnnoncesManager;
@@ -42,6 +43,7 @@ public final class CoreBungeePlugin extends Plugin {
     private static CoreBungeePlugin instance;
     private Configuration configuration;
     private AnnoncesManager announceManager;
+    private BungeeMessagingManager messagingManager;
     private ChatManager chatManager;
     private TeleportManager teleportManager;
 
@@ -74,6 +76,7 @@ public final class CoreBungeePlugin extends Plugin {
 
         DbTables.createTables();
 
+        messagingManager = new BungeeMessagingManager(this);
         announceManager = new AnnoncesManager();
         chatManager = new ChatManager(this);
         teleportManager = new TeleportManager(this);
@@ -201,6 +204,10 @@ public final class CoreBungeePlugin extends Plugin {
 
     public Map<String, SLocation> getCurrentEvents() {
         return currentEvents;
+    }
+
+    public BungeeMessagingManager getMessagingManager() {
+        return messagingManager;
     }
 
     public RMap<String, UUID> getProxyPlayer() {
