@@ -232,20 +232,6 @@ public class PlaceBreakListeners implements Listener {
         item.setItemMeta(meta);
     }
 
-//	private static boolean isLeaf(Material material) {
-//		switch (material) {
-//		case ACACIA_LEAVES:
-//		case BIRCH_LEAVES:
-//		case DARK_OAK_LEAVES:
-//		case JUNGLE_LEAVES:
-//		case OAK_LEAVES:
-//		case SPRUCE_LEAVES:
-//			return true;
-//		default:
-//			return false;
-//		}
-//	}
-
     private static boolean isLog(Material material) {
         switch (material) {
             case ACACIA_LOG:
@@ -256,6 +242,13 @@ public class PlaceBreakListeners implements Listener {
             case SPRUCE_LOG:
             case WARPED_STEM:
             case CRIMSON_STEM:
+            case STRIPPED_ACACIA_LOG:
+            case STRIPPED_BIRCH_LOG:
+            case STRIPPED_CRIMSON_HYPHAE:
+            case STRIPPED_JUNGLE_LOG:
+            case STRIPPED_OAK_LOG:
+            case STRIPPED_DARK_OAK_LOG:
+            case STRIPPED_SPRUCE_LOG:
                 return true;
             default:
                 return false;
