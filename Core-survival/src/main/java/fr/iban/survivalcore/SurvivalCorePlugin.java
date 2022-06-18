@@ -1,6 +1,7 @@
 package fr.iban.survivalcore;
 
 import com.earth2me.essentials.Essentials;
+import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.commands.*;
 import fr.iban.survivalcore.listeners.*;
@@ -11,8 +12,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.UUID;
 
 public final class SurvivalCorePlugin extends JavaPlugin {
 
@@ -34,7 +33,6 @@ public final class SurvivalCorePlugin extends JavaPlugin {
         setupEconomy();
 
 		registerEvent(new ServerListPingListener());
-		registerEvent(new InventoryListener());
 		registerEvent(new PlayerFishListener());
 		registerEvent(new EntityDeathListener());
 		registerEvent(new CommandListener());
@@ -52,15 +50,11 @@ public final class SurvivalCorePlugin extends JavaPlugin {
 		getCommand("givetools").setExecutor(new GiveSpecialToolsCMD());
 		getCommand("repair").setExecutor(new RepairCMD());
 		getCommand("annonce").setExecutor(new AnnonceCMD(this));
-		getCommand("pvp").setExecutor(new PvPCMD());
+		getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
 		getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());
 
 		this.hourlyReward = new HourlyReward(this);
-		this.hourlyReward.startTask();
-	}
-	
-	@Override
-	public void onDisable() {
+		this.hourlyReward.init();
 	}
 
 	public static SurvivalCorePlugin getInstance() {

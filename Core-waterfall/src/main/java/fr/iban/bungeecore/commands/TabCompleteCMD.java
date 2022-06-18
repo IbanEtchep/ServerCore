@@ -9,7 +9,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class TabCompleteCMD extends Command{
 
-	private CoreBungeePlugin plugin;
+	private final CoreBungeePlugin plugin;
 
 	public TabCompleteCMD(String name, String perm, CoreBungeePlugin coreBungeePlugin) {
 		super(name, perm);

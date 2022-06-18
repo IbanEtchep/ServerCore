@@ -1,10 +1,8 @@
 package fr.iban.bukkitcore.commands.teleport;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
-import fr.iban.bukkitcore.teleport.TeleportManager;
-import fr.iban.common.teleport.RequestType;
+import fr.iban.bukkitcore.manager.TeleportManager;
 import fr.iban.common.teleport.TpRequest;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -31,12 +29,12 @@ public class TpnoCMD implements CommandExecutor {
             }
 
             if(args.length == 1){
-                plugin.getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
+                plugin.getPlayerManager().getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
                     if(target != null){
                         TpRequest request = teleportManager.getTpRequestFrom(player, target);
                         if(request != null){
                             player.sendMessage("§cDemande de téléportation rejetée.");
-                            teleportManager.getTpRequests(player).removeAsync(request);
+                            teleportManager.removeTpRequest(player.getUniqueId(), request);
                         }else{
                             player.sendMessage("§cVous n'avez pas de requête de téléportation de ce joueur.");
                         }
@@ -47,7 +45,7 @@ public class TpnoCMD implements CommandExecutor {
             }else if(args.length == 0 && !teleportManager.getTpRequests(player).isEmpty()) {
                 TpRequest request = (TpRequest)teleportManager.getTpRequests(player).get(teleportManager.getTpRequests(player).size() - 1);
                 player.sendMessage("§cDemande de téléportation rejetée.");
-                teleportManager.getTpRequests(player).remove(request);
+                teleportManager.removeTpRequest(player.getUniqueId(), request);
             }else {
                 player.sendMessage("§cVous n'avez pas de requête de téléportation.");
             }

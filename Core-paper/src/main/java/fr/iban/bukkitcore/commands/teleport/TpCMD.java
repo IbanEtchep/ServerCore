@@ -15,7 +15,7 @@ import java.util.UUID;
 
 public class TpCMD implements CommandExecutor {
 
-    private CoreBukkitPlugin plugin;
+    private final CoreBukkitPlugin plugin;
 
     public TpCMD(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -32,7 +32,7 @@ public class TpCMD implements CommandExecutor {
             }
 
             if(args.length == 1) {
-                plugin.getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
+                plugin.getPlayerManager().getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
 
                     if(target != null) {
                         if(target.toString().equals(player.getUniqueId().toString())) {

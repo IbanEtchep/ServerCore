@@ -1,8 +1,8 @@
 package fr.iban.survivalcore.listeners;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
-import fr.iban.common.data.AccountProvider;
+import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.manager.AccountManager;
+import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Projectile;
@@ -14,11 +14,8 @@ import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class DamageListeners implements Listener {
-
-	private LoadingCache<UUID, Boolean> pvpCache = Caffeine.newBuilder().expireAfterWrite(10, TimeUnit.SECONDS).build(uuid -> new AccountProvider(uuid).getAccount().getOption(Option.PVP));
 
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onDamage(EntityDamageEvent e) {
@@ -49,6 +46,9 @@ public class DamageListeners implements Listener {
 	}
 
 	private boolean canPVP(UUID p1, UUID p2) {
-		return pvpCache.get(p1).booleanValue() && pvpCache.get(p2).booleanValue();
+		AccountManager accountManager = CoreBukkitPlugin.getInstance().getAccountManager();
+		Account account1 = accountManager.getAccount(p1);
+		Account account2 = accountManager.getAccount(p2);
+		return Boolean.TRUE.equals(account1.getOption(Option.PVP)) && Boolean.TRUE.equals(account2.getOption(Option.PVP));
 	}
 }

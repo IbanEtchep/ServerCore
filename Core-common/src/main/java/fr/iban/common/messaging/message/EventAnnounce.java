@@ -1,6 +1,7 @@
-package fr.iban.common.teleport;
+package fr.iban.common.messaging.message;
 
 import com.google.gson.Gson;
+import fr.iban.common.teleport.SLocation;
 
 public class EventAnnounce {
 	
@@ -54,10 +55,6 @@ public class EventAnnounce {
 	
 	public void setArena(String arena) {
 		this.arena = arena;
-	}
-
-	public String toJson() {
-		return new Gson().toJson(this);
 	}
 
 }

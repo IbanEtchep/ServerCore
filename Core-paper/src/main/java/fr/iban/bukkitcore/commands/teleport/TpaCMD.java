@@ -1,7 +1,7 @@
 package fr.iban.bukkitcore.commands.teleport;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
-import fr.iban.bukkitcore.teleport.TeleportManager;
+import fr.iban.bukkitcore.manager.TeleportManager;
 import fr.iban.common.teleport.RequestType;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -29,7 +29,7 @@ public class TpaCMD implements CommandExecutor {
             }
 
             if(args.length == 1){
-                plugin.getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
+                plugin.getPlayerManager().getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
 
                     if(target != null){
 

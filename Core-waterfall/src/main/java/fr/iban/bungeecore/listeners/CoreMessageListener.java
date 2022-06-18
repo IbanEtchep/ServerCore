@@ -4,13 +4,20 @@ import com.google.gson.Gson;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.event.CoreMessageEvent;
 import fr.iban.common.messaging.Message;
-import fr.iban.common.teleport.DeathLocation;
-import fr.iban.common.teleport.EventAnnounce;
+import fr.iban.common.messaging.message.DeathLocation;
+import fr.iban.common.messaging.message.EventAnnounce;
+import fr.iban.common.teleport.RequestType;
+import fr.iban.common.teleport.TeleportToLocation;
+import fr.iban.common.teleport.TeleportToPlayer;
+import fr.iban.common.teleport.TpRequest;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+
+import java.util.UUID;
 
 public class CoreMessageListener implements Listener {
 
@@ -25,13 +32,58 @@ public class CoreMessageListener implements Listener {
     public void onCoreMessage(CoreMessageEvent e) {
         Message message = e.getMessage();
 
-        if (message.getServerFrom().equalsIgnoreCase("bungee")) {
-            return;
-        }
-
         switch (e.getMessage().getChannel()) {
             case "EventAnnounce" -> consumeAnnounceMessage(message);
             case "DeathLocation" -> consumeDeathLocationMessage(message);
+            case "TeleportToLocationBungee" -> consumeTeleportToLocationBungeeMessage(message);
+            case "TeleportToPlayerBungee" -> consumeTeleportToPlayerBungeeMessage(message);
+            case "TeleportRequestBungee" -> consumeTeleportRequestBungeeMessage(message);
+            case CoreBungeePlugin.SYNC_ACCOUNT_CHANNEL ->
+                    plugin.getAccountManager().reloadAccount(UUID.fromString(message.getMessage()));
+            case CoreBungeePlugin.REMOVE_PENDING_TP_CHANNEL ->
+                    plugin.getTeleportManager().getPendingTeleports().remove(UUID.fromString(message.getMessage()));
+            case CoreBungeePlugin.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
+        }
+    }
+
+    public void consumeRemoveTpRequestMessage(Message message) {
+        TpRequest request = gson.fromJson(message.getMessage(), TpRequest.class);
+        plugin.getTeleportManager().getTpRequests().remove(request.getPlayerTo(), request);
+    }
+
+    private void consumeTeleportToLocationBungeeMessage(Message message) {
+        TeleportToLocation teleportToLocation = gson.fromJson(message.getMessage(), TeleportToLocation.class);
+        ProxiedPlayer player = plugin.getProxy().getPlayer(teleportToLocation.getUuid());
+        if (player != null) {
+            if (teleportToLocation.getDelay() == 0) {
+                plugin.getTeleportManager().teleport(player, teleportToLocation.getLocation());
+            } else {
+                plugin.getTeleportManager().delayedTeleport(player, teleportToLocation.getLocation(), Math.abs(teleportToLocation.getDelay()));
+            }
+        }
+    }
+
+    private void consumeTeleportToPlayerBungeeMessage(Message message) {
+        TeleportToPlayer teleportToPlayer = gson.fromJson(message.getMessage(), TeleportToPlayer.class);
+        ProxiedPlayer player = plugin.getProxy().getPlayer(teleportToPlayer.getUuid());
+        if (player != null) {
+            if (teleportToPlayer.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
+                plugin.getTeleportManager().teleport(player, plugin.getProxy().getPlayer(teleportToPlayer.getTargetId()));
+            } else {
+                plugin.getTeleportManager().delayedTeleport(player, plugin.getProxy().getPlayer(teleportToPlayer.getTargetId()), Math.abs(teleportToPlayer.getDelay()));
+            }
+        }
+    }
+
+    private void consumeTeleportRequestBungeeMessage(Message message) {
+        TpRequest request = gson.fromJson(message.getMessage(), TpRequest.class);
+        ProxiedPlayer from = plugin.getProxy().getPlayer(request.getPlayerFrom());
+        ProxiedPlayer to = plugin.getProxy().getPlayer(request.getPlayerTo());
+
+        if (request.getRequestType() == RequestType.TP) {
+            plugin.getTeleportManager().sendTeleportRequest(from, to);
+        } else if (request.getRequestType() == RequestType.TPHERE) {
+            plugin.getTeleportManager().sendTeleportHereRequest(from, to);
         }
     }
 

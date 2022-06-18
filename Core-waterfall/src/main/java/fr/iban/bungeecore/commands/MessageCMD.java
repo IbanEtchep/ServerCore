@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.bungeecore.manager.AccountManager;
 import fr.iban.bungeecore.utils.HexColor;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -18,8 +18,11 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 public class MessageCMD extends Command implements TabExecutor {
 
-	public MessageCMD(String name, String permission, String name2, String name3, String name4, String name5, String name6) {
+	private CoreBungeePlugin plugin;
+
+	public MessageCMD(String name, String permission, CoreBungeePlugin plugin, String name2, String name3, String name4, String name5, String name6) {
 		super(name, permission, name2, name3, name4, name5, name6);
+		this.plugin = plugin;
 	}	
 
 	public void execute(CommandSender sender, String[] args) {
@@ -45,7 +48,8 @@ public class MessageCMD extends Command implements TabExecutor {
 						if(player.hasPermission("spartacube.colors")) {
 							message = HexColor.translateColorCodes(message);
 						}
-						Account account = new AccountProvider(target.getUniqueId()).getAccount();
+						AccountManager accountManager = plugin.getAccountManager();
+						Account account = accountManager.getAccount(player.getUniqueId());
 						if (account.getOption(Option.MSG) || player.hasPermission("spartacube.msgtogglebypass")) {
 							if(!account.getIgnoredPlayers().contains(player.getUniqueId())) {
 								if(target.hasPermission("spartacube.staff")) {

@@ -10,12 +10,6 @@ public class SurvivalCoreCMD implements CommandExecutor {
     @Override
     public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, @NotNull String[] args) {
         if(sender.hasPermission("survivalcore.admin")){
-            if(args.length == 1 && args[0].equalsIgnoreCase("proxyplayers")){
-                sender.sendMessage(CoreBukkitPlugin.getInstance().getProxyPlayers().size() + " joueurs");
-                CoreBukkitPlugin.getInstance().getProxyPlayers().forEach((name, uuid) -> {
-                    sender.sendMessage("- " + name + " - " + uuid);
-                });
-            }
         }
         return false;
     }

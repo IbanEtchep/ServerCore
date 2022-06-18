@@ -29,7 +29,7 @@ public class RessourcesWorldManager {
         if(plugin.getServerName().equalsIgnoreCase(plugin.getConfig().getString("ressources-servername"))) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + worldname);
         }else {
-            RedisAccess.getInstance().getRedissonClient().getTopic("PlayerRTP").publish(new PlayerRTP(player.getUniqueId(), worldname));
+            plugin.getMessagingManager().sendMessageAsync("PlayerRTP", new PlayerRTP(player.getUniqueId(), worldname));
             PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("ressources-servername"));
         }
     }

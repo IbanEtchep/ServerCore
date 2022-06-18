@@ -2,14 +2,11 @@ package fr.iban.bukkitcore.manager;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.event.CoreMessageEvent;
-import fr.iban.common.messaging.AbstractMessenger;
-import fr.iban.common.messaging.Message;
-import fr.iban.common.messaging.RedisMessenger;
-import fr.iban.common.messaging.SqlMessenger;
+import fr.iban.common.messaging.*;
+import org.bukkit.Bukkit;
 
-public class MessagingManager {
+public class MessagingManager extends AbstractMessagingManager {
 
-    private AbstractMessenger messenger;
     private final CoreBukkitPlugin plugin;
 
     public MessagingManager(CoreBukkitPlugin plugin) {
@@ -17,10 +14,11 @@ public class MessagingManager {
         initMessenger();
     }
 
-    private void initMessenger() {
+    @Override
+    public void initMessenger() {
         switch (plugin.getConfig().getString("messenger", "redis").toLowerCase()) {
-            case "redis" -> messenger = new RedisMessenger();
-            case "sql" -> messenger = new SqlMessenger() {
+            //case "redis" -> messenger = new RedisMessenger();
+            default -> messenger = new SqlMessenger() {
                 @Override
                 public void startPollTask() {
                     plugin.getServer().getScheduler().runTaskTimerAsynchronously(plugin, this::readNewMessages, 1L, 1L);
@@ -39,11 +37,16 @@ public class MessagingManager {
         });
     }
 
-    public AbstractMessenger getMessenger() {
-        return messenger;
+    @Override
+    protected String getServerName() {
+        return plugin.getServerName();
     }
 
-    public void sendMessage(String channel, String jsonMsg) {
-        getMessenger().sendMessage(new Message(channel, plugin.getServerName(), jsonMsg));
+    public void sendMessageAsync(String channel, String jsonMsg) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendMessage(channel, jsonMsg));
+    }
+
+    public <T> void sendMessageAsync(String channel, T message) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> sendMessage(channel, message));
     }
 }

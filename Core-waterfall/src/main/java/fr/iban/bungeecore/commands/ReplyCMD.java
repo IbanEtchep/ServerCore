@@ -7,7 +7,6 @@ import java.util.Map;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
@@ -20,9 +19,11 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 public class ReplyCMD extends Command implements TabExecutor {
 
 	private static HashMap<ProxiedPlayer, ProxiedPlayer> replies = new HashMap<>();
+	private final CoreBungeePlugin plugin;
 
-	public ReplyCMD(String name, String permission, String name2) {
+	public ReplyCMD(String name, String permission, String name2, CoreBungeePlugin plugin) {
 		super(name, permission, name2);
+		this.plugin = plugin;
 	}
 	
 
@@ -39,8 +40,7 @@ public class ReplyCMD extends Command implements TabExecutor {
 						return;
 					} 
 					StringBuilder sb = new StringBuilder("");
-					for (int i = 0; i < args.length; i++)
-						sb.append(args[i]).append(" "); 
+					for (String arg : args) sb.append(arg).append(" ");
 					String msg = sb.toString();
 					ProxyServer.getInstance().getPlayers().forEach( p -> {    
 						if (SocialSpyCMD.sp.contains(p)) {
@@ -48,7 +48,7 @@ public class ReplyCMD extends Command implements TabExecutor {
 						}  
 					});
 					ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
-						Account account = new AccountProvider(target.getUniqueId()).getAccount();
+						Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
 						if (account.getOption(Option.MSG) || player.hasPermission("spartacube.msgtogglebypass")) {
 							 if(target.hasPermission("spartacube.staff")) {
 								 player.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §8[§6Staff§8] §c" + target.getName() + " §6➤§7 " + msg));

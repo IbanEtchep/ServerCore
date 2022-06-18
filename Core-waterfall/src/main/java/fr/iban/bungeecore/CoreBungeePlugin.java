@@ -1,31 +1,21 @@
 package fr.iban.bungeecore;
 
-import fr.iban.bungeecore.chat.ChatManager;
 import fr.iban.bungeecore.commands.*;
-import fr.iban.bungeecore.event.CoreMessageEvent;
 import fr.iban.bungeecore.listeners.*;
-import fr.iban.bungeecore.runnables.SaveAccounts;
-import fr.iban.bungeecore.teleport.*;
-import fr.iban.bungeecore.utils.AnnoncesManager;
+import fr.iban.bungeecore.manager.*;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.data.sql.DbTables;
-import fr.iban.common.messaging.AbstractMessenger;
-import fr.iban.common.messaging.RedisMessenger;
-import fr.iban.common.messaging.SqlMessenger;
-import fr.iban.common.teleport.*;
-import net.md_5.bungee.api.ProxyServer;
+import fr.iban.common.manager.PlayerManager;
+import fr.iban.common.teleport.SLocation;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import org.redisson.api.RMap;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
 
 import java.io.File;
 import java.io.IOException;
@@ -33,22 +23,25 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public final class CoreBungeePlugin extends Plugin {
 
-    private static final String RANKUP_CHANNEL = "survie:rankup";
+    public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
+    public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
+    public static final String ADD_PENDING_TP_CHANNEL = "AddPendingTeleport";
+    public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
+    public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
 
     private static CoreBungeePlugin instance;
     private Configuration configuration;
     private AnnoncesManager announceManager;
-    private AbstractMessenger messenger;
     private ChatManager chatManager;
     private TeleportManager teleportManager;
+    private PlayerManager playerManager;
 
     private Map<String, SLocation> currentEvents;
-
+    private MessagingManager messagingManager;
+    private AccountManager accountManager;
     @Override
     public void onEnable() {
         instance = this;
@@ -65,25 +58,28 @@ public final class CoreBungeePlugin extends Plugin {
             return;
         }
 
-        try {
-            RedisAccess.init(new RedisCredentials(configuration.getString("redis.host"), configuration.getString("redis.password"), configuration.getInt("redis.port"), configuration.getString("redis.clientName")));
-        } catch (Exception e) {
-            e.printStackTrace();
-            getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
-            getProxy().stop();
-            return;
+        if(getConfiguration().getString("messenger", "sql").equals("redis")) {
+            try {
+                RedisAccess.init(new RedisCredentials(configuration.getString("redis.host"), configuration.getString("redis.password"), configuration.getInt("redis.port"), configuration.getString("redis.clientName")));
+            } catch (Exception e) {
+                e.printStackTrace();
+                getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
+                getProxy().stop();
+                return;
+            }
         }
 
         DbTables.createTables();
 
-        startMessenger();
-
-        announceManager = new AnnoncesManager();
+        accountManager = new AccountManager(this);
+        messagingManager = new MessagingManager(this);
+        announceManager = new AnnoncesManager(this);
         chatManager = new ChatManager(this);
         teleportManager = new TeleportManager(this);
+        this.playerManager = new PlayerManager();
+        playerManager.clearOnlinePlayersFromDB();
 
         getProxy().registerChannel("proxy:chat");
-        getProxy().registerChannel(RANKUP_CHANNEL);
         getProxy().registerChannel("proxy:annonce");
         getProxy().registerChannel("proxy:send");
 
@@ -96,48 +92,34 @@ public final class CoreBungeePlugin extends Plugin {
         );
 
         registerCommands(
-                new AnnounceCMD("announce"),
-                new IgnoreCMD("ignore"),
+                new AnnounceCMD("announce", this),
+                new IgnoreCMD("ignore", this),
                 new ChatCMD("chat"),
-                new TptoggleCMD("tptoggle"),
-                new IgnoreCMD("ignore"),
-                new IgnoreListCMD("ignorelist"),
+                new TptoggleCMD("tptoggle", this),
+                new IgnoreListCMD("ignorelist", this),
                 new StaffChatToggle("sctoggle", "servercore.sctoggle", "staffchattoggle"),
-                new MessageCMD("msg", "servercore.msg", "message", "m", "w", "tell", "t"),
-                new ReplyCMD("reply", "servercore.reply", "r"),
+                new MessageCMD("msg", "servercore.msg", this, "message", "m", "w", "tell", "t"),
+                new ReplyCMD("reply", "servercore.reply", "r", this),
                 new SudoCMD("sudo", "servercore.sudo"),
                 new SocialSpyCMD("socialspy", "servercore.socialspy"),
-                new MsgToggleCMD("msgtoggle", "servercore.msgtoggle"),
+                new MsgToggleCMD("msgtoggle", "servercore.msgtoggle", this),
                 new BackCMD("back", "servercore.back.death", teleportManager),
                 new JoinEventCMD("joinevent", this),
                 new TabCompleteCMD("baddtabcomplete", "servercore.addtabcomplete", this),
                 new AnnounceEventCMD("announceevent", this),
                 new CoreCMD("bcore", "servercore.reload", this)
         );
-
-        ProxyServer.getInstance().getScheduler().schedule(this, new SaveAccounts(), 0, 10, TimeUnit.MINUTES);
-
-        RedissonClient redisClient = RedisAccess.getInstance().getRedissonClient();
-        redisClient.getTopic("DeathLocation").addListener(DeathLocation.class, new DeathLocationListener(this));
-        redisClient.getTopic("EventAnnounce").addListener(EventAnnounce.class, new EventAnnounceListener(this));
-        RTopic tpToSlocTopic = redisClient.getTopic("TpToSLoc");
-        tpToSlocTopic.addListener(TeleportToLocation.class, new TpToSLocListener(this));
-        RTopic tpToPlayerTopic = redisClient.getTopic("TpToPlayer");
-        tpToPlayerTopic.addListener(TeleportToPlayer.class, new TpToPlayerListener(this));
-        RTopic tpRequestTopic = redisClient.getTopic("TpRequest");
-        tpRequestTopic.addListener(TpRequest.class, new TpRequestListener(this));
-
     }
 
     @Override
     public void onDisable() {
-        new SaveAccounts().run();
-        RedisAccess.close();
+        if(getConfiguration().getString("messenger", "sql").equals("redis")) {
+            RedisAccess.close();
+        }
         DbAccess.closePool();
         getProxy().unregisterChannel("proxy:chat");
         getProxy().unregisterChannel("proxy:annonce");
         getProxy().unregisterChannel("proxy:send");
-        getProxy().unregisterChannel(RANKUP_CHANNEL);
     }
 
     public void registerEvents(Listener... listeners) {
@@ -187,44 +169,16 @@ public final class CoreBungeePlugin extends Plugin {
             }
         }
     }
-
-    private void startMessenger() {
-        switch (configuration.getString("messenger", "redis").toLowerCase()) {
-            case "redis" -> {
-                messenger = new RedisMessenger();
-                messenger.setOnMessageListener(message -> {
-                    if(!message.getServerFrom().equals("bungee")) {
-                        getProxy().getPluginManager().callEvent(new CoreMessageEvent(message));
-                    }
-                });
-            }
-            case "sql" -> {
-                messenger = new SqlMessenger() {
-                    @Override
-                    public void startPollTask() {
-                        getProxy().getScheduler().schedule(instance, this::readNewMessages, 50L, 50L, TimeUnit.MILLISECONDS);
-                    }
-
-                    @Override
-                    public void startCleanUpTask() {
-                        getProxy().getScheduler().schedule(instance, this::readNewMessages, 1L, 1L, TimeUnit.MINUTES);
-                    }
-                };
-                messenger.setOnMessageListener(message -> {
-                    if(!message.getServerFrom().equals("bungee")) {
-                        getProxy().getPluginManager().callEvent(new CoreMessageEvent(message));
-                    }
-                });
-            }
-        }
-    }
-
     public AnnoncesManager getAnnounceManager() {
         return announceManager;
     }
 
     public Configuration getConfiguration() {
         return configuration;
+    }
+
+    public AccountManager getAccountManager() {
+        return accountManager;
     }
 
     public ChatManager getChatManager() {
@@ -235,15 +189,15 @@ public final class CoreBungeePlugin extends Plugin {
         return teleportManager;
     }
 
+    public MessagingManager getMessagingManager() {
+        return messagingManager;
+    }
+
+    public PlayerManager getPlayerManager() {
+        return playerManager;
+    }
+
     public Map<String, SLocation> getCurrentEvents() {
         return currentEvents;
-    }
-
-    public AbstractMessenger getMessenger() {
-        return messenger;
-    }
-
-    public RMap<String, UUID> getProxyPlayer() {
-        return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
     }
 }

@@ -13,7 +13,7 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 
 public class JoinQuitListeners implements Listener {
 
-	private CoreBukkitPlugin plugin;
+	private final CoreBukkitPlugin plugin;
 
 
 	public JoinQuitListeners(CoreBukkitPlugin plugin) {

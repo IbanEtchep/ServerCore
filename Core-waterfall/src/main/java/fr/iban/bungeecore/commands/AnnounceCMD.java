@@ -1,9 +1,9 @@
 package fr.iban.bungeecore.commands;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
-import fr.iban.bungeecore.utils.AnnoncesManager;
+import fr.iban.bungeecore.manager.AccountManager;
+import fr.iban.bungeecore.manager.AnnoncesManager;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -11,8 +11,11 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class AnnounceCMD extends Command {
 
-	public AnnounceCMD(String name) {
+	private CoreBungeePlugin plugin;
+
+	public AnnounceCMD(String name, CoreBungeePlugin plugin) {
 		super(name);
+		this.plugin = plugin;
 	}
 
 	@Override
@@ -22,8 +25,7 @@ public class AnnounceCMD extends Command {
 			ProxiedPlayer player = (ProxiedPlayer)sender;
 			if(args.length == 1) {
 				if(args[0].equalsIgnoreCase("listdisabled")) {
-					AccountProvider ap = new AccountProvider(player.getUniqueId());
-					Account account = ap.getAccount();
+					Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
 					for(int idA : account.getBlackListedAnnounces()) {
 						player.sendMessage(new TextComponent("- " + idA));
 					}
@@ -33,12 +35,12 @@ public class AnnounceCMD extends Command {
 				if(args[0].equalsIgnoreCase("disable")) {
 					int id = Integer.parseInt(args[1]);
 					if(am.getAnnonces().containsKey(id)) {
-						AccountProvider ap = new AccountProvider(player.getUniqueId());
-						Account account = ap.getAccount();
+						AccountManager accountManager = plugin.getAccountManager();
+						Account account = accountManager.getAccount(player.getUniqueId());
 						if(!account.getBlackListedAnnounces().contains(id)) {
 							account.getBlackListedAnnounces().add(id);
 							player.sendMessage(new TextComponent("§aCette annonce ne vous sera plus affichée à l'avenir."));
-							ap.sendAccountToRedis(account);
+							accountManager.saveAccount(account);
 						}else {
 							player.sendMessage(new TextComponent("§cVous avez déjà bloqué cette annonce."));
 						}

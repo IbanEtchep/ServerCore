@@ -4,49 +4,42 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
+import fr.iban.bukkitcore.manager.AccountManager;
 import fr.iban.bukkitcore.manager.MessagingManager;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
+import fr.iban.bukkitcore.manager.TeleportManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
-import fr.iban.bukkitcore.teleport.TeleportManager;
-import fr.iban.bukkitcore.teleport.TeleportToLocationListener;
-import fr.iban.bukkitcore.teleport.TeleportToPlayerListener;
-import fr.iban.bukkitcore.teleport.TpWaitingListener;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
-import fr.iban.common.messaging.AbstractMessenger;
-import fr.iban.common.teleport.TeleportToLocation;
-import fr.iban.common.teleport.TeleportToPlayer;
+import fr.iban.common.manager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.redisson.api.RMap;
-import org.redisson.api.RTopic;
-import org.redisson.api.RedissonClient;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public final class CoreBukkitPlugin extends JavaPlugin {
 
+    public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
+	public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
+	public static final String ADD_PENDING_TP_CHANNEL = "AddPendingTeleport";
+	public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
+	public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
 	private static CoreBukkitPlugin instance;
 	private TeleportManager teleportManager;
-	private RedissonClient redisClient;
 	private Map<UUID, TextCallback> textInputs;
-	private List<UUID> tpWaiting;
 	private Essentials essentials;
 	private RessourcesWorldManager ressourcesWorldManager;
 	private MessagingManager messagingManager;
-	private RTopic teleportToPlayerRTopic;
-	private RTopic teleportToLocationRTopic;
-	private TeleportToPlayerListener teleportToPlayerListener;
-	private TeleportToLocationListener teleportToLocationListener;
-	private RTopic tpWaitingTopic;
-	private TpWaitingListener tpWaitingListener;
+	private AccountManager accountManager;
+	private PlayerManager playerManager;
 
 	@Override
     public void onEnable() {
@@ -63,22 +56,25 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     		getLogger().severe("Erreur lors de l'initialisation de la connexion sql.");
 			Bukkit.shutdown();
 		}
-    	
-    	try {
-            RedisAccess.init(new RedisCredentials(getConfig().getString("redis.host"), getConfig().getString("redis.password"), getConfig().getInt("redis.port"), getConfig().getString("redis.clientName")));
-    	}catch (Exception e) {
-    		getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
-			Bukkit.shutdown();
+
+		if(getConfig().getString("messenger", "sql").equals("redis")) {
+			try {
+				RedisAccess.init(new RedisCredentials(getConfig().getString("redis.host"), getConfig().getString("redis.password"), getConfig().getInt("redis.port"), getConfig().getString("redis.clientName")));
+			}catch (Exception e) {
+				getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
+				Bukkit.shutdown();
+			}
 		}
 
         RewardsDAO.createTables();
         
         textInputs = new HashMap<>();
-		tpWaiting = new ArrayList<>();
-        
+
+		this.accountManager = new AccountManager(this);
         this.teleportManager = new TeleportManager(this);
         this.ressourcesWorldManager = new RessourcesWorldManager();
 		this.messagingManager = new MessagingManager(this);
+		this.playerManager = new PlayerManager();
 
         registerListeners(
         		new HeadDatabaseListener(),
@@ -88,7 +84,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         		new PlayerMoveListener(this),
         		new DeathListener(this),
         		new CommandsListener(this),
-				new AsyncTabCompleteListener(this)
+				new AsyncTabCompleteListener(this),
+				new CoreMessageListener(this)
         		);
 
 		getCommand("core").setExecutor(new CoreCMD(this));
@@ -114,29 +111,15 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		getCommand("tpno").setExecutor(new TpnoCMD(this));
 		getCommand("tphere").setExecutor(new TphereCMD(this));
 
-
         PluginMessageHelper.registerChannels(this);
-        
-    	redisClient = RedisAccess.getInstance().getRedissonClient();
-		teleportToPlayerRTopic = redisClient.getTopic("TeleportToPlayer");
-		teleportToPlayerListener = new TeleportToPlayerListener();
-		teleportToPlayerRTopic.addListener(TeleportToPlayer.class, teleportToPlayerListener);
-		teleportToLocationRTopic = redisClient.getTopic("TeleportToLocation");
-		teleportToLocationListener = new TeleportToLocationListener();
-		teleportToLocationRTopic.addListener(TeleportToLocation.class, teleportToLocationListener);
-
-		tpWaitingTopic = redisClient.getTopic("tpWaiting");
-		tpWaitingListener = new TpWaitingListener(this);
-		tpWaitingTopic.addListener(String.class, tpWaitingListener);
     }
 
     @Override
     public void onDisable() {
-        RedisAccess.close();
+		if(getConfig().getString("messenger", "sql").equals("redis")) {
+			RedisAccess.close();
+		}
         DbAccess.closePool();
-		tpWaitingTopic.removeListener(tpWaitingListener);
-		teleportToLocationRTopic.removeListener(teleportToLocationListener);
-		teleportToPlayerRTopic.removeListener(teleportToPlayerListener);
     }
     
 	private void registerListeners(Listener... listeners) {
@@ -148,11 +131,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		}
 
 	}
-	
-	public RedissonClient getRedisClient() {
-		return redisClient;
-	}
-
 	public static CoreBukkitPlugin getInstance() {
 		return instance;
 	}
@@ -164,7 +142,11 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	public Map<UUID, TextCallback> getTextInputs() {
 		return textInputs;
 	}
-	
+
+	public AccountManager getAccountManager() {
+		return accountManager;
+	}
+
 	public TeleportManager getTeleportManager() {
 		return teleportManager;
 	}
@@ -173,29 +155,15 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		return essentials;
 	}
 
-	public RMap<String, String> getProxyPlayers(){
-		return RedisAccess.getInstance().getRedissonClient().getMap("ProxyPlayers");
-	}
-
 	public RessourcesWorldManager getRessourcesWorldManager() {
 		return ressourcesWorldManager;
 	}
 
-	public List<UUID> getTpWaiting() {
-		return tpWaiting;
-	}
-
-	public CompletableFuture<UUID> getProxiedPlayerUUID(String name){
-		return CompletableFuture.supplyAsync(() -> {
-			String uuidString = getProxyPlayers().get(name);
-			if(uuidString == null){
-				return null;
-			}
-			return UUID.fromString(uuidString);
-		});
-	}
-
 	public MessagingManager getMessagingManager() {
 		return messagingManager;
+	}
+
+	public PlayerManager getPlayerManager() {
+		return playerManager;
 	}
 }

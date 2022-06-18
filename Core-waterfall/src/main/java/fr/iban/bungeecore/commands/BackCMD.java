@@ -1,6 +1,6 @@
 package fr.iban.bungeecore.commands;
 
-import fr.iban.bungeecore.teleport.TeleportManager;
+import fr.iban.bungeecore.manager.TeleportManager;
 import fr.iban.common.teleport.SLocation;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;

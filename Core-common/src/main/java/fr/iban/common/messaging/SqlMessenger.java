@@ -7,19 +7,20 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 public abstract class SqlMessenger extends AbstractMessenger {
 
     private DataSource ds = DbAccess.getDataSource();
+    private boolean locked = false;
     private long lastId;
 
     public SqlMessenger() {
         CompletableFuture.runAsync(this::init).thenRun(() -> {
-           startPollTask();
-           startCleanUpTask();
+            startPollTask();
+            startCleanUpTask();
         });
     }
 
@@ -71,8 +72,11 @@ public abstract class SqlMessenger extends AbstractMessenger {
     }
 
     public void readNewMessages() {
+        if (locked) {
+            return;
+        }else locked = true;
+
         String selectStatement = "SELECT id, serverFrom, channel, msg FROM sc_messenger WHERE id > ? AND (NOW() - createdAt < 30) ";
-        List<Message> messages = new ArrayList<>();
 
         try (Connection connection = ds.getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(selectStatement)) {
@@ -91,6 +95,8 @@ public abstract class SqlMessenger extends AbstractMessenger {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            this.locked = false;
         }
     }
 

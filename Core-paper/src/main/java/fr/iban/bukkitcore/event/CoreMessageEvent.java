@@ -10,6 +10,7 @@ public class CoreMessageEvent extends Event {
     private Message message;
 
     public CoreMessageEvent(Message message) {
+        super(true);
         this.message = message;
     }
 

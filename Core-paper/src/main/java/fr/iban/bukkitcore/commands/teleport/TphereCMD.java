@@ -25,7 +25,7 @@ public class TphereCMD implements CommandExecutor {
             }
 
             if(args.length == 1) {
-                plugin.getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
+                plugin.getPlayerManager().getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
 
                     if(target != null) {
                         if(target.toString().equals(player.getUniqueId().toString())) {

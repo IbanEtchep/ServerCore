@@ -21,17 +21,13 @@ public class ChatCMD extends Command {
 				sender.sendMessage(TextComponent.fromLegacyText("§a/chat clear - clear le chat"));
 			}else if(args.length == 1) {
 				switch (args[0]) {
-				case "clear":
-					for(int i=0 ; i < 200 ; i++) {
-						ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(""));
+					case "clear" -> {
+						for (int i = 0; i < 200; i++) {
+							ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(""));
+						}
+						ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText("§cLe chat a été clear par " + sender.getName() + "."));
 					}
-					ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText("§cLe chat a été clear par " + sender.getName() + "."));
-					break;
-				case "toggle":
-					CoreBungeePlugin.getInstance().getChatManager().toggleChat(sender);
-					break;
-				default:
-					break;
+					case "toggle" -> CoreBungeePlugin.getInstance().getChatManager().toggleChat(sender);
 				}
 			}
 		}

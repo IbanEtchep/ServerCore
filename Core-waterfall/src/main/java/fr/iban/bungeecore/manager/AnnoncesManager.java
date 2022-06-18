@@ -1,12 +1,12 @@
-package fr.iban.bungeecore.utils;
+package fr.iban.bungeecore.manager;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.bungeecore.utils.ChatUtils;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import fr.iban.common.utils.ArrayUtils;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -14,10 +14,12 @@ import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class AnnoncesManager {
-	
+
+	private CoreBungeePlugin plugin;
 	private Map<Integer, BaseComponent[]> annonces = new HashMap<>();
 
-	public AnnoncesManager() {
+	public AnnoncesManager(CoreBungeePlugin plugin) {
+		this.plugin = plugin;
 		addAnnounces();
 		startAnnouncetask();
 	}
@@ -49,8 +51,8 @@ public class AnnoncesManager {
 			int id = (int) ArrayUtils.getRandomFromArray(annonces.keySet().toArray());
 			BaseComponent[] annonce = annonces.get(id);
 			for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-				AccountProvider ap = new AccountProvider(player.getUniqueId());
-				Account account = ap.getAccount();
+				AccountManager accountManager = plugin.getAccountManager();
+				Account account = accountManager.getAccount(player.getUniqueId());
 				if(!account.getBlackListedAnnounces().contains(id)) {
 					player.sendMessage(annonce);
 				}

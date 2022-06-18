@@ -1,4 +1,6 @@
-package fr.iban.common.teleport;
+package fr.iban.common.messaging.message;
+
+import fr.iban.common.teleport.SLocation;
 
 import java.util.UUID;
 

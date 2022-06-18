@@ -37,7 +37,7 @@ public class AsyncTabCompleteListener implements Listener {
 
                     if(args.length >= 1){
                         List<String> playerNames = new ArrayList<>();
-                        for(String name: plugin.getProxyPlayers().keySet()) {
+                        for(String name: plugin.getPlayerManager().getProxyPlayerNamesFromDB().values()) {
                             if (!player.getName().equals(name) && name.toLowerCase().startsWith(start.toLowerCase())) {
                                 playerNames.add(name);
                             }

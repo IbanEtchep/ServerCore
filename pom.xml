@@ -44,6 +44,14 @@
                                         <pattern>com.zaxxer</pattern>
                                         <shadedPattern>fr.iban.libs.com.zaxxer</shadedPattern>
                                     </relocation>
+                                    <relocation>
+                                        <pattern>com.github.ben-manes.caffeine</pattern>
+                                        <shadedPattern>fr.iban.libs.com.github.ben-manes.caffeine</shadedPattern>
+                                    </relocation>
+                                    <relocation>
+                                        <pattern>com.github.benmanes.caffeine</pattern>
+                                        <shadedPattern>fr.iban.libs.com.github.benmanes.caffeine</shadedPattern>
+                                    </relocation>
                                 </relocations>
                             </configuration>
                         </execution>

@@ -1,4 +1,4 @@
-package fr.iban.bungeecore.chat;
+package fr.iban.bungeecore.manager;
 
 import java.util.UUID;
 
@@ -6,11 +6,9 @@ import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.commands.StaffChatToggle;
 import fr.iban.bungeecore.utils.HexColor;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import fr.iban.common.data.Option;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.api.placeholder.PlaceholderManager;
 import me.neznamy.tab.shared.features.PlaceholderManagerImpl;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
@@ -25,9 +23,9 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class ChatManager {
 
-	private CoreBungeePlugin plugin;
+	private final CoreBungeePlugin plugin;
 	private boolean isMuted = false;
-	private ChatColor pingColor;
+	private final ChatColor pingColor;
 
 	public ChatManager(CoreBungeePlugin plugin) {
 		this.plugin = plugin;
@@ -54,8 +52,8 @@ public class ChatManager {
 				return;
 			}
 
-			AccountProvider ap = new AccountProvider(uuid);
-			Account account = ap.getAccount();
+			AccountManager accountManager = plugin.getAccountManager();
+			Account account = accountManager.getAccount(player.getUniqueId());
 
 			String prefix =  plugin.getConfiguration().getString("chat-format");
 			prefix = prefix.replace("%player%", player.getName());
@@ -82,7 +80,7 @@ public class ChatManager {
 			//Envoi du message à chaque joueur
 			for (ProxiedPlayer p: ProxyServer.getInstance().getPlayers()) {
 				String pmessage = msg;
-				Account account2 = new AccountProvider(p.getUniqueId()).getAccount();
+				Account account2 = accountManager.getAccount(player.getUniqueId());
 				if(!account2.getOption(Option.TCHAT)) continue;
 
 				//vérif si le joueur est mentionné dans le message.
@@ -107,13 +105,12 @@ public class ChatManager {
 	public void sendAnnonce(UUID uuid, String annonce) {
 		ProxyServer server = ProxyServer.getInstance();
 		ProxiedPlayer player = server.getPlayer(uuid);
-		String message = annonce;
 
 		if(isMuted && !player.hasPermission("servercore.chatmanage")) {
 			return;
 		}
 
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(HexColor.translateColorCodes("#f07e71§lAnnonce de #fbb29e§l"+ player.getName() + " #f07e71➤ #7bc8fe§l" + message)));
+		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(HexColor.translateColorCodes("#f07e71§lAnnonce de #fbb29e§l"+ player.getName() + " #f07e71➤ #7bc8fe§l" + annonce)));
 	}
 
 	public void sendRankup(UUID uuid, String group) {

@@ -1,5 +1,6 @@
 package fr.iban.common.teleport;
 
+import java.util.Objects;
 import java.util.UUID;
 
 public class TpRequest {
@@ -30,5 +31,18 @@ public class TpRequest {
 
 	public UUID getPlayerTo() {
 		return playerTo;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		TpRequest request = (TpRequest) o;
+		return Objects.equals(playerFrom, request.playerFrom) && Objects.equals(playerTo, request.playerTo) && requestType == request.requestType;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(playerFrom, playerTo, requestType);
 	}
 }

@@ -3,8 +3,8 @@ package fr.iban.bungeecore.commands;
 import java.util.UUID;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.bungeecore.manager.AccountManager;
 import fr.iban.common.data.Account;
-import fr.iban.common.data.AccountProvider;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -12,8 +12,11 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class IgnoreCMD extends Command {
 
-	public IgnoreCMD(String name) {
+	private CoreBungeePlugin plugin;
+
+	public IgnoreCMD(String name, CoreBungeePlugin plugin) {
 		super(name);
+		this.plugin = plugin;
 	}
 
 	@Override
@@ -25,20 +28,20 @@ public class IgnoreCMD extends Command {
 					UUID ignoredPlayer = CoreBungeePlugin.getInstance().getProxy().getPlayer(args[0]).getUniqueId();
 					ProxiedPlayer ignored = CoreBungeePlugin.getInstance().getProxy().getPlayer(args[0]);
 					if(ignoredPlayer != player.getUniqueId()) {
-						AccountProvider ap = new AccountProvider(player.getUniqueId());
-						Account account = ap.getAccount();
+						AccountManager accountManager = plugin.getAccountManager();
+						Account account = accountManager.getAccount(player.getUniqueId());
 						if(!account.getIgnoredPlayers().contains(ignoredPlayer)) {
 						  if(!ignored.hasPermission("spartacube.staff")) {
 							account.getIgnoredPlayers().add(ignoredPlayer);
 							player.sendMessage(new TextComponent("§aVous ignorez maintenant §7" + ignored.getName() + "§a."));
-							ap.sendAccountToRedis(account);
+							accountManager.saveAccount(account);
 						  } else {
 							  player.sendMessage(new TextComponent("§cVous ne pouvez pas ignorer un membre du staff !"));
 						  }
 						}else {
 							account.getIgnoredPlayers().remove(ignoredPlayer);
 							player.sendMessage(new TextComponent("§aVous n'ignorez plus §7" + ignored.getName() + "§a."));
-							ap.sendAccountToRedis(account);
+							accountManager.saveAccount(account);
 						}
 					} else {
 						 player.sendMessage(new TextComponent("§cVous ne pouvez pas vous ignorer vous même.")); 

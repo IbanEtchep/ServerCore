@@ -12,6 +12,7 @@ public class DbTables {
 		createIpTable();
 		createOptionsTable();
 		createIgnoredPlayersTable();
+		createOnlinePlayersTable();
 	}
 
 	/*
@@ -76,6 +77,14 @@ public class DbTables {
 							"  FOREIGN KEY (id) REFERENCES sc_players(id)" +
 					") engine = InnoDB;");
 	}
+
+	private static void createOnlinePlayersTable() {
+		createTable("CREATE TABLE IF NOT EXISTS sc_online_players (" +
+				"  player_id INTEGER PRIMARY KEY," +
+				"  FOREIGN KEY (player_id) REFERENCES sc_players(id)" +
+				");");
+	}
+
 	private static void createTable(String statement) {
 		try (Connection connection = DbAccess.getDataSource().getConnection()) {
 			try(PreparedStatement preparedStatemente = connection.prepareStatement(statement)){
