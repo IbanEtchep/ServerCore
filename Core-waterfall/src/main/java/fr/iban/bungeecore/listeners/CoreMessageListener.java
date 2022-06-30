@@ -3,6 +3,7 @@ package fr.iban.bungeecore.listeners;
 import com.google.gson.Gson;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.event.CoreMessageEvent;
+import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
 import fr.iban.common.messaging.message.DeathLocation;
 import fr.iban.common.messaging.message.EventAnnounce;
@@ -38,11 +39,11 @@ public class CoreMessageListener implements Listener {
             case "TeleportToLocationBungee" -> consumeTeleportToLocationBungeeMessage(message);
             case "TeleportToPlayerBungee" -> consumeTeleportToPlayerBungeeMessage(message);
             case "TeleportRequestBungee" -> consumeTeleportRequestBungeeMessage(message);
-            case CoreBungeePlugin.SYNC_ACCOUNT_CHANNEL ->
+            case CoreChannel.SYNC_ACCOUNT_CHANNEL ->
                     plugin.getAccountManager().reloadAccount(UUID.fromString(message.getMessage()));
-            case CoreBungeePlugin.REMOVE_PENDING_TP_CHANNEL ->
+            case CoreChannel.REMOVE_PENDING_TP_CHANNEL ->
                     plugin.getTeleportManager().getPendingTeleports().remove(UUID.fromString(message.getMessage()));
-            case CoreBungeePlugin.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
+            case CoreChannel.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
         }
     }
 

@@ -4,10 +4,7 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.commands.teleport.*;
 import fr.iban.bukkitcore.listeners.*;
-import fr.iban.bukkitcore.manager.AccountManager;
-import fr.iban.bukkitcore.manager.MessagingManager;
-import fr.iban.bukkitcore.manager.RessourcesWorldManager;
-import fr.iban.bukkitcore.manager.TeleportManager;
+import fr.iban.bukkitcore.manager.*;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
@@ -15,7 +12,6 @@ import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
-import fr.iban.common.manager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
@@ -39,7 +35,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private RessourcesWorldManager ressourcesWorldManager;
 	private MessagingManager messagingManager;
 	private AccountManager accountManager;
-	private PlayerManager playerManager;
+	private BukkitPlayerManager playerManager;
 
 	@Override
     public void onEnable() {
@@ -74,7 +70,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         this.teleportManager = new TeleportManager(this);
         this.ressourcesWorldManager = new RessourcesWorldManager();
 		this.messagingManager = new MessagingManager(this);
-		this.playerManager = new PlayerManager();
+		messagingManager.init();
+		this.playerManager = new BukkitPlayerManager();
 
         registerListeners(
         		new HeadDatabaseListener(),
@@ -116,6 +113,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
+		messagingManager.close();
 		if(getConfig().getString("messenger", "sql").equals("redis")) {
 			RedisAccess.close();
 		}
@@ -163,7 +161,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		return messagingManager;
 	}
 
-	public PlayerManager getPlayerManager() {
+	public BukkitPlayerManager getPlayerManager() {
 		return playerManager;
 	}
 }

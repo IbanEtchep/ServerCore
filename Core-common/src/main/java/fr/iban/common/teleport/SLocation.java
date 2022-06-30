@@ -98,6 +98,7 @@ public class SLocation {
 		sb.append(yaw);
 		return sb.toString();
 	}
+
 	
 	public SLocation deserialize(String slocation) {
 		String[] split = slocation.split(":");

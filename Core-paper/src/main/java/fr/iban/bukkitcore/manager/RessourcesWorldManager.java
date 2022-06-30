@@ -29,7 +29,7 @@ public class RessourcesWorldManager {
         if(plugin.getServerName().equalsIgnoreCase(plugin.getConfig().getString("ressources-servername"))) {
             Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + worldname);
         }else {
-            plugin.getMessagingManager().sendMessageAsync("PlayerRTP", new PlayerRTP(player.getUniqueId(), worldname));
+            plugin.getMessagingManager().sendMessage("PlayerRTP", new PlayerRTP(player.getUniqueId(), worldname));
             PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("ressources-servername"));
         }
     }

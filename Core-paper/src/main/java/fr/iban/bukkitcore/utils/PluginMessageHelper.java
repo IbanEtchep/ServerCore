@@ -75,9 +75,27 @@ public class PluginMessageHelper {
 		out.writeUTF("Message");
 		out.writeUTF("ALL");
 		out.writeUTF(message);
-		Optional<Player> optionalPlayer = (Optional<Player>) Bukkit.getOnlinePlayers().stream().findFirst();
-		if(optionalPlayer.isPresent()){
-			optionalPlayer.get().sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
-		}
+		Bukkit.getOnlinePlayers().stream().findFirst().ifPresent(player ->
+				player.sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray()));
+	}
+
+	public static void sendMessage(String playername, String message){
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("Message");
+		out.writeUTF(playername);
+		out.writeUTF(message);
+		Bukkit.getOnlinePlayers().stream().findFirst().ifPresent(player -> {
+			player.sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
+		});
+	}
+
+	public static void sendMessageRaw(String playername, String message){
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF("MessageRaw");
+		out.writeUTF(playername);
+		out.writeUTF(message);
+		Bukkit.getOnlinePlayers().stream().findFirst().ifPresent(player -> {
+			player.sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
+		});
 	}
 }

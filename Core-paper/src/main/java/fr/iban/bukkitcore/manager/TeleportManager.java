@@ -84,7 +84,7 @@ public class TeleportManager {
 
     public void removeTeleportWaiting(UUID uuid) {
         pendingTeleports.remove(uuid);
-        plugin.getMessagingManager().sendMessageAsync(CoreBukkitPlugin.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
+        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
     }
 
     public boolean isTeleportWaiting(UUID uuid) {
@@ -110,11 +110,11 @@ public class TeleportManager {
 
     public void addTpRequest(UUID uuid, TpRequest tpRequest) {
         tpRequests.put(uuid, tpRequest);
-        plugin.getMessagingManager().sendMessageAsync(CoreBukkitPlugin.ADD_TP_REQUEST_CHANNEL, tpRequest);
+        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.ADD_TP_REQUEST_CHANNEL, tpRequest);
     }
 
     public void removeTpRequest(UUID uuid, TpRequest tpRequest) {
         tpRequests.remove(uuid, tpRequest);
-        plugin.getMessagingManager().sendMessageAsync(CoreBukkitPlugin.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
+        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
     }
 }

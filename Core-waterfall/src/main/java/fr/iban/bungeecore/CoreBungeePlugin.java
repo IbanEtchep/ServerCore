@@ -25,13 +25,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class CoreBungeePlugin extends Plugin {
-
-    public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
-    public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
-    public static final String ADD_PENDING_TP_CHANNEL = "AddPendingTeleport";
-    public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
-    public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
-
     private static CoreBungeePlugin instance;
     private Configuration configuration;
     private AnnoncesManager announceManager;
@@ -73,10 +66,11 @@ public final class CoreBungeePlugin extends Plugin {
 
         accountManager = new AccountManager(this);
         messagingManager = new MessagingManager(this);
+        messagingManager.init();
         announceManager = new AnnoncesManager(this);
         chatManager = new ChatManager(this);
         teleportManager = new TeleportManager(this);
-        this.playerManager = new PlayerManager();
+        playerManager = new PlayerManager();
         playerManager.clearOnlinePlayersFromDB();
 
         getProxy().registerChannel("proxy:chat");
@@ -113,6 +107,7 @@ public final class CoreBungeePlugin extends Plugin {
 
     @Override
     public void onDisable() {
+        messagingManager.close();
         if(getConfiguration().getString("messenger", "sql").equals("redis")) {
             RedisAccess.close();
         }

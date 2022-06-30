@@ -5,6 +5,7 @@ import com.github.benmanes.caffeine.cache.LoadingCache;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountDAO;
+import fr.iban.common.messaging.CoreChannel;
 
 import java.util.UUID;
 
@@ -29,6 +30,6 @@ public class AccountManager {
     public void saveAccount(Account account) {
         AccountDAO accountDAO = new AccountDAO();
         accountDAO.sendAccountToDB(account);
-        plugin.getMessagingManager().sendMessageAsync(CoreBungeePlugin.SYNC_ACCOUNT_CHANNEL, account.getUUID().toString());
+        plugin.getMessagingManager().sendMessage(CoreChannel.SYNC_ACCOUNT_CHANNEL, account.getUUID().toString());
     }
 }

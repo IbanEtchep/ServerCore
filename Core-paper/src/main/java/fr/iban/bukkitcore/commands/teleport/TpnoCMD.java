@@ -8,6 +8,8 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.UUID;
+
 public class TpnoCMD implements CommandExecutor {
 
     private final CoreBukkitPlugin plugin;
@@ -20,33 +22,32 @@ public class TpnoCMD implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if(sender instanceof Player){
+        if (sender instanceof Player) {
             Player player = (Player) sender;
 
-            if(!player.hasPermission("core.tpno")){
+            if (!player.hasPermission("core.tpno")) {
                 player.sendMessage("§cVous n'avez pas la permission d'exécuter cette commande.");
                 return false;
             }
 
-            if(args.length == 1){
-                plugin.getPlayerManager().getProxiedPlayerUUID(args[0]).thenAcceptAsync(target -> {
-                    if(target != null){
-                        TpRequest request = teleportManager.getTpRequestFrom(player, target);
-                        if(request != null){
-                            player.sendMessage("§cDemande de téléportation rejetée.");
-                            teleportManager.removeTpRequest(player.getUniqueId(), request);
-                        }else{
-                            player.sendMessage("§cVous n'avez pas de requête de téléportation de ce joueur.");
-                        }
-                    }else{
-                        player.sendMessage("§cCe joueur n'est pas en ligne.");
+            if (args.length == 1) {
+                UUID target = plugin.getPlayerManager().getOnlinePlayerUUID(args[0]);
+                if (target != null) {
+                    TpRequest request = teleportManager.getTpRequestFrom(player, target);
+                    if (request != null) {
+                        player.sendMessage("§cDemande de téléportation rejetée.");
+                        teleportManager.removeTpRequest(player.getUniqueId(), request);
+                    } else {
+                        player.sendMessage("§cVous n'avez pas de requête de téléportation de ce joueur.");
                     }
-                });
-            }else if(args.length == 0 && !teleportManager.getTpRequests(player).isEmpty()) {
-                TpRequest request = (TpRequest)teleportManager.getTpRequests(player).get(teleportManager.getTpRequests(player).size() - 1);
+                } else {
+                    player.sendMessage("§cCe joueur n'est pas en ligne.");
+                }
+            } else if (args.length == 0 && !teleportManager.getTpRequests(player).isEmpty()) {
+                TpRequest request = (TpRequest) teleportManager.getTpRequests(player).get(teleportManager.getTpRequests(player).size() - 1);
                 player.sendMessage("§cDemande de téléportation rejetée.");
                 teleportManager.removeTpRequest(player.getUniqueId(), request);
-            }else {
+            } else {
                 player.sendMessage("§cVous n'avez pas de requête de téléportation.");
             }
 

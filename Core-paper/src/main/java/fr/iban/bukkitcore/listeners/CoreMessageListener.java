@@ -4,7 +4,9 @@ import com.google.gson.Gson;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.event.CoreMessageEvent;
 import fr.iban.bukkitcore.utils.SLocationUtils;
+import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
+import fr.iban.common.messaging.message.PlayerUUIDAndName;
 import fr.iban.common.teleport.SLocation;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
@@ -32,17 +34,29 @@ public class CoreMessageListener implements Listener {
         Message message = e.getMessage();
 
         switch (e.getMessage().getChannel()) {
-            case CoreBukkitPlugin.SYNC_ACCOUNT_CHANNEL ->
+            case CoreChannel.SYNC_ACCOUNT_CHANNEL ->
                     plugin.getAccountManager().reloadAccount(UUID.fromString(message.getMessage()));
             case "TeleportToLocationBukkit" -> consumeTeleportToLocationBukkitMessage(message);
             case "TeleportToPlayerBukkit" -> consumeTeleportToPlayerBukkitMessage(message);
-            case CoreBukkitPlugin.ADD_PENDING_TP_CHANNEL ->
+            case CoreChannel.ADD_PENDING_TP_CHANNEL ->
                     plugin.getTeleportManager().getPendingTeleports().add(UUID.fromString(e.getMessage().getMessage()));
-            case CoreBukkitPlugin.REMOVE_PENDING_TP_CHANNEL ->
+            case CoreChannel.REMOVE_PENDING_TP_CHANNEL ->
                     plugin.getTeleportManager().getPendingTeleports().remove(UUID.fromString(e.getMessage().getMessage()));
-            case CoreBukkitPlugin.ADD_TP_REQUEST_CHANNEL -> consumeAddTpRequestMessage(message);
-            case CoreBukkitPlugin.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
+            case CoreChannel.ADD_TP_REQUEST_CHANNEL -> consumeAddTpRequestMessage(message);
+            case CoreChannel.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
+            case CoreChannel.PLAYER_JOIN_CHANNEL -> consumePlayerJoinMessage(message);
+            case CoreChannel.PLAYER_QUIT_CHANNEL -> consumePlayerQuitMessage(message);
         }
+    }
+
+    public void consumePlayerJoinMessage(Message message) {
+        PlayerUUIDAndName playerMessage = gson.fromJson(message.getMessage(), PlayerUUIDAndName.class);
+        plugin.getPlayerManager().getOnlinePlayers().put(playerMessage.getUuid(), playerMessage.getName());
+        plugin.getPlayerManager().getOfflinePlayers().putIfAbsent(playerMessage.getName(), playerMessage.getUuid());
+    }
+
+    public void consumePlayerQuitMessage(Message message) {
+        plugin.getPlayerManager().getOnlinePlayers().remove(UUID.fromString(message.getMessage()));
     }
 
     public void consumeAddTpRequestMessage(Message message) {

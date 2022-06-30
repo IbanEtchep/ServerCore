@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
+import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.teleport.*;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
@@ -34,11 +35,11 @@ public class TeleportManager {
         ServerInfo targetServer = proxy.getServerInfo(location.getServer());
 
         if (targetServer.getName().equals(player.getServer().getInfo().getName())) {
-            plugin.getMessagingManager().sendMessageAsync("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
+            plugin.getMessagingManager().sendMessage("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
         } else {
             proxy.getScheduler().runAsync(plugin, () -> player.connect(targetServer, (connected, throwable) -> {
                 if (connected) {
-                    plugin.getMessagingManager().sendMessageAsync("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
+                    plugin.getMessagingManager().sendMessage("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
                 }
             }));
         }
@@ -76,11 +77,11 @@ public class TeleportManager {
         }
 
         if (targetServer.getName().equals(player.getServer().getInfo().getName())) {
-            plugin.getMessagingManager().sendMessageAsync("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
+            plugin.getMessagingManager().sendMessage("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
         } else {
             proxy.getScheduler().runAsync(plugin, () -> player.connect(targetServer, (connected, throwable) -> {
                 if (connected) {
-                    plugin.getMessagingManager().sendMessageAsync("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
+                    plugin.getMessagingManager().sendMessage("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
                 }
             }));
         }
@@ -171,12 +172,12 @@ public class TeleportManager {
 
     public void setTeleportWaiting(ProxiedPlayer player) {
         pendingTeleports.add(player.getUniqueId());
-        plugin.getMessagingManager().sendMessageAsync(CoreBungeePlugin.ADD_PENDING_TP_CHANNEL, player.getUniqueId().toString());
+        plugin.getMessagingManager().sendMessage(CoreChannel.ADD_PENDING_TP_CHANNEL, player.getUniqueId().toString());
     }
 
     public void removeTeleportWaiting(UUID uuid) {
         pendingTeleports.remove(uuid);
-        plugin.getMessagingManager().sendMessageAsync(CoreBungeePlugin.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
+        plugin.getMessagingManager().sendMessage(CoreChannel.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
     }
 
     public boolean isTeleportWaiting(ProxiedPlayer player) {
@@ -202,11 +203,11 @@ public class TeleportManager {
 
     public void addTpRequest(UUID uuid, TpRequest tpRequest) {
         tpRequests.put(uuid, tpRequest);
-        plugin.getMessagingManager().sendMessageAsync(CoreBungeePlugin.ADD_TP_REQUEST_CHANNEL, tpRequest);
+        plugin.getMessagingManager().sendMessage(CoreChannel.ADD_TP_REQUEST_CHANNEL, tpRequest);
     }
 
     public void removeTpRequest(UUID uuid, TpRequest tpRequest) {
         tpRequests.remove(uuid, tpRequest);
-        plugin.getMessagingManager().sendMessageAsync(CoreBungeePlugin.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
+        plugin.getMessagingManager().sendMessage(CoreChannel.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
     }
 }

@@ -10,7 +10,10 @@ public abstract class AbstractMessagingManager {
     /**
      * Init an implementation of AbstractMessenger
      */
-    public abstract void initMessenger();
+    public abstract void init();
+
+    public abstract void close();
+
     protected abstract String getServerName();
 
     public void sendMessage(String channel, String jsonMsg) {
@@ -21,4 +24,7 @@ public abstract class AbstractMessagingManager {
         sendMessage(channel, gson.toJson(message));
     }
 
+    public AbstractMessenger getMessenger() {
+        return messenger;
+    }
 }

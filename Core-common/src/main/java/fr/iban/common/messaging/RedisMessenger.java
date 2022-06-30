@@ -6,11 +6,17 @@ import org.redisson.api.listener.MessageListener;
 
 public class RedisMessenger extends AbstractMessenger implements MessageListener<Message> {
 
-    private final RTopic topic;
+    private RTopic topic;
 
-    public RedisMessenger() {
+    @Override
+    public void init() {
         topic = RedisAccess.getInstance().getRedissonClient().getTopic("CoreMessage");
         topic.addListener(Message.class, this);
+    }
+
+    @Override
+    public void close() {
+
     }
 
     @Override

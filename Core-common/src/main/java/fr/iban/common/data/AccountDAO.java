@@ -22,11 +22,9 @@ public class AccountDAO {
                 ps.setString(1, uuid.toString());
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        long lastseen = rs.getLong("lastseen");
-                        account.setLastSeen(lastseen);
-
-                        short maxclaims = rs.getShort("maxclaims");
-                        account.setMaxClaims(maxclaims);
+                        account.setLastSeen(rs.getLong("lastseen"));
+                        account.setMaxClaims(rs.getShort("maxclaims"));
+                        account.setName(rs.getString("name"));
                     }
                 }
             }

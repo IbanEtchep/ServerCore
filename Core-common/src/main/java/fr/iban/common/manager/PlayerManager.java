@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class PlayerManager {
 
@@ -30,15 +31,23 @@ public class PlayerManager {
         return proxyPlayers;
     }
 
-    public CompletableFuture<UUID> getProxiedPlayerUUID(String name){
-        return CompletableFuture.supplyAsync(() -> {
-            for (Map.Entry<UUID, String> entry : getProxyPlayerNamesFromDB().entrySet()) {
-                if(entry.getValue().equals(name)) {
-                    return entry.getKey();
+    public Map<String, UUID> getPlayerNamesFromDb() {
+        String sql = "SELECT uuid, name FROM sc_players;";
+        Map<String, UUID> proxyPlayers = new HashMap<>();
+        try (Connection connection = DbAccess.getDataSource().getConnection()) {
+            try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        UUID uuid = UUID.fromString(rs.getString("uuid"));
+                        String name = rs.getString("name");
+                        proxyPlayers.put(name, uuid);
+                    }
                 }
             }
-            return null;
-        });
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return proxyPlayers;
     }
 
     public void addOnlinePlayerToDB(UUID uuid) {

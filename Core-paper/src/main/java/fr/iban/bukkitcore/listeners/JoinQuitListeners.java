@@ -38,9 +38,7 @@ public class JoinQuitListeners implements Listener {
 	public void onQuit(PlayerQuitEvent e) {
 		Player player = e.getPlayer();
 		e.setQuitMessage(null);
-		if(plugin.getTextInputs().containsKey(player.getUniqueId())) {
-			plugin.getTextInputs().remove(player.getUniqueId());
-		}
+		plugin.getTextInputs().remove(player.getUniqueId());
 	}
 
 }

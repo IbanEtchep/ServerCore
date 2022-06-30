@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import fr.iban.bungeecore.manager.AccountManager;
+import fr.iban.common.messaging.CoreChannel;
+import fr.iban.common.messaging.message.PlayerUUIDAndName;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -71,23 +73,24 @@ public class ProxyJoinQuitListener implements Listener {
                     TextComponent message = new TextComponent("§8[§a+§8] §8" + String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName()));
                     message.setHoverEvent(ChatUtils.getShowTextHoverEvent(ChatColor.GRAY + "Vu pour la dernière fois " + getLastSeen(account.getLastSeen())));
 
-                    ProxyServer.getInstance().getPlayers().forEach(p -> {
+                    proxy.getPlayers().forEach(p -> {
                         Account account2 = accountManager.getAccount(p.getUniqueId());
                         if (account2.getOption(Option.JOIN_MESSAGE) && !account2.getIgnoredPlayers().contains(player.getUniqueId())) {
                             p.sendMessage(message);
                         }
                     });
-                    ProxyServer.getInstance().getLogger().info("§8[§a+§8] §8" + String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName()));
+                    proxy.getLogger().info("§8[§a+§8] §8" + String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName()));
                 }
             } else {
                 BaseComponent[] welcomponent = new ComponentBuilder("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !").event(ChatUtils.getShowTextHoverEvent("§7Clic !")).event(ChatUtils.getSuggestCommandClickEvent("Bienvenue " + player.getName())).create();
-                ProxyServer.getInstance().getPlayers().forEach(p -> p.sendMessage(welcomponent));
-                ProxyServer.getInstance().getLogger().info("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !");
+                proxy.getPlayers().forEach(p -> p.sendMessage(welcomponent));
+                proxy.getLogger().info("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !");
             }
 
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
             plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
+            plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerUUIDAndName(player.getUniqueId(), player.getName()));
         });
 
     }
@@ -137,6 +140,7 @@ public class ProxyJoinQuitListener implements Listener {
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
             plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
+            plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
         });
     }
 

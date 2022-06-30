@@ -30,7 +30,7 @@ public class AccountManager {
     public void saveAccount(Account account) {
         AccountDAO accountDAO = new AccountDAO();
         accountDAO.sendAccountToDB(account);
-        plugin.getMessagingManager().sendMessageAsync(CoreBukkitPlugin.SYNC_ACCOUNT_CHANNEL, account.getUUID().toString());
+        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.SYNC_ACCOUNT_CHANNEL, account.getUUID().toString());
     }
 
     public void saveAccountAsync(Account account) {
