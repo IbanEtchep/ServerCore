@@ -16,6 +16,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import revxrsal.commands.CommandHandlerVisitor;
+import revxrsal.commands.bukkit.BukkitCommandHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
 	public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
 	private static CoreBukkitPlugin instance;
+	private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
 	private TeleportManager teleportManager;
 	private Map<UUID, TextCallback> textInputs;
 	private Essentials essentials;
@@ -81,32 +84,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         		new PlayerMoveListener(this),
         		new DeathListener(this),
         		new CommandsListener(this),
-				new AsyncTabCompleteListener(this),
 				new CoreMessageListener(this)
         		);
 
-		getCommand("core").setExecutor(new CoreCMD(this));
-		getCommand("serveur").setExecutor(new ServeurCMD());
-		getCommand("survie").setExecutor(new SurvieCMD());
-		getCommand("ressources").setExecutor(new RessourcesCMD());
-		getCommand("ressources").setTabCompleter(new RessourcesCMD());
-
-		getCommand("abbc").setExecutor(new ActionBarCMD());
-		getCommand("options").setExecutor(new OptionsCMD());
-        getCommand("recompenses").setExecutor(new RecompensesCMD());
-        getCommand("recompenses").setTabCompleter(new RecompensesCMD());
-        getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
-		getCommand("site").setExecutor(new SimpleCommands(this));
-		getCommand("discord").setExecutor(new SimpleCommands(this));
-		getCommand("vote").setExecutor(new SimpleCommands(this));
-		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
-
-		getCommand("tp").setExecutor(new TpCMD(this));
-		getCommand("tpa").setExecutor(new TpaCMD(this));
-		getCommand("tpahere").setExecutor(new TpahereCMD(this));
-		getCommand("tpyes").setExecutor(new TpyesCMD(this));
-		getCommand("tpno").setExecutor(new TpnoCMD(this));
-		getCommand("tphere").setExecutor(new TphereCMD(this));
+		registerCommands();
 
         PluginMessageHelper.registerChannels(this);
     }
@@ -119,7 +100,32 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		}
         DbAccess.closePool();
     }
-    
+
+	private void registerCommands() {
+		BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
+		this.coreCommandHandlerVisitor = new CoreCommandHandlerVisitor(this);
+		commandHandler.accept(coreCommandHandlerVisitor);
+		commandHandler.register(new TeleportCommands(this));
+
+		commandHandler.registerBrigadier();
+
+		getCommand("core").setExecutor(new CoreCMD(this));
+		getCommand("serveur").setExecutor(new ServeurCMD());
+		getCommand("survie").setExecutor(new SurvieCMD());
+		getCommand("ressources").setExecutor(new RessourcesCMD());
+		getCommand("ressources").setTabCompleter(new RessourcesCMD());
+
+		getCommand("abbc").setExecutor(new ActionBarCMD());
+		getCommand("options").setExecutor(new OptionsCMD());
+		getCommand("recompenses").setExecutor(new RecompensesCMD());
+		getCommand("recompenses").setTabCompleter(new RecompensesCMD());
+		getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
+		getCommand("site").setExecutor(new SimpleCommands(this));
+		getCommand("discord").setExecutor(new SimpleCommands(this));
+		getCommand("vote").setExecutor(new SimpleCommands(this));
+		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
+	}
+
 	private void registerListeners(Listener... listeners) {
 
 		PluginManager pm = Bukkit.getPluginManager();
@@ -163,5 +169,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
 	public BukkitPlayerManager getPlayerManager() {
 		return playerManager;
+	}
+
+	public CoreCommandHandlerVisitor getCommandHandlerVisitor() {
+		return coreCommandHandlerVisitor;
 	}
 }

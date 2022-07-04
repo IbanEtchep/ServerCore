@@ -20,18 +20,6 @@ commands:
   addtabcomplete:
   abbc:
     permission: servercore.abbc
-  tp:
-  tpa:
-  tpno:
-    aliases:
-      - tpdeny
-  tpyes:
-    aliases:
-      - tpaccept
-  tphere:
-    aliases:
-      - s
-  tpahere:
   bungeebroadcast:
     aliases:
       - bbc

@@ -78,7 +78,7 @@ public class HourlyReward {
     }
 
     public void addPlayTime(UUID uuid, int minutes) {
-        String sql = "INSERT INTO sc_hourly_rewards_time (uuid, playtime) VALUES (?, ?) ON DUPLICATE KEY UPDATE playtime=(playtime-VALUES(playtime));";
+        String sql = "INSERT INTO sc_hourly_rewards_time (uuid, playtime) VALUES (?, ?) ON DUPLICATE KEY UPDATE playtime=(playtime+VALUES(playtime));";
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
