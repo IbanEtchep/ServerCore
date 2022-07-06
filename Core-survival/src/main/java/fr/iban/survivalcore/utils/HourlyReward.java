@@ -4,6 +4,7 @@ import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.survivalcore.SurvivalCorePlugin;
+import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
@@ -17,7 +18,7 @@ import java.util.UUID;
 
 public class HourlyReward {
 
-    private SurvivalCorePlugin plugin;
+    private final SurvivalCorePlugin plugin;
 
     public HourlyReward(SurvivalCorePlugin plugin) {
         this.plugin = plugin;
@@ -42,20 +43,20 @@ public class HourlyReward {
             }
         }, 1200L, 1200L);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
-            getTimeBiggerThanOneHour().forEach(uuid -> {
-                Player player = Bukkit.getPlayer(uuid);
-                if (player != null) {
-                    if (CoreBukkitPlugin.getInstance().getServerName().equals("Survie")) {
-                        plugin.getEconomy().depositPlayer(player, 750);
-                    } else {
-                        player.sendMessage("§a§lLa récompense vous attend dans /recompenses.");
-                        RewardsDAO.addRewardAsync(player.getUniqueId().toString(), "750§e⛃§r", "Survie", "eco give {player} " + 750);
-                    }
-                    removePlayTime(uuid, 60);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> getTimeBiggerThanOneHour().forEach(uuid -> {
+            Player player = Bukkit.getPlayer(uuid);
+            if (player != null) {
+                player.sendMessage("§a§lVous avez reçu 750§e⛃§a§l pour avoir joué 1 heure.");
+                Economy economy = plugin.getEconomy();
+                if (economy != null) {
+                    economy.depositPlayer(player, 750);
+                } else {
+                    player.sendMessage("§a§lLa récompense vous attend dans /recompenses.");
+                    RewardsDAO.addRewardAsync(player.getUniqueId().toString(), "750§e⛃§r", "Survie", "eco give {player} " + 750);
                 }
-            });
-        }, 12000L, 12000L);
+                removePlayTime(uuid, 60);
+            }
+        }), 12000L, 12000L);
     }
 
 
