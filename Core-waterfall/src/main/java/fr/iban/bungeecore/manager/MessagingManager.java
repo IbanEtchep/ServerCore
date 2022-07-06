@@ -21,7 +21,6 @@ public class MessagingManager extends AbstractMessagingManager {
             }
         });
         messenger.init();
-        plugin.getLogger().info("Messenger type : " + plugin.getConfiguration().getString("messenger", "redis"));
     }
 
     @Override

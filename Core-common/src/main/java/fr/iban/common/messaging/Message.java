@@ -1,8 +1,10 @@
 package fr.iban.common.messaging;
 
+import com.google.gson.Gson;
+
 public class Message {
 
-    private String channel; //ECONOMY_USER_BALANCE_UPDATE, LAND_UPDATE, WARP_UPDATE
+    private String channel;
     private String serverFrom;
     private String message;
 
@@ -24,5 +26,9 @@ public class Message {
 
     public String getMessage() {
         return message;
+    }
+
+    public <T> T getMessage(Class<T> clazz) {
+        return new Gson().fromJson(message, clazz);
     }
 }
