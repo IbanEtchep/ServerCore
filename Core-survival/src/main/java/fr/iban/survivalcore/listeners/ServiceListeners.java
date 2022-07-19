@@ -10,7 +10,7 @@ import org.bukkit.event.server.ServiceUnregisterEvent;
 
 public class ServiceListeners implements Listener {
 
-    private SurvivalCorePlugin plugin;
+    private final SurvivalCorePlugin plugin;
 
     public ServiceListeners(SurvivalCorePlugin plugin) {
         this.plugin = plugin;

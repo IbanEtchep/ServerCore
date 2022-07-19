@@ -42,7 +42,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
         handler.registerValueResolver(0, OfflinePlayer.class, context -> {
             String value = context.arguments().pop();
             if (!playerManager.getOfflinePlayers().containsKey(value)) {
-                throw new CommandErrorException("Ce joueur " + value + " n'a jamais joué sur le serveur.");
+                throw new CommandErrorException("Le joueur " + value + " n'a jamais joué sur le serveur.");
             }
             return Bukkit.getOfflinePlayer(playerManager.getOfflinePlayerUUID(value));
         });

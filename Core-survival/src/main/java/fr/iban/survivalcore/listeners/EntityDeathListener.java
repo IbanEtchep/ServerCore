@@ -122,7 +122,11 @@ public class EntityDeathListener implements Listener {
                             message += "s'est fait assassiner par " + killer.getName() + " !";
                         }
                     } else if (entity.getDamager() instanceof Mob) {
-                        message += "s'est fait tuer par un " + entity.getDamager().getType().toString().toLowerCase().replace("_", " ") + " !";
+                        if(entity.getDamager().getType() == EntityType.WARDEN) {
+                            message += "s'est fait atomiser par un Warden !";
+                        }else{
+                            message += "s'est fait tuer par un " + entity.getDamager().getType().toString().toLowerCase().replace("_", " ") + " !";
+                        }
                     }
                 }
                 break;

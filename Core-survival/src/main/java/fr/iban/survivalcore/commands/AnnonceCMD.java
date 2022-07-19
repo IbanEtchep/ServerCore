@@ -1,6 +1,5 @@
 package fr.iban.survivalcore.commands;
 
-import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.SurvivalCorePlugin;
 import net.milkbowl.vault.economy.Economy;
@@ -24,6 +23,7 @@ public class AnnonceCMD implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Economy econ = plugin.getEconomy();
+		System.out.println(econ);
 		Player player = (Player) sender;
 		int cooldownTime = 3600; // Get number of seconds from wherever you want
 		
@@ -39,15 +39,15 @@ public class AnnonceCMD implements CommandExecutor {
 			cooldowns.remove(sender.getName());
 		} else {
 			cooldowns.put(sender.getName(), System.currentTimeMillis());
-			String message = ""; {
+			StringBuilder message = new StringBuilder(); {
 				for (String part : args) {
-					if (message != "") message += " ";
-					message += part;
+					if (!message.toString().equals("")) message.append(" ");
+					message.append(part);
 				}
 				if (econ.getBalance(player) >= 250) {
 					econ.withdrawPlayer(player, 250);
-					PluginMessageHelper.sendAnnonce(player, message);
-				} else if (econ.getBalance(player) <= 250) {
+					PluginMessageHelper.sendAnnonce(player, message.toString());
+				} else {
 					player.sendMessage("§cIl vous faut 250$ pour faire une annonce !");
 					cooldowns.remove(sender.getName());
 				}

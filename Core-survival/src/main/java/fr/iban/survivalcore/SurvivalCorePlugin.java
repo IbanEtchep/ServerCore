@@ -13,7 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     private static SurvivalCorePlugin instance;
-    private Economy econ = null;
+    private Economy econ;
 
 
     @Override
@@ -68,8 +68,10 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
         }
         RegisteredServiceProvider<Economy> rsp = getServer().getServicesManager().getRegistration(Economy.class);
         if (rsp == null) {
+            getLogger().info("No economy provider found.");
             return;
         }
+        getLogger().info("Using " + rsp.getProvider().getName() + " economy.");
         econ = rsp.getProvider();
     }
 
