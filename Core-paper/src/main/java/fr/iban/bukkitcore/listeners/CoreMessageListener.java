@@ -71,74 +71,12 @@ public class CoreMessageListener implements Listener {
 
     private void consumeTeleportToLocationBukkitMessage(Message message) {
         TeleportToLocation ttl = gson.fromJson(message.getMessage(), TeleportToLocation.class);
-        if (!ttl.getLocation().getServer().equals(CoreBukkitPlugin.getInstance().getServerName())) {
-            return;
-        }
-
-        SLocation sloc = ttl.getLocation();
-        Location loc = SLocationUtils.getLocation(sloc);
-
-        new BukkitRunnable() {
-            int count = 0;
-
-            @Override
-            public void run() {
-
-                Player player = Bukkit.getPlayer(ttl.getUuid());
-
-                if (player != null) {
-                    tp(player, loc);
-                    cancel();
-                }
-
-                count++;
-
-                if (count > 20) {
-                    cancel();
-                }
-
-            }
-        }.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+        plugin.getTeleportManager().performTeleportToLocation(ttl);
     }
 
     private void consumeTeleportToPlayerBukkitMessage(Message message) {
         TeleportToPlayer ttp = gson.fromJson(message.getMessage(), TeleportToPlayer.class);
-        Player target = Bukkit.getPlayer(ttp.getTargetId());
-
-        if (target == null) {
-            return;
-        }
-
-        new BukkitRunnable() {
-
-            @Override
-            public void run() {
-
-                Player target = Bukkit.getPlayer(ttp.getTargetId());
-                Player player = Bukkit.getPlayer(ttp.getUuid());
-
-                if (target == null) {
-                    cancel();
-                    return;
-                }
-
-                if (player != null) {
-                    tp(player, target.getLocation());
-                    cancel();
-                }
-
-            }
-        }.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+        plugin.getTeleportManager().performTeleportToPlayer(ttp);
     }
 
-    private void tp(Player player, Location loc) {
-        player.sendActionBar("§aChargement des chunks...");
-        player.teleportAsync(loc).thenAccept(result -> {
-            if (result) {
-                player.sendActionBar("§aTéléporation effectuée !");
-            } else {
-                player.sendActionBar("§cLa téléportation a échoué !");
-            }
-        });
-    }
 }
