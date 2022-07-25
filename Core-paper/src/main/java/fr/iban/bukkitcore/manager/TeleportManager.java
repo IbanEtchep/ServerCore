@@ -7,6 +7,11 @@ import com.google.common.collect.ListMultimap;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.SLocationUtils;
 import fr.iban.common.teleport.*;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -16,15 +21,14 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class TeleportManager {
 
     private final CoreBukkitPlugin plugin;
     private final ListMultimap<UUID, TpRequest> tpRequests = ArrayListMultimap.create();
     private final List<UUID> pendingTeleports = new ArrayList<>();
+    private final Map<UUID, Location> unsafeTpPending = new HashMap<>();
 
     public TeleportManager(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -191,8 +195,28 @@ public class TeleportManager {
                     }
                 });
             } else {
-                player.sendMessage("§cLa zone de téléportation n'est pas sécurisée. Annulation de la téléportation.");
+                unsafeTpPending.put(player.getUniqueId(), loc);
+                player.sendMessage(Component.text("⚠ La zone de téléportation n'est pas sécurisée.\nSi vous souhaitez tout de même vous y téléporter, cliquez ici.")
+                        .color(NamedTextColor.RED)
+                        .clickEvent(ClickEvent.runCommand("/tplastunsafe"))
+                        .hoverEvent(HoverEvent.showText(Component.text("Se téléporter à vos risques et périls.", NamedTextColor.WHITE).decorate(TextDecoration.BOLD))));
             }
         });
+    }
+
+    public void tpAsyncLastUnsafe(Player player) {
+        Location location = unsafeTpPending.get(player.getUniqueId());
+        if(location != null) {
+            player.teleportAsync(location).thenAccept(result -> {
+                if (result) {
+                    player.sendActionBar("§aTéléporation effectuée !");
+                } else {
+                    player.sendActionBar("§cLa téléportation a échoué !");
+                }
+            });
+            unsafeTpPending.remove(player.getUniqueId());
+        }else {
+            player.sendMessage("§cVous n'avez pas de téléportation en attente.");
+        }
     }
 }

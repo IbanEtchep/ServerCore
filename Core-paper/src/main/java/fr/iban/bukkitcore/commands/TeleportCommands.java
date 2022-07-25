@@ -116,4 +116,9 @@ public class TeleportCommands {
         }
     }
 
+    @Command("tplastunsafe")
+    public void tpLastUnsafe(Player player) {
+        teleportManager.tpAsyncLastUnsafe(player);
+    }
+
 }

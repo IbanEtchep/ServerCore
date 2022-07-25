@@ -40,6 +40,9 @@ public class SLocationUtils {
 
 		for (int i = 1; i < 5; i++) {
 			Material relativeMaterial = feet.getRelative(BlockFace.DOWN, i).getType();
+			if(relativeMaterial == Material.LAVA) {
+				return false;
+			}
 			if(relativeMaterial.isSolid() || relativeMaterial == Material.WATER) {
 				return true;
 			}
