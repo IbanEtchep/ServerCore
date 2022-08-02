@@ -3,10 +3,12 @@ package fr.iban.bungeecore.listeners;
 import com.google.gson.Gson;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.event.CoreMessageEvent;
+import fr.iban.bungeecore.utils.ChatUtils;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
 import fr.iban.common.messaging.message.DeathLocation;
 import fr.iban.common.messaging.message.EventAnnounce;
+import fr.iban.common.messaging.message.LastRTPLocation;
 import fr.iban.common.teleport.RequestType;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
@@ -36,6 +38,7 @@ public class CoreMessageListener implements Listener {
         switch (e.getMessage().getChannel()) {
             case "EventAnnounce" -> consumeAnnounceMessage(message);
             case "DeathLocation" -> consumeDeathLocationMessage(message);
+            case "LastRTPLocation" -> consumeLastRTPLocationMessage(message);
             case "TeleportToLocationBungee" -> consumeTeleportToLocationBungeeMessage(message);
             case "TeleportToPlayerBungee" -> consumeTeleportToPlayerBungeeMessage(message);
             case "TeleportRequestBungee" -> consumeTeleportRequestBungeeMessage(message);
@@ -91,6 +94,11 @@ public class CoreMessageListener implements Listener {
     private void consumeDeathLocationMessage(Message message) {
         DeathLocation deathLocation = gson.fromJson(message.getMessage(), DeathLocation.class);
         plugin.getTeleportManager().getDeathLocations().put(deathLocation.getUuid(), deathLocation.getLocation());
+    }
+
+    private void consumeLastRTPLocationMessage(Message message) {
+        LastRTPLocation lastRTPLocation = gson.fromJson(message.getMessage(), LastRTPLocation.class);
+        plugin.getTeleportManager().getLastRTPLocations().put(lastRTPLocation.getUuid(), lastRTPLocation.getLocation());
     }
 
     private void consumeAnnounceMessage(Message message) {

@@ -2,7 +2,6 @@ package fr.iban.bukkitcore.manager;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
-import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.teleport.PlayerRTP;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;

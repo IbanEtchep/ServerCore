@@ -4,12 +4,12 @@ import fr.iban.common.teleport.SLocation;
 
 import java.util.UUID;
 
-public class DeathLocation {
-	
+public class LastRTPLocation {
+
 	private UUID uuid;
 	private SLocation location;
-	
-	public DeathLocation(UUID uuid, SLocation location) {
+
+	public LastRTPLocation(UUID uuid, SLocation location) {
 		this.uuid = uuid;
 		this.location = location;
 	}

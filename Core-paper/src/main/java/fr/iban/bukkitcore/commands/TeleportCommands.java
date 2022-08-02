@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Named;
 import revxrsal.commands.annotation.Optional;
+import revxrsal.commands.annotation.Usage;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.UUID;
@@ -115,6 +116,12 @@ public class TeleportCommands {
             sender.sendMessage("§cVous n'avez pas de requête de téléportation.");
         }
     }
+
+//    @Command("tpsloc")
+//    @Usage("/tploc x y z world server")
+//    public void teleportToLocation(Player player, double x, double y, double z, String world, String server) {
+//
+//    }
 
     @Command("tplastunsafe")
     public void tpLastUnsafe(Player player) {

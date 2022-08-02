@@ -3,8 +3,6 @@ package fr.iban.bukkitcore.commands;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.menu.RessourceMenu;
-import fr.iban.bukkitcore.menu.ServeurMenu;
-import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -43,7 +41,6 @@ public class RessourcesCMD implements CommandExecutor, TabCompleter {
 		}
 		return false;
 	}
-
 
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {

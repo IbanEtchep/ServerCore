@@ -23,7 +23,6 @@ public class AnnonceCMD implements CommandExecutor {
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		Economy econ = plugin.getEconomy();
-		System.out.println(econ);
 		Player player = (Player) sender;
 		int cooldownTime = 3600; // Get number of seconds from wherever you want
 		
