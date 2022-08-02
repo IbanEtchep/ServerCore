@@ -13,8 +13,6 @@
 <artifactId>CoreWaterfall</artifactId>
 <packaging>jar</packaging>
 
-<name>Core Waterfall</name>
-
 <build>
 	<plugins>
 		<plugin>

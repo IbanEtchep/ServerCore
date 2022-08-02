@@ -13,8 +13,6 @@
 	<artifactId>CorePaper</artifactId>
 	<packaging>jar</packaging>
 
-	<name>Core Paper</name>
-
 	<build>
 		<plugins>
 			<plugin>
