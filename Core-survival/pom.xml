@@ -105,9 +105,9 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>fr.iban</groupId>
+			<groupId>com.github.IbanEtchep</groupId>
 			<artifactId>Lands</artifactId>
-			<version>${project.version}</version>
+			<version>v1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
