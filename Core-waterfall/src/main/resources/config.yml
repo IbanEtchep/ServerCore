@@ -18,6 +18,7 @@ motd:
   - "motd"
 chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'
 ping-color: '#fdcb6e'
+chat-hover: 'test'
 
 tabcomplete:
   global:

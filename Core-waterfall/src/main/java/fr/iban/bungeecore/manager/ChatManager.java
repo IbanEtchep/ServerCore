@@ -18,6 +18,7 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;
+import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -61,14 +62,7 @@ public class ChatManager {
 			prefix = prefix.replace("%lp_suffix%", getSuffix(player));
 			prefix = prefix.replace("%premium%", getPremiumString(player));
 			prefix = HexColor.translateColorCodes(prefix);
-
-			TabAPI tabAPI = TabAPI.getInstance();
-			TabPlayer tabPlayer = tabAPI.getPlayer(uuid);
-			PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
-			for (String placeholderIdentifier : placeholderManager.detectPlaceholders(prefix)) {
-				prefix = prefix.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));
-			}
-
+			prefix = replacePlaceHolders(prefix, uuid);
 			msg = prefix+msg;
 
 			if(!account.getOption(Option.TCHAT)) {
@@ -90,16 +84,35 @@ public class ChatManager {
 				}
 
 				if(!account2.getIgnoredPlayers().contains(player.getUniqueId())){
-					p.sendMessage(TextComponent.fromLegacyText(pmessage));
+					p.sendMessage(getComponentMessage(pmessage, uuid));
 				}
 
-				new ComponentBuilder().append(TextComponent.fromLegacyText(pmessage)).create();
 			}
 
 			//Envoi du message à la console
 			ProxyServer.getInstance().getLogger().info(msg);
 
 		});
+	}
+
+	private TextComponent getComponentMessage(String message, UUID uuid) {
+		TextComponent textComponent = new TextComponent(TextComponent.fromLegacyText(message));
+		String chatHover = plugin.getConfiguration().getString("chat-hover");
+		if(chatHover.length() > 0) {
+			textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+					TextComponent.fromLegacyText(replacePlaceHolders(HexColor.translateColorCodes(chatHover), uuid))));
+		}
+		return textComponent;
+	}
+
+	private String replacePlaceHolders(String message, UUID uuid) {
+		TabAPI tabAPI = TabAPI.getInstance();
+		TabPlayer tabPlayer = tabAPI.getPlayer(uuid);
+		PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
+		for (String placeholderIdentifier : placeholderManager.detectPlaceholders(message)) {
+			message = message.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));
+		}
+		return message;
 	}
 
 	public void sendAnnonce(UUID uuid, String annonce) {

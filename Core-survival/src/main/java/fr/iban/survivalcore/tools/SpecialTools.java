@@ -31,7 +31,7 @@ public class SpecialTools {
     );
 
     public static final Set<Material> canBreakWith3x3Shovel = EnumSet.of(
-            Material.GRASS_BLOCK, Material.DIRT, Material.SAND, Material.RED_SAND, Material.GRAVEL
+            Material.GRASS_BLOCK, Material.DIRT, Material.SAND, Material.RED_SAND, Material.GRAVEL, Material.SOUL_SAND, Material.SOUL_SOIL
     );
 
     public static Map<UUID, BlockFace> faces = new HashMap<>();

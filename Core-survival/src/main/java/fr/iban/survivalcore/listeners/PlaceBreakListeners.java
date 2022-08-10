@@ -52,7 +52,6 @@ public class PlaceBreakListeners implements Listener {
 
         //Pioche 3x3
         if (SpecialTools.is3x3Pickaxe(itemInHand)) {
-            //Bukkit.broadcastMessage("pioche");
             for (Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)) {
                 Chunk c = b.getChunk();
                 Land l = landManager.getLandAt(c);
