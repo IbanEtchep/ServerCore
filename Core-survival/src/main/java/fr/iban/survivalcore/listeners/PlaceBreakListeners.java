@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import fr.iban.survivalcore.event.HammerBlockBreakEvent;
 import net.coreprotect.CoreProtect;
 import net.coreprotect.CoreProtectAPI;
 import org.bukkit.Bukkit;
@@ -58,6 +59,7 @@ public class PlaceBreakListeners implements Listener {
                 if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
                     continue;
 
+                Bukkit.getPluginManager().callEvent(new HammerBlockBreakEvent(player, b, e.getExpToDrop()));
                 b.breakNaturally(itemInHand);
                 CoreProtectAPI coreProtect = getCoreProtect();
                 if (coreProtect != null) { //Ensure we have access to the API

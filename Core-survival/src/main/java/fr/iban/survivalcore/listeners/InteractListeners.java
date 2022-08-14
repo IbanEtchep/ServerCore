@@ -71,7 +71,7 @@ public class InteractListeners implements Listener {
 							Damageable itemDmg = (Damageable) meta;
 							
 							double rand = Math.random() * 100;
-							double breakChance = (100/(meta.getEnchantLevel(Enchantment.DURABILITY)+1));
+							double breakChance = (100.0/(meta.getEnchantLevel(Enchantment.DURABILITY)+1));
 							if(rand <= breakChance) {
 								
 								itemDmg.setDamage(itemDmg.getDamage() + 1);
