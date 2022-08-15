@@ -35,10 +35,15 @@ public class TeleportManager {
         ProxyServer proxy = plugin.getProxy();
         ServerInfo targetServer = proxy.getServerInfo(location.getServer());
 
+        if(plugin.isMultiPaperServer(player.getServer().getInfo().getName()) && plugin.isMultiPaperServer(location.getServer())) {
+            targetServer = proxy.getServerInfo(player.getServer().getInfo().getName());
+        }
+
         if (targetServer.getName().equals(player.getServer().getInfo().getName())) {
             plugin.getMessagingManager().sendMessage("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
         } else {
-            proxy.getScheduler().runAsync(plugin, () -> player.connect(targetServer, (connected, throwable) -> {
+            ServerInfo finalTargetServer = targetServer;
+            proxy.getScheduler().runAsync(plugin, () -> player.connect(finalTargetServer, (connected, throwable) -> {
                 if (connected) {
                     plugin.getMessagingManager().sendMessage("TeleportToLocationBukkit", new TeleportToLocation(player.getUniqueId(), location));
                 }
@@ -72,15 +77,16 @@ public class TeleportManager {
         ProxyServer proxy = plugin.getProxy();
         ServerInfo targetServer = target.getServer().getInfo();
 
-        if (target == null) {
-            player.sendMessage(TextComponent.fromLegacyText("§cLe joueur auquel vous souhaitez vous téléporter n'est pas en ligne."));
-            return;
+        if(plugin.isMultiPaperServer(player.getServer().getInfo().getName()) &&
+                plugin.isMultiPaperServer(target.getServer().getInfo().getName())) {
+            targetServer = proxy.getServerInfo(player.getServer().getInfo().getName());
         }
 
         if (targetServer.getName().equals(player.getServer().getInfo().getName())) {
             plugin.getMessagingManager().sendMessage("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
         } else {
-            proxy.getScheduler().runAsync(plugin, () -> player.connect(targetServer, (connected, throwable) -> {
+            ServerInfo finalTargetServer = targetServer;
+            proxy.getScheduler().runAsync(plugin, () -> player.connect(finalTargetServer, (connected, throwable) -> {
                 if (connected) {
                     plugin.getMessagingManager().sendMessage("TeleportToPlayerBukkit", new TeleportToPlayer(player.getUniqueId(), target.getUniqueId()));
                 }

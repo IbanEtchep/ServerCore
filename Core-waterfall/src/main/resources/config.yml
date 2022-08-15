@@ -20,6 +20,9 @@ chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ 
 ping-color: '#fdcb6e'
 chat-hover: 'test'
 
+multipaper-servers: []
+
+
 tabcomplete:
   global:
     - tpa

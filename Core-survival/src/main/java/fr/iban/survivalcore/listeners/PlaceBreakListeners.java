@@ -250,6 +250,7 @@ public class PlaceBreakListeners implements Listener {
             case STRIPPED_OAK_LOG:
             case STRIPPED_DARK_OAK_LOG:
             case STRIPPED_SPRUCE_LOG:
+            case MANGROVE_LOG:
                 return true;
             default:
                 return false;

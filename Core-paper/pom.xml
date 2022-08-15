@@ -121,7 +121,7 @@
 		<dependency>
 			<groupId>com.github.Revxrsal.Lamp</groupId>
 			<artifactId>common</artifactId>
-			<version>3.0.7</version>
+			<version>3.0.8</version>
 			<scope>compile</scope>
 		</dependency>
 		<!-- For the bukkit module -->

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -31,7 +32,7 @@ public class SpecialTools {
     );
 
     public static final Set<Material> canBreakWith3x3Shovel = EnumSet.of(
-            Material.GRASS_BLOCK, Material.DIRT, Material.SAND, Material.RED_SAND, Material.GRAVEL, Material.SOUL_SAND, Material.SOUL_SOIL
+            Material.GRASS_BLOCK, Material.DIRT, Material.SAND, Material.RED_SAND, Material.GRAVEL, Material.SOUL_SAND, Material.SOUL_SOIL, Material.CLAY
     );
 
     public static Map<UUID, BlockFace> faces = new HashMap<>();
@@ -86,6 +87,16 @@ public class SpecialTools {
         return hades;
     }
 
+    public static ItemStack get3x3FarmerHoe() {
+        ItemStack hades = new ItemStack(Material.NETHERITE_HOE);
+
+        ItemMeta cus = hades.getItemMeta();
+        cus.setDisplayName("§e§lHoue de Déméter");
+        cus.setLore(Arrays.asList("§e§l-------------", "§e§lCette houe permet de replanter", "§e§lautomatiquement vos récoltes sur", "§e§lune surface de 3x3.", "§e§l-------------", "§c§l[ITEM LEGENDAIRE]"));
+        hades.setItemMeta(cus);
+        return hades;
+    }
+
     public static ItemStack getXpSword() {
         ItemStack xpsword = new ItemStack(Material.NETHERITE_SWORD);
         ItemMeta cus = xpsword.getItemMeta();
@@ -111,6 +122,10 @@ public class SpecialTools {
         return item.getType() == Material.NETHERITE_HOE && item.hasItemMeta() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains("§e§lCette houe permet de replanter");
     }
 
+    public static boolean is3x3ReplantHoue(ItemStack item) {
+        return isReplantHoue(item) && item.getItemMeta().getLore().contains("§e§lune surface de 3x3.");
+    }
+
     public static boolean is3x3Pickaxe(ItemStack item) {
         return item.getType() == Material.NETHERITE_PICKAXE && item.hasItemMeta() && item.getItemMeta().hasLore() && item.getItemMeta().getLore().contains("§3|| §bMine du §93x3§3 ||");
     }
@@ -128,7 +143,7 @@ public class SpecialTools {
         return getSurroundingBlocks(faces.get(player.getUniqueId()), targetBlock).stream().filter(block -> canBreakWith3x3Pickaxe.contains(block.getType())).collect(Collectors.toList());
     }
 
-    private static List<Block> getSurroundingBlocks(BlockFace blockFace, Block targetBlock) {
+    public static List<Block> getSurroundingBlocks(BlockFace blockFace, Block targetBlock) {
         ArrayList<Block> blocks = new ArrayList<>();
         World world = targetBlock.getWorld();
 

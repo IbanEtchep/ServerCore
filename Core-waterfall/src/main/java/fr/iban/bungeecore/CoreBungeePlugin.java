@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class CoreBungeePlugin extends Plugin {
@@ -195,5 +196,14 @@ public final class CoreBungeePlugin extends Plugin {
 
     public Map<String, SLocation> getCurrentEvents() {
         return currentEvents;
+    }
+
+    public List<String> getMultipaperServers() {
+        return getConfiguration().getStringList("multipaper-servers");
+    }
+
+    public boolean isMultiPaperServer(String server) {
+        List<String> servers = getMultipaperServers();
+        return servers != null && servers.contains(server);
     }
 }
