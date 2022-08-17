@@ -15,6 +15,10 @@ public class SLocationUtils {
 		return new SLocation(CoreBukkitPlugin.getInstance().getServerName(), loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
 	}
 
+	public static SLocation getSLocation(Location loc, String serverName) {
+		return new SLocation(serverName, loc.getWorld().getName(), loc.getX(), loc.getY(), loc.getZ(), loc.getPitch(), loc.getYaw());
+	}
+
 	public static Location getLocation(SLocation sloc) {
 		if(sloc == null){
 			return null;
