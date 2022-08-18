@@ -17,6 +17,7 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import revxrsal.commands.bungee.BungeeCommandHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -134,6 +135,9 @@ public final class CoreBungeePlugin extends Plugin {
         for (Command command : commands) {
             getProxy().getPluginManager().registerCommand(this, command);
         }
+
+        BungeeCommandHandler commandHandler = BungeeCommandHandler.create(this);
+        commandHandler.register(new CoreCommands(this));
     }
 
     public static CoreBungeePlugin getInstance() {

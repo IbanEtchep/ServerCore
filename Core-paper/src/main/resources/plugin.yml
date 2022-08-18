@@ -6,10 +6,6 @@ authors: [ Iban ]
 softdepend: [Essentials]
 
 commands:
-  site:
-  discord:
-  vote:
-  grades:
   ressources:
   serveur:
   options:

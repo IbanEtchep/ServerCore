@@ -23,7 +23,7 @@ public enum HexColor {
 	FLAT_LIGHT_GREEN("#55efc4"),
 	FLAT_BLUE2("#3742fa");
 
-	private String hex;
+	private final String hex;
 	public static final char COLOR_CHAR = '\u00A7';
 
 	private HexColor(String hex) {

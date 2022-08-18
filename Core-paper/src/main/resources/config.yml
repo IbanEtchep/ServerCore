@@ -12,13 +12,9 @@ database:
   dbname: dbname
   password: password
 
-messages:
-  site: "url du site"
-  vote: "url pour voter"
-  discord: "url du discord"
-  grades: "url des info sur les grades"
-
 servername: "Survie"
+survival-servers:
+  - "survie"
 ressources-servername: "ressources"
 
 tabcomplete:

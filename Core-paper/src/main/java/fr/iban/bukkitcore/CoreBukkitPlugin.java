@@ -118,9 +118,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		getCommand("recompenses").setExecutor(new RecompensesCMD());
 		getCommand("recompenses").setTabCompleter(new RecompensesCMD());
 		getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
-		getCommand("site").setExecutor(new SimpleCommands(this));
-		getCommand("discord").setExecutor(new SimpleCommands(this));
-		getCommand("vote").setExecutor(new SimpleCommands(this));
 		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
 	}
 

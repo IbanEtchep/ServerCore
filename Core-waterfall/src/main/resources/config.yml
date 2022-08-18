@@ -20,6 +20,12 @@ chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ 
 ping-color: '#fdcb6e'
 chat-hover: 'test'
 
+messages:
+  site: "url du site"
+  vote: "url pour voter"
+  discord: "url du discord"
+  grades: "url des info sur les grades"
+
 multipaper-servers: []
 
 tabcomplete:

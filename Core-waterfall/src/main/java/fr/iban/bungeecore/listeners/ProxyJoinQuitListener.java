@@ -62,7 +62,7 @@ public class ProxyJoinQuitListener implements Listener {
     public void onProxyJoin(PostLoginEvent e) {
         ProxiedPlayer player = e.getPlayer();
         UUID uuid = player.getUniqueId();
-        ProxyServer proxy = ProxyServer.getInstance();
+        ProxyServer proxy = plugin.getProxy();
 
         proxy.getScheduler().runAsync(plugin, () -> {
             AccountManager accountManager = plugin.getAccountManager();
@@ -121,8 +121,8 @@ public class ProxyJoinQuitListener implements Listener {
     @EventHandler
     public void onDisconnect(PlayerDisconnectEvent e) {
         ProxiedPlayer player = e.getPlayer();
+        ProxyServer proxy = plugin.getProxy();
 
-        ProxyServer proxy = ProxyServer.getInstance();
         proxy.getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
             AccountManager accountManager = plugin.getAccountManager();
             Account account = accountManager.getAccount(player.getUniqueId());
