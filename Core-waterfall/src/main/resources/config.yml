@@ -22,7 +22,6 @@ chat-hover: 'test'
 
 multipaper-servers: []
 
-
 tabcomplete:
   global:
     - tpa

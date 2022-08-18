@@ -8,6 +8,11 @@ import java.util.UUID;
 import fr.iban.bungeecore.manager.AccountManager;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.message.PlayerUUIDAndName;
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.TabConstants;
+import me.neznamy.tab.api.TabFeature;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.shared.TAB;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
 import org.ocpsoft.prettytime.PrettyTime;
 
@@ -58,9 +63,6 @@ public class ProxyJoinQuitListener implements Listener {
         ProxiedPlayer player = e.getPlayer();
         UUID uuid = player.getUniqueId();
         ProxyServer proxy = ProxyServer.getInstance();
-        if (player.hasPermission("premium") && !player.hasPermission("group.support")) {
-            proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player " + player.getName() + " tabsuffix #feca57 ✮");
-        }
 
         proxy.getScheduler().runAsync(plugin, () -> {
             AccountManager accountManager = plugin.getAccountManager();
@@ -121,20 +123,18 @@ public class ProxyJoinQuitListener implements Listener {
         ProxiedPlayer player = e.getPlayer();
 
         ProxyServer proxy = ProxyServer.getInstance();
-        proxy.getPluginManager().dispatchCommand(proxy.getConsole(), "btab player " + player.getName() + " remove");
-
-        ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
+        proxy.getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
             AccountManager accountManager = plugin.getAccountManager();
             Account account = accountManager.getAccount(player.getUniqueId());
 
             if ((System.currentTimeMillis() - account.getLastSeen()) > 60000) {
-                ProxyServer.getInstance().getPlayers().forEach(p -> {
+                proxy.getPlayers().forEach(p -> {
                     Account account2 = accountManager.getAccount(p.getUniqueId());
                     if (account2.getOption(Option.LEAVE_MESSAGE) && !account2.getIgnoredPlayers().contains(player.getUniqueId())) {
                         p.sendMessage(TextComponent.fromLegacyText("§8[§c-§8] §8" + String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getName())));
                     }
                 });
-                ProxyServer.getInstance().getLogger().info("§8[§c-§8] §8" + String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getName()));
+                proxy.getLogger().info("§8[§c-§8] §8" + String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getName()));
             }
 
             account.setLastSeen(System.currentTimeMillis());

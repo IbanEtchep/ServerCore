@@ -3,6 +3,7 @@ package fr.iban.bungeecore;
 import fr.iban.bungeecore.commands.*;
 import fr.iban.bungeecore.listeners.*;
 import fr.iban.bungeecore.manager.*;
+import fr.iban.bungeecore.utils.TabHook;
 import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
@@ -32,7 +33,7 @@ public final class CoreBungeePlugin extends Plugin {
     private ChatManager chatManager;
     private TeleportManager teleportManager;
     private PlayerManager playerManager;
-
+    private TabHook tabHook;
     private Map<String, SLocation> currentEvents;
     private MessagingManager messagingManager;
     private AccountManager accountManager;
@@ -105,6 +106,9 @@ public final class CoreBungeePlugin extends Plugin {
                 new CoreCMD("bcore", "servercore.reload", this),
                 new LastRtpCMD(this, "lastrtp")
         );
+
+        tabHook = new TabHook(this);
+        tabHook.enable();
     }
 
     @Override
@@ -117,6 +121,7 @@ public final class CoreBungeePlugin extends Plugin {
         getProxy().unregisterChannel("proxy:chat");
         getProxy().unregisterChannel("proxy:annonce");
         getProxy().unregisterChannel("proxy:send");
+        tabHook.disable();
     }
 
     public void registerEvents(Listener... listeners) {

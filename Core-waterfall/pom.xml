@@ -74,6 +74,10 @@
 		<id>krypton</id>
 		<url>https://repo.kryptonmc.org/releases</url>
 	</repository>
+	<repository>
+		<id>jitpack.io</id>
+		<url>https://jitpack.io</url>
+	</repository>
 </repositories>
 
 <dependencies>
@@ -105,15 +109,29 @@
 	<dependency>
 		<groupId>me.neznamy</groupId>
 		<artifactId>tab-api</artifactId>
-		<version>3.0.2</version>
+		<version>3.1.4</version>
 		<scope>provided</scope>
 	</dependency>
 	<!-- TAB -->
 	<dependency>
 		<groupId>me.neznamy</groupId>
 		<artifactId>tab-shared</artifactId>
-		<version>3.0.2</version>
+		<version>3.1.4</version>
 		<scope>provided</scope>
+	</dependency>
+	<!-- For the common module -->
+	<dependency>
+		<groupId>com.github.Revxrsal.Lamp</groupId>
+		<artifactId>common</artifactId>
+		<version>3.0.8</version>
+		<scope>compile</scope>
+	</dependency>
+	<!-- For the bukkit module -->
+	<dependency>
+		<groupId>com.github.Revxrsal.Lamp</groupId>
+		<artifactId>bungee</artifactId>
+		<version>3.0.8</version>
+		<scope>compile</scope>
 	</dependency>
 </dependencies>
 </project>
