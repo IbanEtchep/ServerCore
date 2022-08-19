@@ -33,11 +33,11 @@ public class PluginMessageHelper {
 		}
 	}
 	
-	public static void sendPlayerToServer(Player player , String serveur) {
+	public static void sendPlayerToServer(Player player , String server) {
 	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
 	    out.writeUTF("ConnectOther");
 	    out.writeUTF(player.getName());
-	    out.writeUTF(serveur);
+	    out.writeUTF(server);
 	    player.sendPluginMessage(CoreBukkitPlugin.getInstance(), BUNGEECORD_CHANNEL, out.toByteArray());
 	}
 	
