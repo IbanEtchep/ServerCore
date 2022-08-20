@@ -25,11 +25,12 @@ import java.util.UUID;
 
 public final class CoreBukkitPlugin extends JavaPlugin {
 
-    public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
+	private static CoreBukkitPlugin instance;
+	public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
 	public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
 	public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
 	public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
-	private static CoreBukkitPlugin instance;
+	private String serverName;
 	private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
 	private TeleportManager teleportManager;
 	private Map<UUID, TextCallback> textInputs;
@@ -42,7 +43,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     public void onEnable() {
     	instance = this;
     	saveDefaultConfig();
-
+		this.serverName = getConfig().getString("servername");
 		if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
 			essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
 		}
@@ -136,7 +137,11 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	}
 
 	public String getServerName() {
-		return getConfig().getString("servername");
+		return serverName;
+	}
+
+	public void setServerName(String serverName) {
+		this.serverName = serverName;
 	}
 
 	public Map<UUID, TextCallback> getTextInputs() {

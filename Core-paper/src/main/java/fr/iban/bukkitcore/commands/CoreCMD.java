@@ -19,6 +19,7 @@ public class CoreCMD implements CommandExecutor {
         if (args.length == 1) {
             if (args[0].equalsIgnoreCase("reload")) {
                 plugin.reloadConfig();
+                plugin.setServerName(plugin.getConfig().getString("servername"));
                 sender.sendMessage("§apapercore reloaded.");
             } else if (args[0].equalsIgnoreCase("debug")) {
                 AbstractMessenger messenger = plugin.getMessagingManager().getMessenger();
