@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
 
-    private CoreBukkitPlugin plugin;
+    private final CoreBukkitPlugin plugin;
 
     public CoreCommandHandlerVisitor(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -42,7 +42,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
         handler.registerValueResolver(0, OfflinePlayer.class, context -> {
             String value = context.arguments().pop();
             if (!playerManager.getOfflinePlayers().containsKey(value)) {
-                throw new CommandErrorException("Le joueur " + value + " n'a jamais joué sur le serveur.");
+                throw new CommandErrorException("Le joueur " + value + " n''a jamais joué sur le serveur.");
             }
             return Bukkit.getOfflinePlayer(playerManager.getOfflinePlayerUUID(value));
         });
@@ -50,7 +50,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
         handler.registerParameterValidator(OfflinePlayer.class, (value, parameter, actor) -> {
             if (parameter.hasAnnotation(Online.class)) {
                 if (!playerManager.getOnlinePlayers().containsKey(value.getUniqueId()))
-                    throw new CommandErrorException("Ce joueur n'est pas en ligne.");
+                    throw new CommandErrorException("Ce joueur n''est pas en ligne.");
             }
         });
 
@@ -59,7 +59,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
         handler.registerValueResolver(0, UUID.class, context -> {
             String value = context.arguments().pop();
             if (!playerManager.getOfflinePlayers().containsKey(value)) {
-                throw new CommandErrorException("Ce joueur " + value + " n'a jamais joué sur le serveur.");
+                throw new CommandErrorException("Ce joueur " + value + " n''a jamais joué sur le serveur.");
             }
             return playerManager.getOfflinePlayerUUID(value);
         });
@@ -67,7 +67,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
         handler.registerParameterValidator(UUID.class, (value, parameter, actor) -> {
             if (parameter.hasAnnotation(Online.class)) {
                 if (!playerManager.getOnlinePlayers().containsKey(value))
-                    throw new CommandErrorException("Ce joueur n'est pas en ligne.");
+                    throw new CommandErrorException("Ce joueur n''est pas en ligne.");
             }
         });
     }
