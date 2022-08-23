@@ -1,6 +1,5 @@
 package fr.iban.survivalcore.utils;
 
-import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.survivalcore.SurvivalCorePlugin;
@@ -37,22 +36,24 @@ public class HourlyReward {
 
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> {
             for (Player player : Bukkit.getOnlinePlayers()) {
-                if (player.hasPermission("premium")) {
+                if (getSalary(player) != 0) {
                     addPlayTime(player.getUniqueId(), 1);
                 }
             }
         }, 1200L, 1200L);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> getTimeBiggerThanOneHour().forEach(uuid -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, () -> getTimeBiggerThan(getTimePerPayout()).forEach(uuid -> {
             Player player = Bukkit.getPlayer(uuid);
             if (player != null) {
-                player.sendMessage("§a§lVous avez reçu 750§e⛃§a§l pour avoir joué 1 heure.");
+                int salary = getSalary(player);
+                if(salary == 0) return;
+                player.sendMessage("§a§lVous avez reçu "+salary+"§e⛃§a§l pour avoir joué 1 heure.");
                 Economy economy = plugin.getEconomy();
                 if (economy != null) {
-                    economy.depositPlayer(player, 750);
+                    economy.depositPlayer(player, salary);
                 } else {
                     player.sendMessage("§a§lLa récompense vous attend dans /recompenses.");
-                    RewardsDAO.addRewardAsync(player.getUniqueId().toString(), "750§e⛃§r", "Survie", "eco give {player} " + 750);
+                    RewardsDAO.addRewardAsync(player.getUniqueId().toString(), salary+"§e⛃§r", "Survie", "eco give {player} " + salary);
                 }
                 removePlayTime(uuid, 60);
             }
@@ -60,11 +61,12 @@ public class HourlyReward {
     }
 
 
-    public List<UUID> getTimeBiggerThanOneHour() {
-        String sql = "SELECT uuid FROM sc_hourly_rewards_time WHERE playtime > 60;";
+    public List<UUID> getTimeBiggerThan(int time) {
+        String sql = "SELECT uuid FROM sc_hourly_rewards_time WHERE playtime > ?;";
         List<UUID> uuidList = new ArrayList<>();
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                ps.setInt(1, time);
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
                         UUID uuid = UUID.fromString(rs.getString("uuid"));
@@ -104,4 +106,21 @@ public class HourlyReward {
         }
     }
 
+    public int getSalary(Player player) {
+        int maxSalary = 0;
+        List<String> salaries = plugin.getConfig().getStringList("salary.permissions");
+        for (String salaryString : salaries) {
+            String[] splitted = salaryString.split(":");
+            String permission = splitted[0];
+            int salary = Integer.parseInt(splitted[1]);
+            if(player.hasPermission(permission) && maxSalary < salary) {
+                maxSalary = salary;
+            }
+        }
+        return maxSalary;
+    }
+
+    public int getTimePerPayout() {
+        return plugin.getConfig().getInt("salary.time-per-payout", 60);
+    }
 }

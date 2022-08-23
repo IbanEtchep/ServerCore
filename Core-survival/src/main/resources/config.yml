@@ -1,2 +1,8 @@
 mending-trade-price: 64
 mending-trade-material: DIAMOND
+salary:
+  #time in minutes
+  time-per-payout: 60
+  permissions:
+    - group.default:100
+    - group.mercenaire:100
