@@ -25,15 +25,14 @@ public class TabHook {
             ProxiedPlayer player = plugin.getProxy().getPlayer(tabPlayer.getUniqueId());
 
             if (player.hasPermission("premium") && !player.hasPermission("group.support")) {
-                if (!tablistFormatManager.getCustomSuffix(tabPlayer).equals("#feca57 ✮")) {
+                if (tablistFormatManager.getCustomSuffix(tabPlayer) == null
+                        || !tablistFormatManager.getCustomSuffix(tabPlayer).equals("#feca57 ✮")) {
                     tablistFormatManager.setSuffix(tabPlayer, "#feca57 ✮");
                 }
-            } else {
-                if (tablistFormatManager.getCustomSuffix(tabPlayer).equals("#feca57 ✮")) {
-                    tablistFormatManager.resetSuffix(tabPlayer);
-                }
+            } else if (tablistFormatManager.getCustomSuffix(tabPlayer) != null
+                    && tablistFormatManager.getCustomSuffix(tabPlayer).equals("#feca57 ✮")) {
+                tablistFormatManager.resetSuffix(tabPlayer);
             }
-            tablistFormatManager.setSuffix(tabPlayer, "#feca57 ✮");
         });
     }
 
