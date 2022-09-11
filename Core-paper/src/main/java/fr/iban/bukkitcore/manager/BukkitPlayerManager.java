@@ -52,7 +52,7 @@ public class BukkitPlayerManager extends PlayerManager {
     }
 
     public String getName(UUID uuid) {
-        return getOfflinePlayers().entrySet().stream()
+        return offlinePlayers.entrySet().stream()
                 .filter(entry -> entry.getValue().equals(uuid))
                 .map(Map.Entry::getKey).findFirst().orElse(null);
     }

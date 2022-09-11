@@ -28,7 +28,7 @@ public class RaidTriggerListener implements Listener {
 
 	private boolean isCooldown(Player player) {
 		if(cooldown.containsKey(player.getUniqueId())) {
-			if(System.currentTimeMillis() - cooldown.get(player.getUniqueId()) < 10000) {
+			if(System.currentTimeMillis() - cooldown.get(player.getUniqueId()) < 30000) {
 				return true;
 			}else {
 				cooldown.remove(player.getUniqueId());
