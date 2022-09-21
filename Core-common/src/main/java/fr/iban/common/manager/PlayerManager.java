@@ -6,9 +6,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class PlayerManager {
 
@@ -38,9 +38,13 @@ public class PlayerManager {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 try (ResultSet rs = ps.executeQuery()) {
                     while (rs.next()) {
-                        UUID uuid = UUID.fromString(rs.getString("uuid"));
-                        String name = rs.getString("name");
-                        proxyPlayers.put(name, uuid);
+                        try {
+                            UUID uuid = UUID.fromString(rs.getString("uuid"));
+                            String name = rs.getString("name");
+                            proxyPlayers.put(name, uuid);
+                        }catch (IllegalArgumentException e) {
+                            System.out.println("Core : UUID invalide :" + UUID.fromString(rs.getString("uuid")));
+                        }
                     }
                 }
             }
