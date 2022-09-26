@@ -9,6 +9,8 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import revxrsal.commands.bukkit.BukkitCommandHandler;
+import revxrsal.commands.exception.CommandErrorException;
 
 public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
@@ -39,14 +41,7 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
                 new ServiceListeners(this)
         );
 
-        getCommand("addhomes").setExecutor(new HomesManageCMD());
-        getCommand("dolphin").setExecutor(new DolphinCMD());
-        getCommand("feed").setExecutor(new FeedCMD());
-        getCommand("givetools").setExecutor(new GiveSpecialToolsCMD());
-        getCommand("repair").setExecutor(new RepairCMD());
-        getCommand("annonce").setExecutor(new AnnonceCMD(this));
-        getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
-        getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());
+        registerCommands();
 
         HourlyReward hourlyReward = new HourlyReward(this);
         hourlyReward.init();
@@ -54,6 +49,21 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     public static SurvivalCorePlugin getInstance() {
         return instance;
+    }
+
+    private void registerCommands() {
+        getCommand("dolphin").setExecutor(new DolphinCMD());
+        getCommand("givetools").setExecutor(new GiveSpecialToolsCMD());
+        getCommand("annonce").setExecutor(new AnnonceCMD(this));
+        getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
+        getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());
+
+        BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
+        commandHandler.accept(CoreBukkitPlugin.getInstance().getCommandHandlerVisitor());
+
+        commandHandler.register(new RepairCMD(this));
+        commandHandler.register(new FeedCMD(this));
+        commandHandler.registerBrigadier();
     }
 
     public void registerEvents(Listener... listeners) {

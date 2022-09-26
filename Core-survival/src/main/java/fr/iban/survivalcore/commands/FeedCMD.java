@@ -1,48 +1,75 @@
 package fr.iban.survivalcore.commands;
 
+import com.earth2me.essentials.utils.DateUtil;
+import fr.iban.survivalcore.SurvivalCorePlugin;
+import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.commons.lang.time.DateUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.bukkit.annotation.CommandPermission;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+public class FeedCMD {
 
-public class FeedCMD implements CommandExecutor {
+	private final SurvivalCorePlugin plugin;
+	private final Map<UUID, Long> cooldowns = new HashMap<>();
 
-	private Map<UUID, Long> cooldowns = new HashMap<>();
+	public FeedCMD(SurvivalCorePlugin plugin) {
+		this.plugin = plugin;
+	}
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(sender instanceof Player) {
-			Player player = (Player)sender;
-			if(player.hasPermission("spartacube.feed")) {
+	@Command("feed")
+	@CommandPermission("servercore.feed")
+	public void feed(Player player) {
+		if(hasCooldown(player)) {
+			return;
+		}
 
-				if(!cooldowns.isEmpty() && cooldowns.containsKey(player.getUniqueId())) {
-					int secondsLeft = (int) (120000 - (System.currentTimeMillis() - cooldowns.get(player.getUniqueId()))) / 1000;
-					if(secondsLeft <= 0) {
-						cooldowns.remove(player.getUniqueId());
-					}else if(!player.hasPermission("spartacube.feed.bypasscooldown")){
-						player.sendMessage("§cVous devez attendre " + secondsLeft +" secondes avant de réutiliser cette commande !");
-						return false;
-					}
-				}
+		player.setFoodLevel(20);
+		player.setSaturation(5f);
+		player.sendMessage("§aVous avez été rassasié.");
 
-				player.setFoodLevel(20);
-				player.setSaturation(5f);
-				player.sendMessage("§aVous avez été rassasié.");
+		if(getCooldownTime(player) > 0){
+			cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+		}
+	}
 
-				if(!player.hasPermission("spartacube.feed.bypasscooldown")){
-					cooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-				}
-			}else {
-				player.sendMessage("§cVous n'avez pas la permission pour effectuer cette commande.");
+	private boolean hasCooldown(Player player) {
+		if (cooldowns.containsKey(player.getUniqueId())) {
+			int cooldownTime = getCooldownFromConfig(player, "feed") * 1000;
+			long lastRep = cooldowns.get(player.getUniqueId());
+			if (System.currentTimeMillis() - lastRep > cooldownTime) {
+				cooldowns.remove(player.getUniqueId());
+				return false;
+			} else {
+				player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + DateUtil.formatDateDiff(lastRep+cooldownTime) + ".");
+				return true;
 			}
 		}
 		return false;
 	}
 
+	public int getCooldownTime(Player player) {
+		return player.hasPermission("servercore.feed.bypasscooldown") ? 0 : getCooldownFromConfig(player, "feed");
+	}
 
+	private int getCooldownFromConfig(Player player, String command) {
+		int minCooldown = Integer.MAX_VALUE;
+		List<String> cooldowns = plugin.getConfig().getStringList("cooldowns." + command + ".permissions");
+		for (String cooldownString : cooldowns) {
+			String[] splitted = cooldownString.split(":");
+			String permission = splitted[0];
+			int cooldownTime = Integer.parseInt(splitted[1]);
+			if (player.hasPermission(permission) && minCooldown > cooldownTime) {
+				minCooldown = cooldownTime;
+			}
+		}
+		return minCooldown;
+	}
 
 }

@@ -8,15 +8,6 @@ softdepend: [Lands, CoreProtect, BetterRTP]
 depend: [LuckPerms, Essentials, Core, Vault]
 
 commands:
-  site:
-  discord:
-  vote:
-  map:
-  stoptuto:
-  addhomes:
-  grades:
-  feed:
-  repair:
   givetools:
   annonce:
   pvp:

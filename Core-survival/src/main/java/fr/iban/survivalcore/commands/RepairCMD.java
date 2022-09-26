@@ -1,103 +1,132 @@
 package fr.iban.survivalcore.commands;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+import com.earth2me.essentials.utils.DateUtil;
+import fr.iban.survivalcore.SurvivalCorePlugin;
 import fr.iban.survivalcore.tools.SpecialTools;
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Default;
+import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.bukkit.annotation.CommandPermission;
 
-public class RepairCMD implements CommandExecutor {
+@Command("repair")
+public class RepairCMD {
+
+    private final SurvivalCorePlugin plugin;
 
     private final Map<UUID, Long> repairCooldowns = new HashMap<>();
     private final Map<UUID, Long> repairAllCooldowns = new HashMap<>();
 
+    public RepairCMD(SurvivalCorePlugin plugin) {
+        this.plugin = plugin;
+    }
 
-    @SuppressWarnings("deprecation")
-    public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (sender instanceof Player player) {
-            String norepair = ChatColor.RED + "Erreur: " + ChatColor.DARK_RED + "Cet item n'est pas réparable";
-            if (args.length == 0 || args[0].equalsIgnoreCase("hand")) {
-                if (player.hasPermission("servercore.repair")) {
-                    ItemStack item = player.getItemInHand();
-                    if (isRepairable(item) && canRepair(player)) {
-                        player.getItemInHand().setDurability((short) 0);
-                        player.sendMessage(ChatColor.GOLD + "§aRéparation effectuée.");
-                        repairCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-                    } else {
-                        player.sendMessage(norepair);
-                    }
-                } else {
-                    player.sendMessage(ChatColor.DARK_RED + "Vous n'êtes pas autorisé à utiliser cette commande");
-                }
-            } else if (args[0].equalsIgnoreCase("all")) {
-                if (player.hasPermission("servercore.repairall")) {
-                    if (canRepair(player)) {
-                        for (ItemStack item : player.getInventory().getContents()) {
-                            if (isRepairable(item)) {
-                                item.setDurability((short) 0);
-                            }
-                        }
-                        for (ItemStack item : player.getInventory().getArmorContents()) {
-                            if (isRepairable(item)) {
-                                item.setDurability((short) 0);
-                            }
-                        }
-                        repairAllCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-                        player.sendMessage(ChatColor.GOLD + "§aRéparations effectuées.");
-                    }
-                } else {
-                    player.sendMessage(ChatColor.DARK_RED + "Vous n'êtes pas autorisé à utiliser cette commande");
+    @Command("repair")
+    @CommandPermission("servercore.repair")
+    @Default
+    public void repair(Player sender) {
+        repairHand(sender);
+    }
+
+    @Subcommand("hand")
+    @CommandPermission("servercore.repair")
+    public void repairHand(Player player) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (isRepairable(item) && !hasRepairCooldown(player)) {
+            repairItem(item);
+            player.sendMessage(ChatColor.GOLD + "§aRéparation effectuée.");
+            repairCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+        } else {
+            player.sendMessage(ChatColor.RED + "Erreur: " + ChatColor.DARK_RED + "Cet item n'est pas réparable");
+        }
+    }
+
+    @Subcommand("all")
+    @CommandPermission("servercore.repairall")
+    public void repairAll(Player player) {
+        if (!hasRepairAllCooldown(player)) {
+            for (ItemStack item : player.getInventory().getContents()) {
+                if (isRepairable(item)) {
+                    repairItem(item);
                 }
             }
+            for (ItemStack item : player.getInventory().getArmorContents()) {
+                if (isRepairable(item)) {
+                    repairItem(item);
+                }
+            }
+            repairAllCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
+            player.sendMessage(ChatColor.GOLD + "§aRéparations effectuées.");
         }
-        return true;
     }
 
     private boolean isRepairable(ItemStack item) {
-        if (item == null || item.getType().isBlock() || item.getType().getMaxDurability() < 1 || item.getDurability() == 0 || (
-                SpecialTools.is3x3Pickaxe(item) && !item.getItemMeta().getLore().contains("§c§l[ITEM LEGENDAIRE]"))) {
+        return item != null
+                && !item.getType().isBlock()
+                && item.getType().getMaxDurability() >= 1
+                && item.getDurability() != 0
+                && (!SpecialTools.is3x3Pickaxe(item) || Objects.requireNonNull(item.getItemMeta().getLore()).contains("§c§l[ITEM LEGENDAIRE]"));
+    }
+
+    public void repairItem(ItemStack item) {
+        Damageable damageable = (Damageable) item.getItemMeta();
+        damageable.setDamage(0);
+        item.setItemMeta(damageable);
+    }
+
+    private boolean hasRepairAllCooldown(Player player) {
+        if(player.hasPermission("servercore.repairall.bypasscooldown")) {
             return false;
         }
-        return true;
-    }
-
-
-    private boolean canRepair(Player player) {
-        if (repairCooldowns.containsKey(player.getUniqueId())) {
-            long lastRep = repairCooldowns.get(player.getUniqueId());
-            long troisheures = 3 * 3600 * 1000;
-            if (System.currentTimeMillis() - lastRep > troisheures) {
-                repairCooldowns.remove(player.getUniqueId());
-                return true;
-            } else {
-                long remain = troisheures - (System.currentTimeMillis() - lastRep);
-                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + remain / 1000 + " secondes.");
-                return false;
-            }
-        }
-        return true;
-    }
-
-    private boolean canRepairAll(Player player) {
         if (repairAllCooldowns.containsKey(player.getUniqueId())) {
+            int cooldownTime = getCooldownFromConfig(player, "repairall") * 1000;
             long lastRep = repairAllCooldowns.get(player.getUniqueId());
-            long troisheures = 3 * 3600 * 1000;
-            if (System.currentTimeMillis() - lastRep > troisheures) {
+            if (System.currentTimeMillis() - lastRep > cooldownTime) {
                 repairAllCooldowns.remove(player.getUniqueId());
-                return true;
-            } else {
-                long remain = troisheures - (System.currentTimeMillis() - lastRep);
-                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + remain / 1000 + " secondes.");
                 return false;
+            } else {
+                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + DateUtil.formatDateDiff(lastRep+cooldownTime) + " secondes.");
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    private boolean hasRepairCooldown(Player player) {
+        if(player.hasPermission("servercore.repairall.bypasscooldown")) {
+            return false;
+        }
+        if (repairCooldowns.containsKey(player.getUniqueId())) {
+            int cooldownTime = getCooldownFromConfig(player, "repair") * 1000;
+            long lastRep = repairCooldowns.get(player.getUniqueId());
+            if (System.currentTimeMillis() - lastRep > cooldownTime) {
+                repairCooldowns.remove(player.getUniqueId());
+                return false;
+            } else {
+                long remain = cooldownTime - (System.currentTimeMillis() - lastRep);
+                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + remain / 1000 + " secondes.");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private int getCooldownFromConfig(Player player, String command) {
+        int minCooldown = Integer.MAX_VALUE;
+        List<String> salaries = plugin.getConfig().getStringList("cooldowns." + command + ".permissions");
+        for (String cooldownString : salaries) {
+            String[] splitted = cooldownString.split(":");
+            String permission = splitted[0];
+            int cooldownTime = Integer.parseInt(splitted[1]);
+            if (player.hasPermission(permission) && minCooldown > cooldownTime) {
+                minCooldown = cooldownTime;
+            }
+        }
+        return minCooldown;
     }
 }

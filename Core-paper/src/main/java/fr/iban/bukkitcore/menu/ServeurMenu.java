@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.menu;
 
+import fr.iban.bukkitcore.CoreBukkitPlugin;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -27,7 +28,7 @@ public class ServeurMenu extends Menu {
 	public void handleMenu(InventoryClickEvent e) {
 		if(e.getClickedInventory() == e.getView().getTopInventory()) {
 			if(e.getCurrentItem().getType() == Material.GRASS) {
-				PluginMessageHelper.sendPlayerToServer(player, "survie");
+				PluginMessageHelper.sendPlayerToServer(player, CoreBukkitPlugin.getInstance().getConfig().getString("survie-servername", "survie"));
 			}else if (e.getCurrentItem().getType() == Material.IRON_PICKAXE) {
 				new RessourceMenu(player).open();
 			}
