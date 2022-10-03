@@ -11,6 +11,8 @@ import fr.iban.common.data.redis.RedisAccess;
 import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
+import fr.iban.common.manager.TrustedCommandsManager;
+import fr.iban.common.manager.TrustedUserManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -39,8 +41,11 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private MessagingManager messagingManager;
 	private AccountManager accountManager;
 	private BukkitPlayerManager playerManager;
-	@Override
-    public void onEnable() {
+	private TrustedCommandsManager trustedCommandManager;
+	private BukkitTrustedUserManager trustedUserManager;
+	private ApprovalManager approvalManager;
+
+	public void onEnable() {
     	instance = this;
     	saveDefaultConfig();
 		this.serverName = getConfig().getString("servername");
@@ -72,8 +77,12 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         this.teleportManager = new TeleportManager(this);
         this.ressourcesWorldManager = new RessourcesWorldManager();
 		this.messagingManager = new MessagingManager(this);
+		this.trustedCommandManager = new TrustedCommandsManager();
+		Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
 		messagingManager.init();
 		this.playerManager = new BukkitPlayerManager();
+		this.trustedUserManager = new BukkitTrustedUserManager(this);
+		this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
 
         registerListeners(
         		new HeadDatabaseListener(),
@@ -105,6 +114,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		this.coreCommandHandlerVisitor = new CoreCommandHandlerVisitor(this);
 		commandHandler.accept(coreCommandHandlerVisitor);
 		commandHandler.register(new TeleportCommands(this));
+		commandHandler.register(new TrustCommandsCMD(this));
 
 		commandHandler.registerBrigadier();
 
@@ -118,7 +128,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		getCommand("options").setExecutor(new OptionsCMD());
 		getCommand("recompenses").setExecutor(new RecompensesCMD());
 		getCommand("recompenses").setTabCompleter(new RecompensesCMD());
-		getCommand("addtabcomplete").setExecutor(new AddTabCompleteCMD(this));
 		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
 	}
 
@@ -164,6 +173,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		return ressourcesWorldManager;
 	}
 
+	public TrustedCommandsManager getTrustedCommandManager() {
+		return trustedCommandManager;
+	}
+
 	public MessagingManager getMessagingManager() {
 		return messagingManager;
 	}
@@ -176,4 +189,11 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		return coreCommandHandlerVisitor;
 	}
 
+	public BukkitTrustedUserManager getTrustedUserManager() {
+		return trustedUserManager;
+	}
+
+	public ApprovalManager getApprovalManager() {
+		return approvalManager;
+	}
 }

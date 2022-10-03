@@ -13,7 +13,6 @@ commands:
   core:
     permission: servercore.papercore.reload
   recompenses:
-  addtabcomplete:
   abbc:
     permission: servercore.abbc
   bungeebroadcast:

@@ -1,7 +1,9 @@
 package fr.iban.bukkitcore.commands;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.commands.annotation.Context;
 import fr.iban.bukkitcore.commands.annotation.Online;
+import fr.iban.bukkitcore.commands.annotation.SenderType;
 import fr.iban.bukkitcore.manager.BukkitPlayerManager;
 import fr.iban.common.data.Account;
 import fr.iban.common.manager.PlayerManager;
@@ -14,9 +16,7 @@ import revxrsal.commands.autocomplete.SuggestionProvider;
 import revxrsal.commands.autocomplete.SuggestionProviderFactory;
 import revxrsal.commands.exception.CommandErrorException;
 
-import java.util.Collection;
-import java.util.Locale;
-import java.util.UUID;
+import java.util.*;
 
 public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
 
@@ -37,6 +37,19 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                 SuggestionProviderFactory.forType(OfflinePlayer.class, SuggestionProvider.of(playerNames)));
         handler.getAutoCompleter().registerSuggestionFactory(0,
                 SuggestionProviderFactory.forType(UUID.class, SuggestionProvider.of(playerNames)));
+        handler.getAutoCompleter().registerParameterSuggestions(String.class, (args, sender, command) -> {
+            if(command.hasAnnotation(Context.class)) {
+                return Arrays.asList("global", "bukkit", "proxy");
+            }
+            return null;
+        });
+
+        handler.getAutoCompleter().registerParameterSuggestions(String.class, (args, sender, command) -> {
+            if(command.hasAnnotation(SenderType.class)) {
+                return Arrays.asList("player", "staff", "console");
+            }
+            return null;
+        });
 
         //OfflinePlayer
         handler.registerValueResolver(0, OfflinePlayer.class, context -> {
@@ -53,6 +66,7 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                     throw new CommandErrorException("Ce joueur n''est pas en ligne.");
             }
         });
+
 
 
         //UUID

@@ -2,12 +2,18 @@ package fr.iban.common.messaging.message;
 
 import java.util.UUID;
 
-public class PlayerUUIDAndName {
+public class PlayerInfo {
 
     private UUID uuid;
     private String name;
+    private String ip;
 
-    public PlayerUUIDAndName(UUID uuid, String name) {
+    public PlayerInfo(UUID uuid, String name, String ip) {
+        this(uuid, name);
+        this.ip = ip;
+    }
+
+    public PlayerInfo(UUID uuid, String name) {
         this.uuid = uuid;
         this.name = name;
     }
@@ -26,5 +32,9 @@ public class PlayerUUIDAndName {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getIp() {
+        return ip;
     }
 }

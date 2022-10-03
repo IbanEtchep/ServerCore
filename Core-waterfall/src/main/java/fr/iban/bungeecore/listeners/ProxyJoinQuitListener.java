@@ -1,27 +1,13 @@
 package fr.iban.bungeecore.listeners;
 
-import java.util.Date;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
-
-import fr.iban.bungeecore.manager.AccountManager;
-import fr.iban.common.messaging.CoreChannel;
-import fr.iban.common.messaging.message.PlayerUUIDAndName;
-import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.api.TabConstants;
-import me.neznamy.tab.api.TabFeature;
-import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.shared.TAB;
-import net.md_5.bungee.api.event.ServerConnectedEvent;
-import org.ocpsoft.prettytime.PrettyTime;
-
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.commands.ReplyCMD;
+import fr.iban.bungeecore.manager.AccountManager;
 import fr.iban.bungeecore.utils.ChatUtils;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
-import fr.iban.common.data.redis.RedisAccess;
+import fr.iban.common.messaging.CoreChannel;
+import fr.iban.common.messaging.message.PlayerInfo;
 import fr.iban.common.utils.ArrayUtils;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.ProxyServer;
@@ -34,6 +20,12 @@ import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import org.ocpsoft.prettytime.PrettyTime;
+
+import java.util.Date;
+import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 public class ProxyJoinQuitListener implements Listener {
 
@@ -92,7 +84,7 @@ public class ProxyJoinQuitListener implements Listener {
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
             plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
-            plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerUUIDAndName(player.getUniqueId(), player.getName()));
+            plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerInfo(player.getUniqueId(), player.getName()));
         });
 
     }

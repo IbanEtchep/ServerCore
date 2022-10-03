@@ -63,6 +63,7 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
         commandHandler.register(new RepairCMD(this));
         commandHandler.register(new FeedCMD(this));
+        commandHandler.register(new ShowGroupsCMD());
         commandHandler.registerBrigadier();
     }
 

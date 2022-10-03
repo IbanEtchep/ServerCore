@@ -3,20 +3,14 @@ package fr.iban.bukkitcore.listeners;
 import com.google.gson.Gson;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.event.CoreMessageEvent;
-import fr.iban.bukkitcore.utils.SLocationUtils;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
-import fr.iban.common.messaging.message.PlayerUUIDAndName;
-import fr.iban.common.teleport.SLocation;
+import fr.iban.common.messaging.message.PlayerInfo;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import fr.iban.common.teleport.TpRequest;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.UUID;
 
@@ -50,7 +44,7 @@ public class CoreMessageListener implements Listener {
     }
 
     public void consumePlayerJoinMessage(Message message) {
-        PlayerUUIDAndName playerMessage = gson.fromJson(message.getMessage(), PlayerUUIDAndName.class);
+        PlayerInfo playerMessage = gson.fromJson(message.getMessage(), PlayerInfo.class);
         plugin.getPlayerManager().getOnlinePlayers().put(playerMessage.getUuid(), playerMessage.getName());
         plugin.getPlayerManager().getOfflinePlayers().putIfAbsent(playerMessage.getName(), playerMessage.getUuid());
     }

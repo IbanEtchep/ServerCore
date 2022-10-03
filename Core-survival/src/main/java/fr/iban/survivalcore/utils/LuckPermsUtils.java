@@ -3,6 +3,9 @@ package fr.iban.survivalcore.utils;
 import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 
+import fr.iban.bukkitcore.utils.HexColor;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.model.group.Group;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.entity.Player;
 
@@ -38,20 +41,11 @@ public class LuckPermsUtils {
 		luckapi.getUserManager().saveUser(user);
 	}
 
-	public static void addHomes(Player player, int amount) {
-		CompletableFuture<User> userFuture = luckapi.getUserManager().loadUser(player.getUniqueId());
-		userFuture.thenAcceptAsync(user -> {
-			int homes = 1;
-			for (PermissionNode permNode : user.getNodes(NodeType.PERMISSION)) {
-				if(permNode.getKey().startsWith("essentials.sethome.multiple.")) {
-					homes = Integer.parseInt(StringUtils.removeStart(permNode.getKey(), "essentials.sethome.multiple."));
-					user.data().remove(permNode);
-				}
-			}
-			SurvivalCorePlugin.getInstance().getLogger().log(Level.INFO, "Résidences de " + player.getName() + " " + homes + " -> "+(homes+amount));
-			user.data().add(Node.builder("essentials.sethome.multiple."+(homes+amount)).build());
-			luckapi.getUserManager().saveUser(user);
-		});
+	public static void showGroups(Player player) {
+		for (Group group : luckapi.getGroupManager().getLoadedGroups()) {
+			CachedMetaData metaData = group.getCachedData().getMetaData();
+			player.sendMessage(HexColor.translateColorCodes(metaData.getSuffix() + metaData.getPrefix() + " " + player.getName()));
+		}
 	}
 
 	public static User loadUser(Player player) {

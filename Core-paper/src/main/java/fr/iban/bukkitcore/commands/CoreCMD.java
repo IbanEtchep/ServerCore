@@ -8,7 +8,7 @@ import org.bukkit.command.CommandSender;
 
 public class CoreCMD implements CommandExecutor {
 
-    private CoreBukkitPlugin plugin;
+    private final CoreBukkitPlugin plugin;
 
     public CoreCMD(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
