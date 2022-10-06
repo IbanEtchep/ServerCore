@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,13 +29,13 @@ public class CommandsListener implements Listener {
     public void onCommandSend(PlayerCommandSendEvent e) {
         Player player = e.getPlayer();
 
-        if (player.hasPermission("spartacube.admin")) {
+        if (player.hasPermission("servercore.admin")) {
             return;
         }
 
-        List<String> allowed = plugin.getTrustedCommandManager().getBukkitPlayerCommands();
+        List<String> allowed = new ArrayList<>(plugin.getTrustedCommandManager().getBukkitPlayerCommands());
 
-        if (player.hasPermission("spartacube.moderation")) {
+        if (player.hasPermission("servercore.moderation")) {
             allowed.addAll(plugin.getTrustedCommandManager().getBukkitStaffCommands());
         }
 

@@ -1,21 +1,13 @@
 package fr.iban.survivalcore.utils;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.logging.Level;
-
 import fr.iban.bukkitcore.utils.HexColor;
-import net.luckperms.api.cacheddata.CachedMetaData;
-import net.luckperms.api.model.group.Group;
-import org.apache.commons.lang.StringUtils;
-import org.bukkit.entity.Player;
-
-import fr.iban.survivalcore.SurvivalCorePlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.cacheddata.CachedMetaData;
+import net.luckperms.api.model.group.Group;
 import net.luckperms.api.model.user.User;
-import net.luckperms.api.node.Node;
-import net.luckperms.api.node.NodeType;
 import net.luckperms.api.node.types.PermissionNode;
+import org.bukkit.entity.Player;
 
 public class LuckPermsUtils {
 
