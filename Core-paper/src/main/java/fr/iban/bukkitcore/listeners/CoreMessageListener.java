@@ -5,6 +5,7 @@ import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.event.CoreMessageEvent;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
+import fr.iban.common.messaging.message.PlayerBoolean;
 import fr.iban.common.messaging.message.PlayerInfo;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
@@ -40,6 +41,7 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
             case CoreChannel.PLAYER_JOIN_CHANNEL -> consumePlayerJoinMessage(message);
             case CoreChannel.PLAYER_QUIT_CHANNEL -> consumePlayerQuitMessage(message);
+            case CoreChannel.VANISH_STATUS_CHANGE_CHANNEL -> consumeVanishStatusChangeMessage(message);
         }
     }
 
@@ -73,4 +75,8 @@ public class CoreMessageListener implements Listener {
         plugin.getTeleportManager().performTeleportToPlayer(ttp);
     }
 
+    private void consumeVanishStatusChangeMessage(Message message) {
+        PlayerBoolean playerBoolean = message.getMessage(PlayerBoolean.class);
+        plugin.getPlayerManager().setVanished(playerBoolean.getUuid(), playerBoolean.isValue());
+    }
 }

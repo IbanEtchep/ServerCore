@@ -82,7 +82,7 @@ public class InteractListeners implements Listener {
 					return;
 				}
 
-				Bukkit.getPluginManager().callEvent(new UseReplantHoeEvent(player, block));
+				new UseReplantHoeEvent(player, block).callEvent();
 				block.breakNaturally();
 				ItemMeta meta = houe.getItemMeta();
 				Damageable itemDmg = (Damageable) meta;

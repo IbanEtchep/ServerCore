@@ -9,5 +9,6 @@ public class CoreChannel {
     public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
     public static final String PLAYER_JOIN_CHANNEL = "PlayerProxyJoin";
     public static final String PLAYER_QUIT_CHANNEL = "PlayerProxyQuit";
+    public static final String VANISH_STATUS_CHANGE_CHANNEL = "VanishStatusChange";
 
 }

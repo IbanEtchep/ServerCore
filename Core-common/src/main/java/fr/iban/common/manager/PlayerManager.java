@@ -1,16 +1,18 @@
 package fr.iban.common.manager;
 
 import fr.iban.common.data.sql.DbAccess;
+import fr.iban.common.messaging.CoreChannel;
+import fr.iban.common.messaging.message.PlayerBoolean;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class PlayerManager {
+
+    protected final List<UUID> vanishedPlayers = new ArrayList<>();
 
     public Map<UUID, String> getProxyPlayerNamesFromDB() {
         String sql = "SELECT uuid, name FROM sc_players P JOIN sc_online_players OP ON P.id=OP.player_id;";
@@ -86,6 +88,18 @@ public class PlayerManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public boolean isVanished(UUID uuid) {
+        return vanishedPlayers.contains(uuid);
+    }
+
+    public void setVanished(UUID uuid, boolean newValue) {
+        if (newValue) {
+            vanishedPlayers.add(uuid);
+        } else {
+            vanishedPlayers.remove(uuid);
         }
     }
 }

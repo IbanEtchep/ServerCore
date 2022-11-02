@@ -9,6 +9,7 @@ import fr.iban.common.messaging.Message;
 import fr.iban.common.messaging.message.DeathLocation;
 import fr.iban.common.messaging.message.EventAnnounce;
 import fr.iban.common.messaging.message.LastRTPLocation;
+import fr.iban.common.messaging.message.PlayerBoolean;
 import fr.iban.common.teleport.RequestType;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
@@ -47,6 +48,7 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.REMOVE_PENDING_TP_CHANNEL ->
                     plugin.getTeleportManager().getPendingTeleports().remove(UUID.fromString(message.getMessage()));
             case CoreChannel.REMOVE_TP_REQUEST_CHANNEL -> consumeRemoveTpRequestMessage(message);
+            case CoreChannel.VANISH_STATUS_CHANGE_CHANNEL -> consumeVanishStatusChangeMessage(message);
         }
     }
 
@@ -150,6 +152,11 @@ public class CoreMessageListener implements Listener {
             sb.append("-");
         }
         return sb.toString();
+    }
+
+    private void consumeVanishStatusChangeMessage(Message message) {
+        PlayerBoolean playerBoolean = message.getMessage(PlayerBoolean.class);
+        plugin.getPlayerManager().setVanished(playerBoolean.getUuid(), playerBoolean.isValue());
     }
 
 }

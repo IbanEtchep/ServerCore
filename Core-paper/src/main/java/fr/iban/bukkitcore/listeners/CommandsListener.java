@@ -46,6 +46,11 @@ public class CommandsListener implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player player = e.getPlayer();
+
+        if(!plugin.getConfig().getBoolean("command-approval", true)) {
+            return;
+        }
+
         if (plugin.getTrustedUserManager().isTrusted(player)) {
             return;
         }

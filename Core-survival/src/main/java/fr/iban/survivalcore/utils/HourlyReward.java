@@ -57,7 +57,7 @@ public class HourlyReward {
                 }
                 removePlayTime(uuid, 60);
             }
-        }), 12000L, 12000L);
+        }), 0L, 12000L);
     }
 
 
@@ -107,17 +107,17 @@ public class HourlyReward {
     }
 
     public int getSalary(Player player) {
-        int maxSalary = 0;
+        int total = 0;
         List<String> salaries = plugin.getConfig().getStringList("salary.permissions");
         for (String salaryString : salaries) {
             String[] splitted = salaryString.split(":");
             String permission = splitted[0];
             int salary = Integer.parseInt(splitted[1]);
-            if(player.hasPermission(permission) && maxSalary < salary) {
-                maxSalary = salary;
+            if(player.hasPermission(permission)) {
+                total += salary;
             }
         }
-        return maxSalary;
+        return total;
     }
 
     public int getTimePerPayout() {

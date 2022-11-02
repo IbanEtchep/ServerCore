@@ -28,7 +28,7 @@ public class SpecialTools {
             Material.REDSTONE_ORE, Material.GRAVEL, Material.BLACKSTONE, Material.END_STONE,
             Material.BASALT, Material.MAGMA_BLOCK, Material.DEEPSLATE, Material.DEEPSLATE_COAL_ORE, Material.COBBLED_DEEPSLATE,
             Material.DEEPSLATE_COPPER_ORE, Material.DEEPSLATE_GOLD_ORE, Material.DEEPSLATE_IRON_ORE, Material.DEEPSLATE_LAPIS_ORE,
-            Material.DEEPSLATE_REDSTONE_ORE, Material.COPPER_ORE, Material.TUFF
+            Material.DEEPSLATE_REDSTONE_ORE, Material.COPPER_ORE, Material.TUFF, Material.CRIMSON_NYLIUM, Material.WARPED_NYLIUM
     );
 
     public static final Set<Material> canBreakWith3x3Shovel = EnumSet.of(

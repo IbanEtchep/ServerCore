@@ -6,6 +6,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.SLocationUtils;
+import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.teleport.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
@@ -96,7 +97,7 @@ public class TeleportManager {
 
     public void removeTeleportWaiting(UUID uuid) {
         pendingTeleports.remove(uuid);
-        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
+        plugin.getMessagingManager().sendMessage(CoreChannel.REMOVE_PENDING_TP_CHANNEL, uuid.toString());
     }
 
     public boolean isTeleportWaiting(UUID uuid) {
@@ -122,7 +123,7 @@ public class TeleportManager {
 
     public void removeTpRequest(UUID uuid, TpRequest tpRequest) {
         tpRequests.remove(uuid, tpRequest);
-        plugin.getMessagingManager().sendMessage(CoreBukkitPlugin.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
+        plugin.getMessagingManager().sendMessage(CoreChannel.REMOVE_TP_REQUEST_CHANNEL, tpRequest);
     }
 
     public void performTeleportToLocation(TeleportToLocation teleportToLocation) {
@@ -189,7 +190,7 @@ public class TeleportManager {
             if (SLocationUtils.isSafeLocation(loc) || player.getGameMode() != GameMode.SURVIVAL) {
                 player.teleportAsync(loc).thenAccept(result -> {
                     if (result) {
-                        player.sendActionBar("§aTéléporation effectuée !");
+                        player.sendActionBar("§aTéléportation effectuée !");
                     } else {
                         player.sendActionBar("§cLa téléportation a échoué !");
                     }
@@ -209,7 +210,7 @@ public class TeleportManager {
         if(location != null) {
             player.teleportAsync(location).thenAccept(result -> {
                 if (result) {
-                    player.sendActionBar("§aTéléporation effectuée !");
+                    player.sendActionBar("§aTéléportation effectuée !");
                 } else {
                     player.sendActionBar("§cLa téléportation a échoué !");
                 }

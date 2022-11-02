@@ -12,7 +12,7 @@ import java.util.UUID;
 
 public class RessourcesWorldManager {
 
-    private Map<UUID, Long> lastTeleportTime = new HashMap<>();
+    private final Map<UUID, Long> lastTeleportTime = new HashMap<>();
 
     public void sendToRessourceWorld(Player player, String worldname) {
         int secondsLeft = getSecondsLeft(player.getUniqueId());

@@ -28,10 +28,6 @@ import java.util.UUID;
 public final class CoreBukkitPlugin extends JavaPlugin {
 
 	private static CoreBukkitPlugin instance;
-	public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
-	public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
-	public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";
-	public static final String ADD_TP_REQUEST_CHANNEL = "AddTeleportRequest";
 	private String serverName;
 	private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
 	private TeleportManager teleportManager;
@@ -51,6 +47,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		this.serverName = getConfig().getString("servername");
 		if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
 			essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
+			getServer().getPluginManager().registerEvents(new EssentialsListeners(this), this);
 		}
     	
     	try {
@@ -80,7 +77,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		this.trustedCommandManager = new TrustedCommandsManager();
 		Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
 		messagingManager.init();
-		this.playerManager = new BukkitPlayerManager();
+		this.playerManager = new BukkitPlayerManager(this);
 		this.trustedUserManager = new BukkitTrustedUserManager(this);
 		this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
 

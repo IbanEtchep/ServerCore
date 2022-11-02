@@ -25,7 +25,7 @@ public class JoinQuitListeners implements Listener {
 		Player player = e.getPlayer();
 		e.setJoinMessage(null);
 		if(plugin.getServerName().equals("null")) {
-			Bukkit.getScheduler().runTaskLater(plugin, () -> PluginMessageHelper.askServerName(player), 10l);
+			Bukkit.getScheduler().runTaskLater(plugin, () -> PluginMessageHelper.askServerName(player), 10L);
 		}
 		RewardsDAO.getRewardsAsync(player.getUniqueId()).thenAccept(list -> {
 			if(!list.isEmpty()) {

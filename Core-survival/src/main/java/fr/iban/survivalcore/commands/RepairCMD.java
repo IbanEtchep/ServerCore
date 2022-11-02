@@ -118,8 +118,8 @@ public class RepairCMD {
 
     private int getCooldownFromConfig(Player player, String command) {
         int minCooldown = Integer.MAX_VALUE;
-        List<String> salaries = plugin.getConfig().getStringList("cooldowns." + command + ".permissions");
-        for (String cooldownString : salaries) {
+        List<String> cooldowns = plugin.getConfig().getStringList("cooldowns." + command + ".permissions");
+        for (String cooldownString : cooldowns) {
             String[] splitted = cooldownString.split(":");
             String permission = splitted[0];
             int cooldownTime = Integer.parseInt(splitted[1]);

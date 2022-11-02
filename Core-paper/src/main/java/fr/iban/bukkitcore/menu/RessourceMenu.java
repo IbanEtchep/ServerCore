@@ -21,8 +21,8 @@ public class RessourceMenu extends Menu {
 
 	@Override
 	public void handleMenu(InventoryClickEvent e) {
-		if(e.getClickedInventory() == e.getView().getTopInventory()) {
-			final RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
+		if(e.getClickedInventory() == e.getView().getTopInventory() && e.getCurrentItem() != null) {
+			RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
 			if(e.getCurrentItem().getType() == Material.GRASS_BLOCK) {
 				ressourcesWorldManager.sendToRessourceWorld(player, "resource_world");
 			}else if (e.getCurrentItem().getType() == Material.NETHERRACK) {
