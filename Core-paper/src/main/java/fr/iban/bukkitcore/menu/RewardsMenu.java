@@ -54,22 +54,21 @@ public class RewardsMenu extends PaginatedMenu {
 		}
 
 		CoreBukkitPlugin core = CoreBukkitPlugin.getInstance();
-		if(reward.getServer().equalsIgnoreCase(core.getServerName())) {
+		if(reward.getServer().equalsIgnoreCase(core.getServerName())
+			|| (reward.getServer().endsWith("%") && reward.getServer().toLowerCase().startsWith(core.getServerName().toLowerCase()))) {
 			if(rewards.contains(reward)) {
 				rewards.remove(reward);
 				Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("{player}", player.getName()));
 				player.sendMessage("§aVous avez récupéré une récompense.");
 				RewardsDAO.removeRewardAsync(player.getUniqueId().toString(), reward).thenRun(() -> {
-					Bukkit.getScheduler().runTask(core, () -> {
-						open();
-					});
+					Bukkit.getScheduler().runTask(core, this::open);
 				});
 				return;
 			}else {
 				player.sendMessage("§cUne erreur est survenue.");
 			}
 		}else {
-			player.sendMessage("§cVous devez vous trouver dans le serveur " + reward.getServer() + " pour récupérer cette récompense.");
+			player.sendMessage("§cVous devez vous trouver dans le serveur " + reward.getServer().replace("%", "") + " pour récupérer cette récompense.");
 		}
 		open();
 
