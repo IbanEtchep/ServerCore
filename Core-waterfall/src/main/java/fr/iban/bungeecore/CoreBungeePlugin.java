@@ -100,12 +100,10 @@ public final class CoreBungeePlugin extends Plugin {
                 new SudoCMD("sudo", "servercore.sudo"),
                 new SocialSpyCMD("socialspy", "servercore.socialspy"),
                 new MsgToggleCMD("msgtoggle", "servercore.msgtoggle", this),
-                new BackCMD("back", "servercore.back.death", teleportManager),
                 new JoinEventCMD("joinevent", this),
                 new TabCompleteCMD("baddtabcomplete", "servercore.addtabcomplete", this),
                 new AnnounceEventCMD("announceevent", this),
-                new CoreCMD("bcore", "servercore.reload", this),
-                new LastRtpCMD(this, "lastrtp")
+                new CoreCMD("bcore", "servercore.reload", this)
         );
 
         tabHook = new TabHook(this);
@@ -138,6 +136,7 @@ public final class CoreBungeePlugin extends Plugin {
 
         BungeeCommandHandler commandHandler = BungeeCommandHandler.create(this);
         commandHandler.register(new CoreCommands(this));
+        commandHandler.register(new TeleportCommands(this));
     }
 
     public static CoreBungeePlugin getInstance() {

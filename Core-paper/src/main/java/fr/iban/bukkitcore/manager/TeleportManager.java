@@ -5,6 +5,7 @@ import com.earth2me.essentials.User;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.SLocationUtils;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.teleport.*;
@@ -30,6 +31,7 @@ public class TeleportManager {
     private final ListMultimap<UUID, TpRequest> tpRequests = ArrayListMultimap.create();
     private final List<UUID> pendingTeleports = new ArrayList<>();
     private final Map<UUID, Location> unsafeTpPending = new HashMap<>();
+    private final Map<UUID, String> lastSurvivalServer = new HashMap<>();
 
     public TeleportManager(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -218,6 +220,26 @@ public class TeleportManager {
             unsafeTpPending.remove(player.getUniqueId());
         }else {
             player.sendMessage("§cVous n'avez pas de téléportation en attente.");
+        }
+    }
+
+    public String getLastSurvivalServer(UUID uuid) {
+        return lastSurvivalServer.get(uuid);
+    }
+
+    public void setLastSurvivalServer(UUID uuid, String server) {
+        lastSurvivalServer.put(uuid, server);
+    }
+
+    public void teleportToSurvivalServer(Player player) {
+        if(!plugin.isSurvivalServer()) {
+            if(getLastSurvivalServer(player.getUniqueId()) != null) {
+                PluginMessageHelper.sendPlayerToServer(player, getLastSurvivalServer(player.getUniqueId()));
+            }else {
+                PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("survie-servername", "survie"));
+            }
+        }else {
+            player.sendMessage("§cVous êtes déjà dans un serveur survie.");
         }
     }
 }

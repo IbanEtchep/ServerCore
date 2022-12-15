@@ -7,6 +7,7 @@ import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
 import fr.iban.common.messaging.message.PlayerBoolean;
 import fr.iban.common.messaging.message.PlayerInfo;
+import fr.iban.common.messaging.message.PlayerStringMessage;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import fr.iban.common.teleport.TpRequest;
@@ -42,6 +43,7 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.PLAYER_JOIN_CHANNEL -> consumePlayerJoinMessage(message);
             case CoreChannel.PLAYER_QUIT_CHANNEL -> consumePlayerQuitMessage(message);
             case CoreChannel.VANISH_STATUS_CHANGE_CHANNEL -> consumeVanishStatusChangeMessage(message);
+            case CoreChannel.LAST_SURVIVAL_SERVER -> consumeLastSurvivalServerMessage(message);
         }
     }
 
@@ -78,5 +80,10 @@ public class CoreMessageListener implements Listener {
     private void consumeVanishStatusChangeMessage(Message message) {
         PlayerBoolean playerBoolean = message.getMessage(PlayerBoolean.class);
         plugin.getPlayerManager().setVanished(playerBoolean.getUuid(), playerBoolean.isValue());
+    }
+
+    private void consumeLastSurvivalServerMessage(Message message) {
+        PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
+        plugin.getTeleportManager().setLastSurvivalServer(msg.getUuid(), msg.getString());
     }
 }

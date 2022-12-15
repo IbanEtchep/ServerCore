@@ -230,31 +230,22 @@ public class PlaceBreakListeners implements Listener {
 
         itemDmg.setDamage(itemDmg.getDamage() + damage);
 
+//        if(itemDmg.getDamage() > item.getType().getMaxDurability()) {
+//
+//        }
+
         item.setItemMeta(meta);
     }
 
     private static boolean isLog(Material material) {
-        switch (material) {
-            case ACACIA_LOG:
-            case BIRCH_LOG:
-            case DARK_OAK_LOG:
-            case JUNGLE_LOG:
-            case OAK_LOG:
-            case SPRUCE_LOG:
-            case WARPED_STEM:
-            case CRIMSON_STEM:
-            case STRIPPED_ACACIA_LOG:
-            case STRIPPED_BIRCH_LOG:
-            case STRIPPED_CRIMSON_HYPHAE:
-            case STRIPPED_JUNGLE_LOG:
-            case STRIPPED_OAK_LOG:
-            case STRIPPED_DARK_OAK_LOG:
-            case STRIPPED_SPRUCE_LOG:
-            case MANGROVE_LOG:
-                return true;
-            default:
-                return false;
-        }
+        return switch (material) {
+            case ACACIA_LOG, BIRCH_LOG, DARK_OAK_LOG, JUNGLE_LOG, OAK_LOG,
+                    SPRUCE_LOG, WARPED_STEM, CRIMSON_STEM, STRIPPED_ACACIA_LOG,
+                    STRIPPED_BIRCH_LOG, STRIPPED_CRIMSON_HYPHAE, STRIPPED_JUNGLE_LOG,
+                    STRIPPED_OAK_LOG, STRIPPED_DARK_OAK_LOG, STRIPPED_SPRUCE_LOG, MANGROVE_LOG ->
+                    true;
+            default -> false;
+        };
     }
 
     private CoreProtectAPI getCoreProtect() {

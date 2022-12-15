@@ -4,12 +4,12 @@ import fr.iban.common.teleport.SLocation;
 
 import java.util.UUID;
 
-public class LastRTPLocation {
+public class PlayerSLocationMessage {
 
 	private UUID uuid;
 	private SLocation location;
 
-	public LastRTPLocation(UUID uuid, SLocation location) {
+	public PlayerSLocationMessage(UUID uuid, SLocation location) {
 		this.uuid = uuid;
 		this.location = location;
 	}

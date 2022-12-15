@@ -116,11 +116,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		commandHandler.registerBrigadier();
 
 		getCommand("core").setExecutor(new CoreCMD(this));
-		getCommand("serveur").setExecutor(new ServeurCMD());
-		getCommand("survie").setExecutor(new SurvieCMD());
-		getCommand("ressources").setExecutor(new RessourcesCMD());
-		getCommand("ressources").setTabCompleter(new RessourcesCMD());
-
 		getCommand("abbc").setExecutor(new ActionBarCMD());
 		getCommand("options").setExecutor(new OptionsCMD());
 		getCommand("recompenses").setExecutor(new RecompensesCMD());
@@ -148,6 +143,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
 	public void setServerName(String serverName) {
 		this.serverName = serverName;
+	}
+
+	public boolean isSurvivalServer() {
+		return serverName.toLowerCase().startsWith("survie");
 	}
 
 	public Map<UUID, TextCallback> getTextInputs() {

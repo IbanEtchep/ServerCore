@@ -6,10 +6,7 @@ authors: [ Iban ]
 softdepend: [Essentials]
 
 commands:
-  ressources:
-  serveur:
   options:
-  survie:
   core:
     permission: servercore.papercore.reload
   recompenses:

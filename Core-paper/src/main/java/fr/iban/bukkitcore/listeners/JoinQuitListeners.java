@@ -1,5 +1,7 @@
 package fr.iban.bukkitcore.listeners;
 
+import fr.iban.common.messaging.CoreChannel;
+import fr.iban.common.messaging.message.PlayerStringMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -39,6 +41,9 @@ public class JoinQuitListeners implements Listener {
 		Player player = e.getPlayer();
 		e.setQuitMessage(null);
 		plugin.getTextInputs().remove(player.getUniqueId());
+		if(plugin.getServerName().toLowerCase().startsWith("survie")) {
+			plugin.getMessagingManager().sendMessage(CoreChannel.LAST_SURVIVAL_SERVER, new PlayerStringMessage(player.getUniqueId(), plugin.getServerName()));
+		}
 	}
 
 }

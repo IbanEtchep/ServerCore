@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ActionBarCMD implements CommandExecutor {
 	
-	private List<String> queue = new ArrayList<>();
+	private final List<String> queue = new ArrayList<>();
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

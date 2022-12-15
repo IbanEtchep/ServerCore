@@ -10,5 +10,6 @@ public class CoreChannel {
     public static final String PLAYER_JOIN_CHANNEL = "PlayerProxyJoin";
     public static final String PLAYER_QUIT_CHANNEL = "PlayerProxyQuit";
     public static final String VANISH_STATUS_CHANGE_CHANNEL = "VanishStatusChange";
+    public static final String LAST_SURVIVAL_SERVER = "LastSurvivalServer";
 
 }

@@ -5,7 +5,6 @@ import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
 import me.neznamy.tab.api.TablistFormatManager;
 import me.neznamy.tab.api.event.player.PlayerLoadEvent;
-import me.neznamy.tab.api.team.TeamManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TabHook {

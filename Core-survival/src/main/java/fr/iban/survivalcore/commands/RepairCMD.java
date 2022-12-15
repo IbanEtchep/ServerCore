@@ -4,7 +4,9 @@ import java.util.*;
 
 import com.earth2me.essentials.utils.DateUtil;
 import fr.iban.survivalcore.SurvivalCorePlugin;
+import fr.iban.survivalcore.event.ItemRepairEvent;
 import fr.iban.survivalcore.tools.SpecialTools;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -37,11 +39,15 @@ public class RepairCMD {
     @CommandPermission("servercore.repair")
     public void repairHand(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
-        if (isRepairable(item) && !hasRepairCooldown(player)) {
-            repairItem(item);
+
+        if(hasRepairCooldown(player)) {
+            return;
+        }
+
+        if (isRepairable(item) && repairItem(item)) {
             player.sendMessage(ChatColor.GOLD + "§aRéparation effectuée.");
             repairCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        } else {
+        }else {
             player.sendMessage(ChatColor.RED + "Erreur: " + ChatColor.DARK_RED + "Cet item n'est pas réparable");
         }
     }
@@ -66,21 +72,30 @@ public class RepairCMD {
     }
 
     private boolean isRepairable(ItemStack item) {
-        return item != null
-                && !item.getType().isBlock()
-                && item.getType().getMaxDurability() >= 1
-                && item.getDurability() != 0
-                && (!SpecialTools.is3x3Pickaxe(item) || Objects.requireNonNull(item.getItemMeta().getLore()).contains("§c§l[ITEM LEGENDAIRE]"));
+        if (item != null && item.getItemMeta() instanceof Damageable damageable) {
+            if (damageable.getDamage() == 0) {
+                return false;
+            }
+            return !SpecialTools.is3x3Pickaxe(item) || Objects.requireNonNull(item.getItemMeta().getLore()).contains("§c§l[ITEM LEGENDAIRE]");
+        }
+        return false;
     }
 
-    public void repairItem(ItemStack item) {
-        Damageable damageable = (Damageable) item.getItemMeta();
-        damageable.setDamage(0);
-        item.setItemMeta(damageable);
+    public boolean repairItem(ItemStack item) {
+        if (item.getItemMeta() instanceof Damageable damageable) {
+            ItemRepairEvent event = new ItemRepairEvent(item);
+            Bukkit.getPluginManager().callEvent(event);
+            if (!event.isCancelled()) {
+                damageable.setDamage(0);
+                item.setItemMeta(damageable);
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean hasRepairAllCooldown(Player player) {
-        if(player.hasPermission("servercore.repairall.bypasscooldown")) {
+        if (player.hasPermission("servercore.repairall.bypasscooldown")) {
             return false;
         }
         if (repairAllCooldowns.containsKey(player.getUniqueId())) {
@@ -90,7 +105,7 @@ public class RepairCMD {
                 repairAllCooldowns.remove(player.getUniqueId());
                 return false;
             } else {
-                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + DateUtil.formatDateDiff(lastRep+cooldownTime) + " secondes.");
+                player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + DateUtil.formatDateDiff(lastRep + cooldownTime) + " secondes.");
                 return true;
             }
         }
@@ -98,7 +113,7 @@ public class RepairCMD {
     }
 
     private boolean hasRepairCooldown(Player player) {
-        if(player.hasPermission("servercore.repairall.bypasscooldown")) {
+        if (player.hasPermission("servercore.repairall.bypasscooldown")) {
             return false;
         }
         if (repairCooldowns.containsKey(player.getUniqueId())) {

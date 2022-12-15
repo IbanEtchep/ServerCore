@@ -11,7 +11,7 @@ import net.md_5.bungee.api.plugin.Command;
 
 public class AnnounceCMD extends Command {
 
-	private CoreBungeePlugin plugin;
+	private final CoreBungeePlugin plugin;
 
 	public AnnounceCMD(String name, CoreBungeePlugin plugin) {
 		super(name);
@@ -21,8 +21,7 @@ public class AnnounceCMD extends Command {
 	@Override
 	public void execute(CommandSender sender, String[] args) {
 		AnnoncesManager am = CoreBungeePlugin.getInstance().getAnnounceManager();
-		if(sender instanceof ProxiedPlayer) {
-			ProxiedPlayer player = (ProxiedPlayer)sender;
+		if(sender instanceof ProxiedPlayer player) {
 			if(args.length == 1) {
 				if(args[0].equalsIgnoreCase("listdisabled")) {
 					Account account = plugin.getAccountManager().getAccount(player.getUniqueId());

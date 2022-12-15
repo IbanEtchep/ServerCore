@@ -100,7 +100,7 @@ public class SLocation {
 	}
 
 	
-	public SLocation deserialize(String slocation) {
+	public static SLocation deserialize(String slocation) {
 		String[] split = slocation.split(":");
 		return new SLocation(split[0], split[1], Double.parseDouble(split[2]), Double.parseDouble(split[3]), Double.parseDouble(split[4]), Float.parseFloat(split[5]), Float.parseFloat(split[6]));
 	}

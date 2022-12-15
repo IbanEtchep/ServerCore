@@ -23,6 +23,7 @@ public class TeleportManager {
     private final CoreBungeePlugin plugin;
     private final Map<UUID, SLocation> deathLocations = new HashMap<>();
     private final Map<UUID, SLocation> lastRTPLocations = new HashMap<>();
+    private final Map<UUID, SLocation> lastSurvivalLocations = new HashMap<>();
     private final List<UUID> pendingTeleports = new ArrayList<>();
     private final ListMultimap<UUID, TpRequest> tpRequests = ArrayListMultimap.create();
 
@@ -220,5 +221,9 @@ public class TeleportManager {
 
     public Map<UUID, SLocation> getLastRTPLocations() {
         return lastRTPLocations;
+    }
+
+    public Map<UUID, SLocation> getLastSurvivalLocations() {
+        return lastSurvivalLocations;
     }
 }

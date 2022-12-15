@@ -16,7 +16,9 @@ import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -37,7 +39,6 @@ public class SpecialTools {
 
     public static Map<UUID, BlockFace> faces = new HashMap<>();
 
-
     public static ItemStack get3x3Pickaxe() {
         ItemStack hades = new ItemStack(Material.NETHERITE_PICKAXE);
         ItemMeta cus = hades.getItemMeta();
@@ -49,7 +50,6 @@ public class SpecialTools {
 
     public static ItemStack getCutCleanPickaxe() {
         ItemStack hades = new ItemStack(Material.NETHERITE_PICKAXE);
-
         ItemMeta cus = hades.getItemMeta();
         cus.setDisplayName("§e§lPioche d'Hades");
         cus.setLore(Arrays.asList("§e§l-------------", "§e§lCette pioche fait fondre", "§e§lles minerais que vous minez.", "§e§l-------------", "§c§l[ITEM LEGENDAIRE]"));
@@ -79,7 +79,6 @@ public class SpecialTools {
 
     public static ItemStack getFarmerHoe() {
         ItemStack hades = new ItemStack(Material.NETHERITE_HOE);
-
         ItemMeta cus = hades.getItemMeta();
         cus.setDisplayName("§e§lHoue du fermier");
         cus.setLore(Arrays.asList("§e§l-------------", "§e§lCette houe permet de replanter", "§e§lautomatiquement vos récoltes.", "§e§l-------------", "§c§l[ITEM LEGENDAIRE]"));
@@ -153,8 +152,7 @@ public class SpecialTools {
         z = targetBlock.getZ();
 
         switch (blockFace) {
-            case UP:
-            case DOWN:
+            case UP, DOWN -> {
                 blocks.add(world.getBlockAt(x + 1, y, z));
                 blocks.add(world.getBlockAt(x - 1, y, z));
                 blocks.add(world.getBlockAt(x, y, z + 1));
@@ -163,9 +161,8 @@ public class SpecialTools {
                 blocks.add(world.getBlockAt(x - 1, y, z - 1));
                 blocks.add(world.getBlockAt(x + 1, y, z - 1));
                 blocks.add(world.getBlockAt(x - 1, y, z + 1));
-                break;
-            case EAST:
-            case WEST:
+            }
+            case EAST, WEST -> {
                 blocks.add(world.getBlockAt(x, y, z + 1));
                 blocks.add(world.getBlockAt(x, y, z - 1));
                 blocks.add(world.getBlockAt(x, y + 1, z));
@@ -174,9 +171,8 @@ public class SpecialTools {
                 blocks.add(world.getBlockAt(x, y - 1, z - 1));
                 blocks.add(world.getBlockAt(x, y - 1, z + 1));
                 blocks.add(world.getBlockAt(x, y + 1, z - 1));
-                break;
-            case NORTH:
-            case SOUTH:
+            }
+            case NORTH, SOUTH -> {
                 blocks.add(world.getBlockAt(x + 1, y, z));
                 blocks.add(world.getBlockAt(x - 1, y, z));
                 blocks.add(world.getBlockAt(x, y + 1, z));
@@ -185,9 +181,9 @@ public class SpecialTools {
                 blocks.add(world.getBlockAt(x - 1, y - 1, z));
                 blocks.add(world.getBlockAt(x + 1, y - 1, z));
                 blocks.add(world.getBlockAt(x - 1, y + 1, z));
-                break;
-            default:
-                break;
+            }
+            default -> {
+            }
         }
 
         blocks.removeAll(Collections.singleton(null));

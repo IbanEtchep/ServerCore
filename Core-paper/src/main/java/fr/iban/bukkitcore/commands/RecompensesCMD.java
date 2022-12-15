@@ -29,7 +29,7 @@ public class RecompensesCMD implements CommandExecutor, TabCompleter {
 					player.sendMessage("§cVous n'avez pas de récompense en attente.");
 				}
 			});
-		}else if(args.length >= 1 && sender.hasPermission("spartacube.addrewards")) {
+		}else if(args.length >= 1 && sender.hasPermission("servercore.addrewards")) {
 			switch (args[0].toLowerCase()) {
 			case "give":
 				if(args.length == 3) {
@@ -78,6 +78,10 @@ public class RecompensesCMD implements CommandExecutor, TabCompleter {
 				break;
 			case "listtemplates":
 				RewardsDAO.getTemplateRewardsAsync().thenAccept(rewards -> {
+					if(rewards.isEmpty()) {
+						sender.sendMessage("§cIl n'y a pas de templates.");
+						return;
+					}
 					rewards.forEach(r -> sender.sendMessage("§a" + r.getId() + " - " + r.getName() + " - " + r.getServer() + " - " + r.getCommand()));
 				});
 				break;
@@ -106,7 +110,7 @@ public class RecompensesCMD implements CommandExecutor, TabCompleter {
 	@Override
 	public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
 		List<String> complete = new ArrayList<>();
-		if(sender.hasPermission("spartacube.addrewards")) {
+		if(sender.hasPermission("servercore.addrewards")) {
 			if(args.length == 1) {
 				if("give".startsWith(args[0].toLowerCase())) {
 					complete.add("give");
