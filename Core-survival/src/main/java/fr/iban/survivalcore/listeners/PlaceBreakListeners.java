@@ -38,90 +38,90 @@ public class PlaceBreakListeners implements Listener {
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
-        LandManager landManager = LandsPlugin.getInstance().getLandManager();
-        Player player = e.getPlayer();
-        Block block = e.getBlock();
-        ItemStack itemInHand = player.getInventory().getItemInMainHand();
-        Location loc = block.getLocation();
-
-        if (player.isSneaking()) return;
-
-        Chunk chunk = block.getChunk();
-        Land land = landManager.getLandAt(chunk);
-
-        if (!land.isWilderness() && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
-
-        //Pioche 3x3
-        if (SpecialTools.is3x3Pickaxe(itemInHand)) {
-            for (Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)) {
-                Chunk c = b.getChunk();
-                Land l = landManager.getLandAt(c);
-                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
-                    continue;
-
-                Bukkit.getPluginManager().callEvent(new HammerBlockBreakEvent(player, b, e.getExpToDrop()));
-                b.breakNaturally(itemInHand);
-                CoreProtectAPI coreProtect = getCoreProtect();
-                if (coreProtect != null) { //Ensure we have access to the API
-                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
-                }
-            }
-        }
-
-        //Pelle 3x3
-        if (SpecialTools.is3x3Shovel(itemInHand)) {
-
-            for (Block b : SpecialTools.getSurroundingBlocksShovel(player, block)) {
-                Chunk c = b.getChunk();
-                Land l = landManager.getLandAt(c);
-                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
-                    continue;
-
-                b.breakNaturally(itemInHand);
-
-                CoreProtectAPI coreProtect = getCoreProtect();
-                if (coreProtect != null) { //Ensure we have access to the API
-                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
-                }
-
-            }
-        }
-
-        //Hache bûcheron
-        if (SpecialTools.isLumberjackAxe(itemInHand)) {
-            //Bukkit.broadcastMessage("hache");
-            if (!isLog(block.getType())) {
-                return;
-            }
-            dropTree(block, itemInHand);
-        }
-
-
-        //Pioche Hades
-        if (SpecialTools.isCutCleanPickaxe(itemInHand)) {
-            switch (block.getType()) {
-                case GOLD_ORE:
-                case DEEPSLATE_GOLD_ORE:
-                    drop(e, Material.GOLD_INGOT, 1, loc, true);
-                    break;
-                case IRON_ORE:
-                case DEEPSLATE_IRON_ORE:
-                    drop(e, Material.IRON_INGOT, 0.7, loc, true);
-                    break;
-                case ANCIENT_DEBRIS:
-                    drop(e, Material.NETHERITE_SCRAP, 2, loc, false);
-                    break;
-                case NETHER_GOLD_ORE:
-                    drop(e, Material.GOLD_INGOT, 1, loc, false);
-                    break;
-                case COPPER_ORE:
-                case DEEPSLATE_COPPER_ORE:
-                    drop(e, Material.COPPER_INGOT, 0.7, loc, true);
-                    break;
-                default:
-                    break;
-            }
-        }
+//        LandManager landManager = LandsPlugin.getInstance().getLandManager();
+//        Player player = e.getPlayer();
+//        Block block = e.getBlock();
+//        ItemStack itemInHand = player.getInventory().getItemInMainHand();
+//        Location loc = block.getLocation();
+//
+//        if (player.isSneaking()) return;
+//
+//        Chunk chunk = block.getChunk();
+//        Land land = landManager.getLandAt(chunk);
+//
+//        if (!land.isWilderness() && !land.isBypassing(player, Action.BLOCK_BREAK)) return;
+//
+//        //Pioche 3x3
+//        if (SpecialTools.is3x3Pickaxe(itemInHand)) {
+//            for (Block b : SpecialTools.getSurroundingBlocksPickaxe(player, block)) {
+//                Chunk c = b.getChunk();
+//                Land l = landManager.getLandAt(c);
+//                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
+//                    continue;
+//
+//                Bukkit.getPluginManager().callEvent(new HammerBlockBreakEvent(player, b, e.getExpToDrop()));
+//                b.breakNaturally(itemInHand);
+//                CoreProtectAPI coreProtect = getCoreProtect();
+//                if (coreProtect != null) { //Ensure we have access to the API
+//                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+//                }
+//            }
+//        }
+//
+//        //Pelle 3x3
+//        if (SpecialTools.is3x3Shovel(itemInHand)) {
+//
+//            for (Block b : SpecialTools.getSurroundingBlocksShovel(player, block)) {
+//                Chunk c = b.getChunk();
+//                Land l = landManager.getLandAt(c);
+//                if (!l.isWilderness() && !l.isBypassing(player, Action.BLOCK_BREAK))
+//                    continue;
+//
+//                b.breakNaturally(itemInHand);
+//
+//                CoreProtectAPI coreProtect = getCoreProtect();
+//                if (coreProtect != null) { //Ensure we have access to the API
+//                    coreProtect.logRemoval(player.getName(), block.getLocation(), block.getType(), block.getBlockData());
+//                }
+//
+//            }
+//        }
+//
+//        //Hache bûcheron
+//        if (SpecialTools.isLumberjackAxe(itemInHand)) {
+//            //Bukkit.broadcastMessage("hache");
+//            if (!isLog(block.getType())) {
+//                return;
+//            }
+//            dropTree(block, itemInHand);
+//        }
+//
+//
+//        //Pioche Hades
+//        if (SpecialTools.isCutCleanPickaxe(itemInHand)) {
+//            switch (block.getType()) {
+//                case GOLD_ORE:
+//                case DEEPSLATE_GOLD_ORE:
+//                    drop(e, Material.GOLD_INGOT, 1, loc, true);
+//                    break;
+//                case IRON_ORE:
+//                case DEEPSLATE_IRON_ORE:
+//                    drop(e, Material.IRON_INGOT, 0.7, loc, true);
+//                    break;
+//                case ANCIENT_DEBRIS:
+//                    drop(e, Material.NETHERITE_SCRAP, 2, loc, false);
+//                    break;
+//                case NETHER_GOLD_ORE:
+//                    drop(e, Material.GOLD_INGOT, 1, loc, false);
+//                    break;
+//                case COPPER_ORE:
+//                case DEEPSLATE_COPPER_ORE:
+//                    drop(e, Material.COPPER_INGOT, 0.7, loc, true);
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
     }
 
 

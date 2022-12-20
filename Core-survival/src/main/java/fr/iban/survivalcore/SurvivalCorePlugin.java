@@ -36,7 +36,7 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
                 new PortalListeners(),
                 //new PlaceBreakListeners(),
                 new DamageListeners(),
-                //new InteractListeners(this),
+                new InteractListeners(this),
                 new PrepareResultListener(),
                 new ServiceListeners(this)
         );
