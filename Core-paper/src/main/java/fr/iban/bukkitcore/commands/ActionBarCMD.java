@@ -19,8 +19,8 @@ public class ActionBarCMD implements CommandExecutor {
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(args.length >= 1) {
 			StringBuilder bc = new StringBuilder();
-			for (int i = 0; i < args.length; i++) {
-				bc.append(args[i] + " ");
+			for (String arg : args) {
+				bc.append(arg + " ");
 			}
 			String message = bc.toString();
 			

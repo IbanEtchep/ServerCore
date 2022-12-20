@@ -42,7 +42,7 @@ public enum Head {
 		this.id = id;
 	}
 		
-	private boolean isAPILoaded() {
+	private static boolean isAPILoaded() {
 		return api != null;
 	}
 	
@@ -56,6 +56,14 @@ public enum Head {
 	
 	public static void loadAPI() {
 		api = new HeadDatabaseAPI();
+	}
+
+	public static ItemStack getByID(String id) {
+		if(isAPILoaded()) {
+			return api.getItemHead(id);
+		}else {
+			return new ItemStack(Material.PLAYER_HEAD);
+		}
 	}
 
 }
