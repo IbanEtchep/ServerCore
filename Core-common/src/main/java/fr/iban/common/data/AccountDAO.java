@@ -48,6 +48,7 @@ public class AccountDAO {
                 ps.executeUpdate();
             }
             saveOptionsToDB(account.getOptions(), connection, uuid);
+            saveIgnoredPlayersToDB(account.getIgnoredPlayers(), connection, uuid);
             deleteOptionsFromDB(account.getOptions(), connection, uuid);
             saveBlackListedAnnouncesToDB(account.getBlackListedAnnounces(), connection, uuid);
             if (account.getIp() != null) {
