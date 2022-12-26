@@ -74,7 +74,7 @@ public class ChatManager {
 			//Envoi du message à chaque joueur
 			for (ProxiedPlayer p: ProxyServer.getInstance().getPlayers()) {
 				String pmessage = msg;
-				Account account2 = accountManager.getAccount(player.getUniqueId());
+				Account account2 = accountManager.getAccount(p.getUniqueId());
 				if(!account2.getOption(Option.TCHAT)) continue;
 
 				//vérif si le joueur est mentionné dans le message.
