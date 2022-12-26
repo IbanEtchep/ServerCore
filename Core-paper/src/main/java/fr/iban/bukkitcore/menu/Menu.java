@@ -3,6 +3,7 @@ package fr.iban.bukkitcore.menu;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,17 +17,15 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-/*
-    Defines the behavior and attributes of all menus in our plugin
- */
+
 public abstract class Menu implements InventoryHolder {
 
-	//Protected values that can be accessed in the menus
 	protected Player player;
 	protected Inventory inventory;
 	protected ItemStack FILLER_GLASS = makeItem(Material.WHITE_STAINED_GLASS_PANE, " ");
+	protected final List<Consumer<InventoryClickEvent>> clickHandlers = new ArrayList<>();
 
-	//let each menu decide their name
+
 	public abstract String getMenuName();
 
 	public abstract int getRows();
@@ -35,7 +34,6 @@ public abstract class Menu implements InventoryHolder {
 		return getRows()*9;
 	}
 
-	//let each menu decide how the items in the menu will be handled when clicked
 	public abstract void handleMenu(InventoryClickEvent e);
 
 	public void handleMenuClose(InventoryCloseEvent e) {

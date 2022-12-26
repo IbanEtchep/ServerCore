@@ -112,6 +112,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		commandHandler.accept(coreCommandHandlerVisitor);
 		commandHandler.register(new TeleportCommands(this));
 		commandHandler.register(new TrustCommandsCMD(this));
+		commandHandler.register(new ServerSwitchCommands(this));
 
 		commandHandler.registerBrigadier();
 
