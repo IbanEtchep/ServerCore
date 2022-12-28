@@ -50,8 +50,9 @@ public class MessageCMD extends Command implements TabExecutor {
 						}
 						AccountManager accountManager = plugin.getAccountManager();
 						Account account = accountManager.getAccount(player.getUniqueId());
+						Account account2 = accountManager.getAccount(target.getUniqueId());
 						if (account.getOption(Option.MSG) || player.hasPermission("spartacube.msgtogglebypass")) {
-							if(!account.getIgnoredPlayers().contains(player.getUniqueId())) {
+							if(!account2.getIgnoredPlayers().contains(player.getUniqueId())) {
 								if(target.hasPermission("spartacube.staff")) {
 									player.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §8[§6Staff§8] §c" + target.getName() + " §6➤§7 " + message));
 								} else {
