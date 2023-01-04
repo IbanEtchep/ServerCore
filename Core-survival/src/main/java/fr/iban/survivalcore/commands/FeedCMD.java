@@ -47,7 +47,7 @@ public class FeedCMD {
 				cooldowns.remove(player.getUniqueId());
 				return false;
 			} else {
-				player.sendMessage("§cVous pourrez à nouveau réparer un item dans " + DateUtil.formatDateDiff(lastRep+cooldownTime) + ".");
+				player.sendMessage("§cVous pourrez à nouveau faire ça dans " + DateUtil.formatDateDiff(lastRep+cooldownTime) + ".");
 				return true;
 			}
 		}

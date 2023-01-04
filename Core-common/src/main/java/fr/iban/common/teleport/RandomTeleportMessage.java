@@ -2,18 +2,19 @@ package fr.iban.common.teleport;
 
 import java.util.UUID;
 
-public class PlayerRTP {
-	
+public class RandomTeleportMessage {
+
 	private UUID uuid;
 	private String targetServer;
 	private String world;
-	
-	public PlayerRTP(UUID uuid, String world) {
+
+	public RandomTeleportMessage(UUID uuid, String targetServer, String world) {
 		this.uuid = uuid;
+		this.targetServer = targetServer;
 		this.world = world;
 	}
-	
-	public PlayerRTP() {}
+
+	public RandomTeleportMessage() {}
 	
 	public UUID getUuid() {
 		return uuid;

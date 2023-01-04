@@ -16,3 +16,8 @@ servername: "Survie"
 survival-servers:
   - "survie"
 ressources-servername: "ressources"
+
+world:
+  overworld: "world"
+  nether: "world_nether"
+  end: "world_the_end"

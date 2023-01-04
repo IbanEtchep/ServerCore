@@ -10,13 +10,11 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.common.teleport.RequestType;
 import fr.iban.common.teleport.TpRequest;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.AutoComplete;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.Named;
-import revxrsal.commands.annotation.Optional;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 
 public class ServerSwitchCommands {
@@ -53,6 +51,12 @@ public class ServerSwitchCommands {
                 default -> sender.sendMessage("§cCe type de monde n'existe pas.");
             }
         }
+    }
+
+    @Command("survivalrtp")
+    @Cooldown(value = 2, unit = TimeUnit.MINUTES)
+    public void survivalRandomTP(Player player) {
+        plugin.getTeleportManager().randomTeleportToSurvivalServer(player);
     }
 
 }

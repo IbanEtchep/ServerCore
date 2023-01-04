@@ -53,7 +53,6 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     private void registerCommands() {
         getCommand("dolphin").setExecutor(new DolphinCMD());
-        getCommand("givetools").setExecutor(new GiveSpecialToolsCMD());
         getCommand("annonce").setExecutor(new AnnonceCMD(this));
         getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
         getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());

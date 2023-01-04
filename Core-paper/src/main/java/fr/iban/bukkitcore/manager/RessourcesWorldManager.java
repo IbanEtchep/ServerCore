@@ -25,12 +25,8 @@ public class RessourcesWorldManager {
         lastTeleportTime.put(player.getUniqueId(), System.currentTimeMillis());
         player.sendMessage("§aTéléportation au monde ressource.");
         CoreBukkitPlugin plugin = CoreBukkitPlugin.getInstance();
-        if(plugin.getServerName().equalsIgnoreCase(plugin.getConfig().getString("ressources-servername"))) {
-            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + worldname);
-        }else {
-            plugin.getMessagingManager().sendMessage("PlayerRTP", new PlayerRTP(player.getUniqueId(), worldname));
-            PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("ressources-servername"));
-        }
+        String ressourcesServer = plugin.getConfig().getString("ressources-servername", "ressources");
+        plugin.getTeleportManager().randomTeleport(player, ressourcesServer, worldname);
     }
 
     private int getSecondsLeft(UUID uuid){

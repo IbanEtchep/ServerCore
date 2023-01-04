@@ -1,8 +1,6 @@
 package fr.iban.common.manager;
 
 import fr.iban.common.data.sql.DbAccess;
-import fr.iban.common.messaging.CoreChannel;
-import fr.iban.common.messaging.message.PlayerBoolean;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
