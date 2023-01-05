@@ -2,8 +2,13 @@ package fr.iban.survivalcore.listeners;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.manager.AccountManager;
+import fr.iban.bukkitcore.utils.ChatUtils;
 import fr.iban.common.data.Account;
+import fr.iban.common.data.Option;
+import fr.iban.survivalcore.SurvivalCorePlugin;
+import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Mob;
@@ -13,9 +18,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-
-import fr.iban.common.data.Option;
-import fr.iban.survivalcore.SurvivalCorePlugin;
 
 public class EntityDeathListener implements Listener {
 
@@ -145,5 +147,22 @@ public class EntityDeathListener implements Listener {
         }
 
         SurvivalCorePlugin.getInstance().getLogger().info(message);
+    }
+
+    @EventHandler
+    public void onDeath(PlayerDeathEvent e) {
+        CoreBukkitPlugin core = CoreBukkitPlugin.getInstance();
+        Player player = e.getEntity();
+        Location location = player.getLocation();
+        player.sendMessage("§3§lVous êtes mort à la position suivante: \n" +
+                "§bServeur : §f" + core.getServerName() + "\n" +
+                "§bMonde : §f" + location.getWorld().getName() + "\n" +
+                "§bCoordonnées : X : §f" + (int) location.getX() +
+                " §bY : §f" + (int) location.getY() +
+                " §bZ : §f" + (int) location.getZ());
+
+        if(core.getServerName().equalsIgnoreCase("ressources")) {
+            player.sendMessage(new ComponentBuilder("§b§lVous pouvez vous téléporter à la position de votre dernière téléportation aléatoire en cliquant sur ce message.").event(ChatUtils.getShowTextHoverEvent("§lClic ici !")).event(ChatUtils.getCommandClickEvent("/lastrtp")).create());
+        }
     }
 }

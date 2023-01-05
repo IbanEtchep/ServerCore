@@ -13,7 +13,7 @@ public class CommandListener implements Listener {
 			e.getPlayer().performCommand("survivalcore:feed");
 			e.setCancelled(true);
 		}
-		if(e.getMessage().equalsIgnoreCase("/rtp") && e.getPlayer().getWorld().getName().equalsIgnoreCase("spawn")){
+		if(e.getMessage().equalsIgnoreCase("/rtp")){
 			e.setMessage("/survivalrtp");
 		}
 		if(e.getMessage().toLowerCase().contains("kill") && e.getMessage().toLowerCase().contains("all")) {

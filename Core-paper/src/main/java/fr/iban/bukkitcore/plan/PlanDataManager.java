@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.plan;
 
+import com.djrapitops.plan.query.QueryService;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 
 import java.time.Instant;
@@ -24,6 +25,7 @@ public class PlanDataManager {
         for (String servername : servers) {
             if (planPlayTimes.containsKey(servername)) {
                 long playTime = planPlayTimes.get(servername);
+                System.out.println(servername + " " + playTime);
                 if (playTime < lowestPlayTime) {
                     bestServer = servername;
                 }
@@ -42,6 +44,9 @@ public class PlanDataManager {
                 planPlayTimes = hook.getPlayTimes();
                 CoreBukkitPlugin.getInstance().getLogger().info("Fetched latest playtime data from Plan");
             });
+            if(!usePlan) {
+                CoreBukkitPlugin.getInstance().getLogger().info("Failed to hook plan");
+            }
             lastPlanFetch = Instant.now().getEpochSecond();
         } catch (NoClassDefFoundError ignored) {
         }

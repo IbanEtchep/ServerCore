@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 public record PlanQueryAccessor(QueryService queryService) {
 
-    final static String GET_SERVER_NAME_SQL = "SELECT * FROM plan_servers WHERE `uuid`=?;";
+    final static String GET_SERVER_NAME_SQL = "SELECT name FROM plan_servers WHERE `uuid`=?;";
     final static String GET_SESSION_TOTAL_WITHIN_DAY_LIMIT_SQL = "SELECT SUM(" + "session_end" + '-' + "session_start" + ") as playtime" +
-            " FROM plan_sessions" +
-            " WHERE server_uuid" + "=?" +
+            " FROM plan_sessions JOIN plan_servers ON plan_sessions.server_id=plan_servers.id" +
+            " WHERE plan_servers.uuid" + "=?" +
             " AND session_end" + ">=?" +
             " AND session_start" + "<=?";
 
@@ -26,10 +26,7 @@ public record PlanQueryAccessor(QueryService queryService) {
 
     private void ensureDBSchemaMatch() {
         CommonQueries queries = queryService.getCommonQueries();
-        if (
-                !queries.doesDBHaveTable("plan_sessions")
-                        || !queries.doesDBHaveTableColumn("plan_sessions", "uuid")
-        ) {
+        if (!queries.doesDBHaveTable("plan_sessions") || !queries.doesDBHaveTableColumn("plan_sessions", "id")) {
             throw new IllegalStateException("Different table schema");
         }
     }
@@ -45,7 +42,7 @@ public record PlanQueryAccessor(QueryService queryService) {
                 }
             });
             // Don't bother fetching the proxy data (as it will always be zero)
-            if (serverName.equalsIgnoreCase("proxy") || serverName.equalsIgnoreCase("bungee") || serverName.equalsIgnoreCase("waterfall") || serverName.equalsIgnoreCase("lavacord")) {
+            if (serverName.equalsIgnoreCase("proxy") || serverName.equalsIgnoreCase("bungee") || serverName.equalsIgnoreCase("waterfall") || serverName.equalsIgnoreCase("events")) {
                 continue;
             }
             long playtime = queryService.query(GET_SESSION_TOTAL_WITHIN_DAY_LIMIT_SQL, statement -> {

@@ -7,10 +7,13 @@ import fr.iban.survivalcore.listeners.*;
 import fr.iban.survivalcore.utils.HourlyReward;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 import revxrsal.commands.exception.CommandErrorException;
+
+import java.util.Objects;
 
 public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
@@ -38,8 +41,18 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
                 new DamageListeners(),
                 new InteractListeners(this),
                 new PrepareResultListener(),
-                new ServiceListeners(this)
+                new ServiceListeners(this),
+                new JoinQuitListeners(this),
+                new PlayerRespawnListener()
         );
+
+        Plugin betterrtp = getServer().getPluginManager().getPlugin("BetterRTP");
+        if (betterrtp != null) {
+            if (betterrtp.isEnabled()) {
+                getLogger().info("Listening BetterRTP");
+                getServer().getPluginManager().registerEvents(new RTPListeners(), this);
+            }
+        }
 
         registerCommands();
 
@@ -55,7 +68,6 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
         getCommand("dolphin").setExecutor(new DolphinCMD());
         getCommand("annonce").setExecutor(new AnnonceCMD(this));
         getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
-        getCommand("survivalcore").setExecutor(new SurvivalCoreCMD());
 
         BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
         commandHandler.accept(CoreBukkitPlugin.getInstance().getCommandHandlerVisitor());

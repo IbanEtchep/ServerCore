@@ -4,6 +4,7 @@ import com.earth2me.essentials.Essentials;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.listeners.*;
 import fr.iban.bukkitcore.manager.*;
+import fr.iban.bukkitcore.plan.PlanDataManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
@@ -66,6 +67,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 			}
 		}
 
+		PlanDataManager.updatePlanPlayTimes();
         RewardsDAO.createTables();
         
         textInputs = new HashMap<>();
