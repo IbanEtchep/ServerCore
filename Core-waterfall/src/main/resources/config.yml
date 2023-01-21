@@ -1,7 +1,7 @@
 redis:
   host: 172.18.0.1
   port: 6380
-  password: Zkvo5le1
+  password: pass
   clientName: Serveur_mc
 
 database:

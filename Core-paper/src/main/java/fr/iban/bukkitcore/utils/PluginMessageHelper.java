@@ -1,19 +1,14 @@
 package fr.iban.bukkitcore.utils;
 
-import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.teleport.PlayerRTP;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
-import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.listeners.PluginMessageReceivedListener;
-
-import java.util.Optional;
 
 public class PluginMessageHelper {
 	

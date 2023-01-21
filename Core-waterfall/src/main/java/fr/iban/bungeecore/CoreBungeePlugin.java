@@ -4,8 +4,6 @@ import fr.iban.bungeecore.commands.*;
 import fr.iban.bungeecore.listeners.*;
 import fr.iban.bungeecore.manager.*;
 import fr.iban.bungeecore.utils.TabHook;
-import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.data.sql.DbTables;
@@ -52,17 +50,6 @@ public final class CoreBungeePlugin extends Plugin {
             getLogger().severe("Erreur lors de l'initialisation de la connexion sql.");
             getProxy().stop();
             return;
-        }
-
-        if(getConfiguration().getString("messenger", "sql").equals("redis")) {
-            try {
-                RedisAccess.init(new RedisCredentials(configuration.getString("redis.host"), configuration.getString("redis.password"), configuration.getInt("redis.port"), configuration.getString("redis.clientName")));
-            } catch (Exception e) {
-                e.printStackTrace();
-                getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
-                getProxy().stop();
-                return;
-            }
         }
 
         DbTables.createTables();
@@ -113,9 +100,6 @@ public final class CoreBungeePlugin extends Plugin {
     @Override
     public void onDisable() {
         messagingManager.close();
-        if(getConfiguration().getString("messenger", "sql").equals("redis")) {
-            RedisAccess.close();
-        }
         DbAccess.closePool();
         getProxy().unregisterChannel("proxy:chat");
         getProxy().unregisterChannel("proxy:annonce");

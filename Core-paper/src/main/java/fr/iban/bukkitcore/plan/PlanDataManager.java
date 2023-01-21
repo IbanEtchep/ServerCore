@@ -25,7 +25,7 @@ public class PlanDataManager {
         for (String servername : servers) {
             if (planPlayTimes.containsKey(servername)) {
                 long playTime = planPlayTimes.get(servername);
-                System.out.println(servername + " " + playTime);
+//                System.out.println(servername + " " + playTime);
                 if (playTime < lowestPlayTime) {
                     bestServer = servername;
                 }

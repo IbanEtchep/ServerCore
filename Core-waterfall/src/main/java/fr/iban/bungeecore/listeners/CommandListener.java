@@ -20,13 +20,13 @@ public class CommandListener implements Listener {
 	public void onCommandDefine(ProxyDefineCommandsEvent e) {
 		ProxiedPlayer player = (ProxiedPlayer) e.getReceiver();
 		
-		if(player.hasPermission("spartacube.admin")) {
+		if(player.hasPermission("servercore.admin")) {
 			return;
 		}
 				
 		List<String> allowed = plugin.getConfiguration().getStringList("tabcomplete.global");
 		
-		if(player.hasPermission("spartacube.moderation")) {
+		if(player.hasPermission("servercore.moderation")) {
 			allowed.addAll(plugin.getConfiguration().getStringList("tabcomplete.moderation"));
 		}
 		

@@ -12,4 +12,5 @@ public class CoreChannel {
     public static final String VANISH_STATUS_CHANGE_CHANNEL = "VanishStatusChange";
     public static final String LAST_SURVIVAL_SERVER = "LastSurvivalServer";
     public static final String RANDOM_TELEPORT = "RandomTeleportChannel";
+    public static final String SYNC_KIT_CLAIM = "SyncKitClaim";
 }

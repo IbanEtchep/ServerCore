@@ -1,5 +1,6 @@
 package fr.iban.bukkitcore.listeners;
 
+import com.earth2me.essentials.User;
 import com.google.gson.Gson;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.event.CoreMessageEvent;
@@ -15,6 +16,8 @@ import fr.iban.common.teleport.TpRequest;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.UUID;
 
 public class CoreMessageListener implements Listener {
@@ -46,6 +49,7 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.VANISH_STATUS_CHANGE_CHANNEL -> consumeVanishStatusChangeMessage(message);
             case CoreChannel.LAST_SURVIVAL_SERVER -> consumeLastSurvivalServerMessage(message);
             case CoreChannel.RANDOM_TELEPORT -> plugin.getTeleportManager().performRandomTeleport(message.getMessage(RandomTeleportMessage.class));
+            case CoreChannel.SYNC_KIT_CLAIM -> consumeKitClaimMessage(message);
         }
     }
 
@@ -87,5 +91,15 @@ public class CoreMessageListener implements Listener {
     private void consumeLastSurvivalServerMessage(Message message) {
         PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
         plugin.getTeleportManager().setLastSurvivalServer(msg.getUuid(), msg.getString());
+    }
+
+    private void consumeKitClaimMessage(Message message) {
+        PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
+        if(plugin.getEssentials() != null) {
+            User user = plugin.getEssentials().getUser(msg.getUuid());
+            if(user == null) return;
+            final Calendar time = new GregorianCalendar();
+            user.setKitTimestamp(msg.getString(), time.getTimeInMillis());
+        }
     }
 }

@@ -52,6 +52,10 @@
                                         <pattern>com.github.benmanes.caffeine</pattern>
                                         <shadedPattern>fr.iban.libs.com.github.benmanes.caffeine</shadedPattern>
                                     </relocation>
+                                    <relocation>
+                                        <pattern>redis.clients</pattern>
+                                        <shadedPattern>fr.iban.libs.redis.clients</shadedPattern>
+                                    </relocation>
                                 </relocations>
                                 <filters>
                                     <filter>

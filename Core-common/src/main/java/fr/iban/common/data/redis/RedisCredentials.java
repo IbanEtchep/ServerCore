@@ -1,5 +1,8 @@
 package fr.iban.common.data.redis;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+
 public class RedisCredentials {
 	
 	private String ip;
@@ -38,7 +41,7 @@ public class RedisCredentials {
 	
 	
 	public String toRedisURL() {
-		return "redis://"+ip+":"+port;
+		return "redis://:"+ URLEncoder.encode(password, StandardCharsets.UTF_8) +"@"+ip+":"+port;
 	}
 	
 }

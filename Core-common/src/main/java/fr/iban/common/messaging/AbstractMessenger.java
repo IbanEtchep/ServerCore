@@ -1,6 +1,5 @@
 package fr.iban.common.messaging;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 public abstract class AbstractMessenger {

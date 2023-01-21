@@ -8,17 +8,12 @@ import fr.iban.bukkitcore.plan.PlanDataManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
-import fr.iban.common.data.redis.RedisAccess;
-import fr.iban.common.data.redis.RedisCredentials;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.manager.TrustedCommandsManager;
-import fr.iban.common.manager.TrustedUserManager;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.PluginManager;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
 
@@ -58,15 +53,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 			Bukkit.shutdown();
 		}
 
-		if(getConfig().getString("messenger", "sql").equals("redis")) {
-			try {
-				RedisAccess.init(new RedisCredentials(getConfig().getString("redis.host"), getConfig().getString("redis.password"), getConfig().getInt("redis.port"), getConfig().getString("redis.clientName")));
-			}catch (Exception e) {
-				getLogger().severe("Erreur lors de l'initialisation de la connexion redis.");
-				Bukkit.shutdown();
-			}
-		}
-
 		PlanDataManager.updatePlanPlayTimes();
         RewardsDAO.createTables();
         
@@ -102,9 +88,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     @Override
     public void onDisable() {
 		messagingManager.close();
-		if(getConfig().getString("messenger", "sql").equals("redis")) {
-			RedisAccess.close();
-		}
         DbAccess.closePool();
     }
 
