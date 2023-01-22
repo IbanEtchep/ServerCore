@@ -11,7 +11,7 @@ import java.util.concurrent.Executors;
 
 public class RedisMessenger extends AbstractMessenger {
 
-    private static final String CHANNEL = "CoreMessage";
+    private static final String CHANNEL = "CoreChannel";
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
     private final ExecutorService subscribeExecutor = Executors.newSingleThreadExecutor();
     private final RedisCredentials redisCredentials;
