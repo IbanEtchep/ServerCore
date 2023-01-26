@@ -2,6 +2,7 @@ package fr.iban.survivalcore.commands;
 
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.SurvivalCorePlugin;
+import me.leoko.advancedban.manager.PunishmentManager;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -37,6 +38,12 @@ public class AnnonceCMD implements CommandExecutor {
 			player.sendMessage("§cUtilisation: /annonce (message)");
 			cooldowns.remove(sender.getName());
 		} else {
+
+			if(PunishmentManager.get().isMuted(player.getUniqueId().toString())) {
+				player.sendMessage("§cVous ne pouvez pas faire d'annonce !");
+				return true;
+			}
+
 			cooldowns.put(sender.getName(), System.currentTimeMillis());
 			StringBuilder message = new StringBuilder(); {
 				for (String part : args) {
