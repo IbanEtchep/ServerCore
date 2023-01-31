@@ -77,7 +77,6 @@ public final class CoreBungeePlugin extends Plugin {
 
         registerCommands(
                 new AnnounceCMD("announce", this),
-                new IgnoreCMD("ignore", this),
                 new ChatCMD("chat"),
                 new TptoggleCMD("tptoggle", this),
                 new IgnoreListCMD("ignorelist", this),
@@ -120,6 +119,7 @@ public final class CoreBungeePlugin extends Plugin {
 
         BungeeCommandHandler commandHandler = BungeeCommandHandler.create(this);
         commandHandler.register(new CoreCommands(this));
+        commandHandler.register(new IgnoreCommand(this));
         commandHandler.register(new TeleportCommands(this));
     }
 

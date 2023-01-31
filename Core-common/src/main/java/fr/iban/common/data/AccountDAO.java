@@ -80,7 +80,7 @@ public class AccountDAO {
 
     public Set<Integer> getBlackListedAnnouncesFromDB(Connection connection, UUID uuid) throws SQLException {
         Set<Integer> announces = new HashSet<>();
-		String sql = "SELECT idAnnonce FROM sc_players, sc_annonces_blacklist WHERE uuid = ? AND sc_players.id=sc_annonces_blacklist.id;";
+        String sql = "SELECT idAnnonce FROM sc_players, sc_annonces_blacklist WHERE uuid = ? AND sc_players.id=sc_annonces_blacklist.id;";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
@@ -94,7 +94,7 @@ public class AccountDAO {
 
     public Set<UUID> getIgnoredPlayersFromDB(Connection connection, UUID uuid) throws SQLException {
         Set<UUID> ignored = new HashSet<>();
-		String sql = "SELECT uuidPlayer FROM sc_players, sc_ignored_players WHERE uuid = ? AND sc_players.id=sc_ignored_players.id";
+        String sql = "SELECT uuidPlayer FROM sc_players, sc_ignored_players WHERE uuid = ? AND sc_players.id=sc_ignored_players.id";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, uuid.toString());
             try (ResultSet rs = ps.executeQuery()) {
@@ -117,11 +117,25 @@ public class AccountDAO {
         }
     }
 
+    public void removeIgnoredPlayerFromDB(UUID uuid, UUID ignoredUUID) {
+        String DELETE_SQL = "DELETE FROM sc_ignored_players WHERE id = (SELECT id FROM sc_players WHERE uuid=?) AND uuidPlayer = ?;";
+
+        try (Connection connection = DbAccess.getDataSource().getConnection()) {
+            try (PreparedStatement ps = connection.prepareStatement(DELETE_SQL)) {
+                ps.setString(1, uuid.toString());
+                ps.setString(2, ignoredUUID.toString());
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void saveOptionsToDB(Map<Option, Boolean> options, Connection connection, UUID uuid) throws SQLException {
         String INSERT_SQL = "INSERT INTO sc_options(id, idOption) VALUES ((SELECT id FROM sc_players WHERE uuid=?), ?) ON DUPLICATE KEY UPDATE id=VALUES(id);";
         for (Entry<Option, Boolean> entry : options.entrySet()) {
             Option option = entry.getKey();
-            if (option.getDefaultValue() == entry.getValue().booleanValue()) continue;
+            if (option.getDefaultValue() == entry.getValue()) continue;
             PreparedStatement ps = connection.prepareStatement(INSERT_SQL);
             ps.setString(1, uuid.toString());
             ps.setString(2, option.toString());
