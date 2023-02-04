@@ -17,8 +17,7 @@ public class JoinEventCMD extends Command {
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		if(sender instanceof ProxiedPlayer) {
-			ProxiedPlayer player = (ProxiedPlayer)sender;
+		if(sender instanceof ProxiedPlayer player) {
 			if(plugin.getCurrentEvents().isEmpty()) {
 				player.sendMessage(TextComponent.fromLegacyText("§cIl n'y a pas d'event en cours :c"));
 				return;
@@ -27,7 +26,8 @@ public class JoinEventCMD extends Command {
 				if(plugin.getCurrentEvents().size() == 1) {
 					joinEvent(plugin.getCurrentEvents().keySet().iterator().next(), player);
 				}else {
-					player.sendMessage(TextComponent.fromLegacyText("§cIl y a actuellement plus d'un event en cours, veuillez indiquer le quel vous voulez rejoindre."));
+					player.sendMessage(TextComponent.fromLegacyText("§cIl y a actuellement plus d'un event en cours, veuillez indiquer le quel vous voulez rejoindre (/joinevent nom)."));
+					player.sendMessage(TextComponent.fromLegacyText("§cEvents en cours : " + String.join(", ", plugin.getCurrentEvents().keySet())));
 				}
 			}else if(args.length == 1) {
 				joinEvent(args[0], player);
@@ -36,7 +36,7 @@ public class JoinEventCMD extends Command {
 	}
 	
 	private void joinEvent(String event, ProxiedPlayer player) {
-		if(plugin.getCurrentEvents().containsKey(event)) {
+		if(plugin.getCurrentEvents().containsKey(event.toLowerCase())) {
 			plugin.getTeleportManager().delayedTeleport(player, plugin.getCurrentEvents().get(event), 3);
 		}else {
 			player.sendMessage(TextComponent.fromLegacyText("§cIl n'y a pas d'event à ce nom."));

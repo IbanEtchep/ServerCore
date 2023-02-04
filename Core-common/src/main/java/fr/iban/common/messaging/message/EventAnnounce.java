@@ -1,6 +1,5 @@
 package fr.iban.common.messaging.message;
 
-import com.google.gson.Gson;
 import fr.iban.common.teleport.SLocation;
 
 public class EventAnnounce {
@@ -15,7 +14,7 @@ public class EventAnnounce {
 	
 	public EventAnnounce(String name, String arena, String desc, SLocation location, String hostName) {
 		this.arena = arena;
-		this.name = name;
+		this.name = name.toLowerCase();
 		this.desc = desc;
 		this.location = location;
 		this.hostName = hostName;
@@ -24,11 +23,7 @@ public class EventAnnounce {
 	public String getName() {
 		return name;
 	}
-	
-	public void setName(String name) {
-		this.name = name;
-	}
-	
+
 	public String getDesc() {
 		return desc;
 	}

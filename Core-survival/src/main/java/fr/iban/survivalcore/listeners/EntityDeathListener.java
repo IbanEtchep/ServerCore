@@ -162,7 +162,7 @@ public class EntityDeathListener implements Listener {
                 " §bZ : §f" + (int) location.getZ());
 
         if(core.getServerName().equalsIgnoreCase("ressources")) {
-            player.sendMessage(new ComponentBuilder("§b§lVous pouvez vous téléporter à la position de votre dernière téléportation aléatoire en cliquant sur ce message.").event(ChatUtils.getShowTextHoverEvent("§lClic ici !")).event(ChatUtils.getCommandClickEvent("/lastrtp")).create());
+            player.sendMessage(new ComponentBuilder("§b§lVous pouvez vous téléporter à la position de votre dernière téléportation aléatoire en cliquant sur ce message ou en exécutant la commande /lastrtp.").event(ChatUtils.getShowTextHoverEvent("§lClic ici !")).event(ChatUtils.getCommandClickEvent("/lastrtp")).create());
         }
     }
 }

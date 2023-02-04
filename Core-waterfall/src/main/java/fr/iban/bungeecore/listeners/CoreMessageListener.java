@@ -121,7 +121,7 @@ public class CoreMessageListener implements Listener {
         plugin.getProxy().broadcast(new ComponentBuilder(getCentered("§f §5§l" + announce.getName() + " ", 30)).create());
         plugin.getProxy().broadcast(TextComponent.fromLegacyText(announce.getDesc()));
         plugin.getProxy().broadcast(TextComponent.fromLegacyText("§fArene : " + announce.getArena()));
-        plugin.getProxy().broadcast(new ComponentBuilder("§d§lCliquez pour rejoindre").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinevent " + key)).create());
+        plugin.getProxy().broadcast(new ComponentBuilder("§d§lCliquez pour rejoindre §7ou tapez /joinevent").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinevent " + key)).create());
         plugin.getProxy().broadcast(new ComponentBuilder(getLine(30)).create());
     }
 
