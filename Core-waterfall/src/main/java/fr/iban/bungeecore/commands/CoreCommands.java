@@ -61,4 +61,15 @@ public class CoreCommands {
         }
     }
 
+    @Command("wiki")
+    public void wiki(BungeeCommandActor actor) {
+        if (actor.isPlayer()) {
+            Objects.requireNonNull(actor.asPlayer()).sendMessage(TextComponent.fromLegacyText(
+                    HexColor.translateColorCodes(plugin.getConfiguration().getString("messages.wiki"))
+            ));
+        } else {
+            actor.reply(HexColor.translateColorCodes(plugin.getConfiguration().getString("messages.wiki")));
+        }
+    }
+
 }

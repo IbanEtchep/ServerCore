@@ -24,6 +24,7 @@ import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 public final class CoreBungeePlugin extends Plugin {
     private static CoreBungeePlugin instance;
@@ -33,7 +34,7 @@ public final class CoreBungeePlugin extends Plugin {
     private TeleportManager teleportManager;
     private PlayerManager playerManager;
     private TabHook tabHook;
-    private Map<String, SLocation> currentEvents;
+    private TreeMap<String, SLocation> currentEvents;
     private MessagingManager messagingManager;
     private AccountManager accountManager;
     @Override
@@ -41,7 +42,7 @@ public final class CoreBungeePlugin extends Plugin {
         instance = this;
         saveDefaultConfig();
         loadConfig();
-        currentEvents = new HashMap<>();
+        currentEvents = new TreeMap<>();
 
         try {
             DbAccess.initPool(new DbCredentials(configuration.getString("database.host"), configuration.getString("database.user"), configuration.getString("database.password"), configuration.getString("database.dbname"), configuration.getInt("database.port")));
@@ -186,7 +187,7 @@ public final class CoreBungeePlugin extends Plugin {
         return playerManager;
     }
 
-    public Map<String, SLocation> getCurrentEvents() {
+    public TreeMap<String, SLocation> getCurrentEvents() {
         return currentEvents;
     }
 

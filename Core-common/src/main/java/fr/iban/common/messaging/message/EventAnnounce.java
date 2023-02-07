@@ -14,7 +14,7 @@ public class EventAnnounce {
 	
 	public EventAnnounce(String name, String arena, String desc, SLocation location, String hostName) {
 		this.arena = arena;
-		this.name = name.toLowerCase();
+		this.name = name;
 		this.desc = desc;
 		this.location = location;
 		this.hostName = hostName;
