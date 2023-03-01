@@ -17,9 +17,8 @@ public class SocialSpyCMD extends Command  {
 		}
 	  @Override
 		public void execute(CommandSender sender, String[] args) {;
-	    if (sender instanceof ProxiedPlayer) {
-	      ProxiedPlayer player = (ProxiedPlayer)sender;
-	        if (sp.contains(player)) {
+	    if (sender instanceof ProxiedPlayer player) {
+			if (sp.contains(player)) {
 	          sp.remove(player);
 	          player.sendMessage(TextComponent.fromLegacyText("§cSocialspy désactivé"));
 	          return;

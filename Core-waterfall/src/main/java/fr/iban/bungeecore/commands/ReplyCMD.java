@@ -18,21 +18,19 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 public class ReplyCMD extends Command implements TabExecutor {
 
-	private static HashMap<ProxiedPlayer, ProxiedPlayer> replies = new HashMap<>();
+	private static final HashMap<ProxiedPlayer, ProxiedPlayer> replies = new HashMap<>();
 	private final CoreBungeePlugin plugin;
 
 	public ReplyCMD(String name, String permission, String name2, CoreBungeePlugin plugin) {
 		super(name, permission, name2);
 		this.plugin = plugin;
 	}
-	
 
 	public void execute(CommandSender sender, String[] args) {
 		if (args.length == 0)
 			sender.sendMessage(TextComponent.fromLegacyText( "§e/r [Message]" + ChatColor.RESET));  
 		if (args.length > 0)
-			if (sender instanceof ProxiedPlayer) {
-				ProxiedPlayer player = (ProxiedPlayer)sender;
+			if (sender instanceof ProxiedPlayer player) {
 				if (getReplies().containsKey(player)) {
 					ProxiedPlayer target = getReplies().get(player);
 					if (target == null) {
@@ -42,29 +40,8 @@ public class ReplyCMD extends Command implements TabExecutor {
 					StringBuilder sb = new StringBuilder("");
 					for (String arg : args) sb.append(arg).append(" ");
 					String msg = sb.toString();
-					ProxyServer.getInstance().getPlayers().forEach( p -> {    
-						if (SocialSpyCMD.sp.contains(p)) {
-							p.sendMessage(TextComponent.fromLegacyText("§8[§cSocialSpy§8] §c" + player.getName() + " §7➔ " +  "§8" + target.getName() + " §6➤ " +  "§7 " + msg));
-						}  
-					});
-					ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
-						Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
-						if (account.getOption(Option.MSG) || player.hasPermission("spartacube.msgtogglebypass")) {
-							 if(target.hasPermission("spartacube.staff")) {
-								 player.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §8[§6Staff§8] §c" + target.getName() + " §6➤§7 " + msg));
-							 } else {
-								 player.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §c" + target.getName() + " §6➤§7 " + msg));
-							 }
-							 if(player.hasPermission("spartacube.staff")) {
-								 target.sendMessage(TextComponent.fromLegacyText("§8[§6Staff§8] §c" + player.getName() + " §7➔ §8Moi §6➤§7 " + msg));
-							 } else {
-								 target.sendMessage(TextComponent.fromLegacyText("§c" + player.getName() + " §7➔ §8Moi §6➤§7 " + msg));
-							 }
-							System.out.println("§c" + player.getName() + " §7 ➔  " +  "§8" + target.getName() + " §6➤ " +  "§7 " + msg);
-						} else {
-							player.sendMessage(TextComponent.fromLegacyText("§c" + target.getName() + " a désactivé ses messages"));
-						}  
-					});
+
+					plugin.getChatManager().sendMessage(player, target, msg);
 				} else {
 					sender.sendMessage(TextComponent.fromLegacyText("§cTu ne peux pas répondre, car personne ne t'a écrit." + ChatColor.RESET));
 				} 

@@ -3,6 +3,8 @@ package fr.iban.bungeecore.manager;
 import java.util.UUID;
 
 import fr.iban.bungeecore.CoreBungeePlugin;
+import fr.iban.bungeecore.commands.ReplyCMD;
+import fr.iban.bungeecore.commands.SocialSpyCMD;
 import fr.iban.bungeecore.commands.StaffChatToggle;
 import fr.iban.bungeecore.utils.HexColor;
 import fr.iban.common.data.Account;
@@ -17,6 +19,7 @@ import net.luckperms.api.model.user.User;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -84,7 +87,7 @@ public class ChatManager {
 				}
 
 				if(!account2.getIgnoredPlayers().contains(player.getUniqueId())){
-					p.sendMessage(getComponentMessage(pmessage, uuid));
+					p.sendMessage(getComponentMessage(pmessage, uuid, player.getName(), p.getName()));
 				}
 
 			}
@@ -95,9 +98,16 @@ public class ChatManager {
 		});
 	}
 
-	private TextComponent getComponentMessage(String message, UUID uuid) {
+	private TextComponent getComponentMessage(String message, UUID uuid, String senderName, String targetName) {
 		TextComponent textComponent = new TextComponent(TextComponent.fromLegacyText(message));
 		String chatHover = plugin.getConfiguration().getString("chat-hover");
+		if(!targetName.equals(senderName)) {
+			String chatHoverSendMessage = plugin.getConfiguration().getString("chat-hover-send-message", "");
+			if(chatHoverSendMessage.length() > 0) {
+				chatHover += "\n" + chatHoverSendMessage;
+			}
+			textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + senderName + " "));
+		}
 		if(chatHover.length() > 0) {
 			textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
 					TextComponent.fromLegacyText(replacePlaceHolders(HexColor.translateColorCodes(chatHover), uuid))));
@@ -126,22 +136,6 @@ public class ChatManager {
 		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(HexColor.translateColorCodes("#f07e71§lAnnonce de #fbb29e§l"+ player.getName() + " #f07e71➤ #7bc8fe§l" + annonce)));
 	}
 
-	public void sendRankup(UUID uuid, String group) {
-		ProxyServer server = ProxyServer.getInstance();
-		ProxiedPlayer player = server.getPlayer(uuid);
-
-		ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText(HexColor.FLAT_PINK.getColor() + player.getName() + " a été promu " + group + "!"));
-
-	}
-
-	public boolean isMuted() {
-		return isMuted;
-	}
-
-	public void setMuted(boolean isMuted) {
-		this.isMuted = isMuted;
-	}
-
 	private String translateColors(String string) {
 		return ChatColor.translateAlternateColorCodes('&', string);
 	}
@@ -164,6 +158,60 @@ public class ChatManager {
 		}else {
 			ProxyServer.getInstance().broadcast(TextComponent.fromLegacyText("§aLe chat n'est plus muet."));
 		}
+	}
+
+	public void sendMessage(ProxiedPlayer sender, ProxiedPlayer target, String msg) {
+		UUID senderUUID = sender.getUniqueId();
+		String senderName = sender.getName();
+		String targetName = target.getName();
+
+		ProxyServer.getInstance().getScheduler().runAsync(CoreBungeePlugin.getInstance(), () -> {
+			String message = msg;
+			if (sender.hasPermission("servercore.colors")) {
+				message = HexColor.translateColorCodes(message);
+			}
+
+			AccountManager accountManager = plugin.getAccountManager();
+			Account account = accountManager.getAccount(senderUUID);
+			if (account.getOption(Option.MSG) || sender.hasPermission("servercore.msgtogglebypass")) {
+				if (!account.getIgnoredPlayers().contains(senderUUID)) {
+
+					for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+						if (SocialSpyCMD.sp.contains(p)) {
+							p.sendMessage(TextComponent.fromLegacyText("§8[§cSocialSpy§8] §c" + senderName + " §7➔ " +  "§8" + targetName + " §6➤ " +  "§7 " + message));
+						}
+					}
+
+					if (target.hasPermission("servercore.staff")) {
+						sender.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §8[§6Staff§8] §c" + targetName + " §6➤§7 " + message));
+					} else {
+						sender.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §c" + targetName + " §6➤§7 " + message));
+					}
+					if (sender.hasPermission("servercore.staff")) {
+						message = "§8[§6Staff§8] " + message;
+					}
+					target.sendMessage(getSendMessageComponent("§c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
+					ProxyServer.getInstance().getLogger().info("§c" + senderName + " §7 ➔  " + "§8" + targetName + " §6➤ " + "§7 " + message);
+				}
+			} else {
+				sender.sendMessage(TextComponent.fromLegacyText("§c" + target.getName() + " a désactivé ses messages"));
+			}
+
+			ReplyCMD.getReplies().put(sender, target);
+			ReplyCMD.getReplies().put(target, sender);
+		});
+	}
+
+
+	private TextComponent getSendMessageComponent(String message, String senderName) {
+		TextComponent textComponent = new TextComponent(TextComponent.fromLegacyText(message));
+		String chatHoverSendMessage = plugin.getConfiguration().getString("chat-hover-send-message", "");
+		textComponent.setClickEvent(new ClickEvent(ClickEvent.Action.SUGGEST_COMMAND, "/msg " + senderName + " "));
+		if (chatHoverSendMessage.length() > 0) {
+			textComponent.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+					TextComponent.fromLegacyText(HexColor.translateColorCodes(chatHoverSendMessage))));
+		}
+		return textComponent;
 	}
 
 	/*
