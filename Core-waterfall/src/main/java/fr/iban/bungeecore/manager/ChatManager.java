@@ -188,9 +188,10 @@ public class ChatManager {
 						sender.sendMessage(TextComponent.fromLegacyText("§8Moi §7➔ §c" + targetName + " §6➤§7 " + message));
 					}
 					if (sender.hasPermission("servercore.staff")) {
-						message = "§8[§6Staff§8] " + message;
+						target.sendMessage(getSendMessageComponent("§8[§6Staff§8] §c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
+					}else {
+						target.sendMessage(getSendMessageComponent("§c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
 					}
-					target.sendMessage(getSendMessageComponent("§c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
 					ProxyServer.getInstance().getLogger().info("§c" + senderName + " §7 ➔  " + "§8" + targetName + " §6➤ " + "§7 " + message);
 				}
 			} else {

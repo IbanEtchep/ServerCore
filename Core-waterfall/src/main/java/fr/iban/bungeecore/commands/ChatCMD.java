@@ -14,7 +14,7 @@ public class ChatCMD extends Command {
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		if(sender.hasPermission("spartacube.chatmanage")) {
+		if(sender.hasPermission("servercore.chatmanage")) {
 			if(args.length == 0) {
 				sender.sendMessage(TextComponent.fromLegacyText("§2Commandes chat :"));
 				sender.sendMessage(TextComponent.fromLegacyText("§a/chat toggle - mute/unmute le chat"));
