@@ -161,5 +161,10 @@
 			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.DevLeoko</groupId>
+			<artifactId>AdvancedBan</artifactId>
+			<version>v2.3.0</version>
+		</dependency>
 	</dependencies>
 </project>
