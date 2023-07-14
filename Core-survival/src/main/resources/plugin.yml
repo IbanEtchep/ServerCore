@@ -4,7 +4,7 @@ api-version: 1.16
 main: fr.iban.survivalcore.SurvivalCorePlugin
 authors: [Iban]
 description: Core des serveurs en mode survie.
-softdepend: [Lands, CoreProtect, BetterRTP, Warps, BungeeHomes]
+softdepend: [BetterRTP, Warps, BungeeHomes]
 depend: [LuckPerms, Essentials, Core, Vault]
 
 commands:

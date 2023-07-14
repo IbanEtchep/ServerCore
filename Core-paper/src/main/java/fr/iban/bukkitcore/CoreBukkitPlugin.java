@@ -36,6 +36,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 	private TrustedCommandsManager trustedCommandManager;
 	private BukkitTrustedUserManager trustedUserManager;
 	private ApprovalManager approvalManager;
+	private PlanDataManager planDataManager;
 
 	public void onEnable() {
     	instance = this;
@@ -53,14 +54,13 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 			Bukkit.shutdown();
 		}
 
-		PlanDataManager.updatePlanPlayTimes();
         RewardsDAO.createTables();
         
         textInputs = new HashMap<>();
 
 		this.accountManager = new AccountManager(this);
         this.teleportManager = new TeleportManager(this);
-        this.ressourcesWorldManager = new RessourcesWorldManager();
+        this.ressourcesWorldManager = new RessourcesWorldManager(this);
 		this.messagingManager = new MessagingManager(this);
 		this.trustedCommandManager = new TrustedCommandsManager();
 		Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
@@ -68,6 +68,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		this.playerManager = new BukkitPlayerManager(this);
 		this.trustedUserManager = new BukkitTrustedUserManager(this);
 		this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
+		this.planDataManager = new PlanDataManager(this);
 
         registerListeners(
         		new HeadDatabaseListener(),
@@ -98,7 +99,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 		commandHandler.register(new TeleportCommands(this));
 		commandHandler.register(new TrustCommandsCMD(this));
 		commandHandler.register(new ServerSwitchCommands(this));
-
 		commandHandler.registerBrigadier();
 
 		getCommand("core").setExecutor(new CoreCMD(this));
@@ -177,5 +177,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
 	public ApprovalManager getApprovalManager() {
 		return approvalManager;
+	}
+
+	public PlanDataManager getPlanDataManager() {
+		return planDataManager;
 	}
 }

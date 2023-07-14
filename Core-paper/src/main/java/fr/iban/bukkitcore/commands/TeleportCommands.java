@@ -117,12 +117,6 @@ public class TeleportCommands {
         }
     }
 
-//    @Command("tpsloc")
-//    @Usage("/tploc x y z world server")
-//    public void teleportToLocation(Player player, double x, double y, double z, String world, String server) {
-//
-//    }
-
     @Command("tplastunsafe")
     public void tpLastUnsafe(Player player) {
         teleportManager.tpAsyncLastUnsafe(player);

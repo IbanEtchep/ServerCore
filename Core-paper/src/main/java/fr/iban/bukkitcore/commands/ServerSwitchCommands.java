@@ -1,19 +1,14 @@
 package fr.iban.bukkitcore.commands;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
-import fr.iban.bukkitcore.commands.annotation.Online;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.manager.TeleportManager;
 import fr.iban.bukkitcore.menu.RessourceMenu;
 import fr.iban.bukkitcore.menu.ServeurMenu;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
-import fr.iban.common.teleport.RequestType;
-import fr.iban.common.teleport.TpRequest;
 import org.bukkit.entity.Player;
 import revxrsal.commands.annotation.*;
-import revxrsal.commands.bukkit.annotation.CommandPermission;
 
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 
@@ -45,9 +40,10 @@ public class ServerSwitchCommands {
         }else {
             final RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
             switch (world) {
-                case "world" -> ressourcesWorldManager.sendToRessourceWorld(sender, "resource_world");
-                case "nether" -> ressourcesWorldManager.sendToRessourceWorld(sender, "resource_nether");
-                case "end" -> ressourcesWorldManager.sendToRessourceWorld(sender, "resource_end");
+                case "world" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_world");
+                case "nether" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_nether");
+                case "end" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_end");
+                case "nortp" -> PluginMessageHelper.sendPlayerToServer(sender, ressourcesWorldManager.getResourceServerName());
                 default -> sender.sendMessage("§cCe type de monde n'existe pas.");
             }
         }

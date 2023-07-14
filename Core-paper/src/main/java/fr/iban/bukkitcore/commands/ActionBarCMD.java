@@ -20,7 +20,7 @@ public class ActionBarCMD implements CommandExecutor {
 		if(args.length >= 1) {
 			StringBuilder bc = new StringBuilder();
 			for (String arg : args) {
-				bc.append(arg + " ");
+				bc.append(arg).append(" ");
 			}
 			String message = bc.toString();
 			

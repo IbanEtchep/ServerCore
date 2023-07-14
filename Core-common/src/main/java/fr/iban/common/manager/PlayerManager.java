@@ -43,7 +43,7 @@ public class PlayerManager {
                             String name = rs.getString("name");
                             proxyPlayers.put(name, uuid);
                         }catch (IllegalArgumentException e) {
-                            System.out.println("Core : UUID invalide :" + UUID.fromString(rs.getString("uuid")));
+                            System.out.println("Core : UUID invalide :" + rs.getString("uuid"));
                         }
                     }
                 }

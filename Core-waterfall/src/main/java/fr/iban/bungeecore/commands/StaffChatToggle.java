@@ -16,9 +16,8 @@ public class StaffChatToggle extends Command {
 	public static List<ProxiedPlayer> sc = new ArrayList<>();
 	  
 	public void execute(CommandSender sender, String[] args) {
-	  if (sender instanceof ProxiedPlayer) {
-	      ProxiedPlayer player = (ProxiedPlayer)sender;
-	      if (sc.contains(player)) {
+	  if (sender instanceof ProxiedPlayer player) {
+		  if (sc.contains(player)) {
 	        sc.remove(player);
 	        player.sendMessage(TextComponent.fromLegacyText("§aVous pouvez à nouveau recevoir des messages du staff"));
 	        return;

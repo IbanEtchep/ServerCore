@@ -308,9 +308,11 @@ public class TeleportManager {
      * @return best server
      */
     private String determineTargetServer(List<String> possibleTargets) {
-        if (PlanDataManager.usePlanIntegration()) {
-            PlanDataManager.fetchPlanIfNeeded(); // Pull fresh plan data if needed
-            String server = PlanDataManager.getServerWithLowestPlayTime(possibleTargets);
+        PlanDataManager planDataManager = plugin.getPlanDataManager();
+        boolean isPlanRtpBalancerEnabled = plugin.getConfig().getBoolean("plan-rtp-balancer", false);
+
+        if (planDataManager.usePlanIntegration() && isPlanRtpBalancerEnabled) {
+            String server = planDataManager.getServerWithLowestPlayTime(possibleTargets);
             if (server != null) {
                 return server;
             }

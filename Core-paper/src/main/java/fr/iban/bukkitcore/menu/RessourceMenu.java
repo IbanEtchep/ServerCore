@@ -3,7 +3,6 @@ package fr.iban.bukkitcore.menu;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.utils.ItemBuilder;
-import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -24,11 +23,11 @@ public class RessourceMenu extends Menu {
 		if(e.getClickedInventory() == e.getView().getTopInventory() && e.getCurrentItem() != null) {
 			RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
 			if(e.getCurrentItem().getType() == Material.GRASS_BLOCK) {
-				ressourcesWorldManager.sendToRessourceWorld(player, "resource_world");
+				ressourcesWorldManager.randomTpResourceWorld(player, "resource_world");
 			}else if (e.getCurrentItem().getType() == Material.NETHERRACK) {
-				ressourcesWorldManager.sendToRessourceWorld(player, "resource_nether");
+				ressourcesWorldManager.randomTpResourceWorld(player, "resource_nether");
 			}else if (e.getCurrentItem().getType() == Material.END_STONE) {
-				ressourcesWorldManager.sendToRessourceWorld(player, "resource_end");
+				ressourcesWorldManager.randomTpResourceWorld(player, "resource_end");
 			}
 		}
 	}

@@ -122,6 +122,7 @@ public final class CoreBungeePlugin extends Plugin {
         commandHandler.register(new CoreCommands(this));
         commandHandler.register(new IgnoreCommand(this));
         commandHandler.register(new TeleportCommands(this));
+        commandHandler.register(new MiscellaneousCommands());
     }
 
     public static CoreBungeePlugin getInstance() {
