@@ -1,7 +1,5 @@
 package fr.iban.bungeecore.manager;
 
-import java.util.UUID;
-
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.bungeecore.commands.ReplyCMD;
 import fr.iban.bungeecore.commands.SocialSpyCMD;
@@ -10,8 +8,9 @@ import fr.iban.bungeecore.utils.HexColor;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.shared.TAB;
 import me.neznamy.tab.shared.features.PlaceholderManagerImpl;
+import me.neznamy.tab.shared.platform.TabPlayer;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.cacheddata.CachedMetaData;
@@ -20,10 +19,11 @@ import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+
+import java.util.UUID;
 
 public class ChatManager {
 
@@ -117,7 +117,7 @@ public class ChatManager {
 
 	private String replacePlaceHolders(String message, UUID uuid) {
 		TabAPI tabAPI = TabAPI.getInstance();
-		TabPlayer tabPlayer = tabAPI.getPlayer(uuid);
+		TabPlayer tabPlayer = TAB.getInstance().getPlayer(uuid);
 		PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
 		for (String placeholderIdentifier : placeholderManager.detectPlaceholders(message)) {
 			message = message.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));

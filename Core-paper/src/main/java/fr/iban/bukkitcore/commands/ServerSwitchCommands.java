@@ -33,7 +33,7 @@ public class ServerSwitchCommands {
     }
 
     @Command("ressources")
-    @AutoComplete("world|nether|end")
+    @AutoComplete("world|nether|end|lastpos")
     public void ressources(Player sender, @Optional String world) {
         if(world == null){
             new RessourceMenu(sender).open();
@@ -43,7 +43,7 @@ public class ServerSwitchCommands {
                 case "world" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_world");
                 case "nether" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_nether");
                 case "end" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_end");
-                case "nortp" -> PluginMessageHelper.sendPlayerToServer(sender, ressourcesWorldManager.getResourceServerName());
+                case "lastpos" -> PluginMessageHelper.sendPlayerToServer(sender, ressourcesWorldManager.getResourceServerName());
                 default -> sender.sendMessage("§cCe type de monde n'existe pas.");
             }
         }

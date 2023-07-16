@@ -82,6 +82,10 @@
 		<id>opencollab-snapshot</id>
 		<url>https://repo.opencollab.dev/maven-snapshots/</url>
 	</repository>
+	<repository>
+		<id>viaversion-repo</id>
+		<url>https://repo.viaversion.com</url>
+	</repository>
 </repositories>
 
 <dependencies>
@@ -113,14 +117,20 @@
 	<dependency>
 		<groupId>me.neznamy</groupId>
 		<artifactId>tab-api</artifactId>
-		<version>3.2.4</version>
+		<version>4.0.0</version>
+		<scope>provided</scope>
+	</dependency>
+	<dependency>
+		<groupId>com.viaversion</groupId>
+		<artifactId>viaversion-api</artifactId>
+		<version>4.5.1</version>
 		<scope>provided</scope>
 	</dependency>
 	<!-- TAB -->
 	<dependency>
 		<groupId>me.neznamy</groupId>
 		<artifactId>tab-shared</artifactId>
-		<version>3.2.4</version>
+		<version>4.0.0</version>
 		<scope>provided</scope>
 	</dependency>
 	<!-- For the common module -->

@@ -279,7 +279,7 @@ public class TeleportManager {
             if (getLastSurvivalServer(player.getUniqueId()) != null) {
                 PluginMessageHelper.sendPlayerToServer(player, getLastSurvivalServer(player.getUniqueId()));
             } else {
-                PluginMessageHelper.sendPlayerToServer(player, plugin.getConfig().getString("survie-servername", "survie"));
+                PluginMessageHelper.sendPlayerToServer(player, getDefaultSurvivalServer());
             }
         } else {
             player.sendMessage("§cVous êtes déjà dans un serveur survie.");
@@ -324,5 +324,9 @@ public class TeleportManager {
 
     private List<String> getSurvivalServers() {
         return plugin.getConfig().getStringList("survival-servers");
+    }
+
+    private String getDefaultSurvivalServer() {
+        return plugin.getConfig().getString("survie-servername", "survie");
     }
 }

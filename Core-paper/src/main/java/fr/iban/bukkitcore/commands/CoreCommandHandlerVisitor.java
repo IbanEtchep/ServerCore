@@ -37,19 +37,6 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                 SuggestionProviderFactory.forType(OfflinePlayer.class, SuggestionProvider.of(playerNames)));
         handler.getAutoCompleter().registerSuggestionFactory(0,
                 SuggestionProviderFactory.forType(UUID.class, SuggestionProvider.of(playerNames)));
-        handler.getAutoCompleter().registerParameterSuggestions(String.class, (args, sender, command) -> {
-            if(command.hasAnnotation(Context.class)) {
-                return Arrays.asList("global", "bukkit", "proxy");
-            }
-            return null;
-        });
-
-        handler.getAutoCompleter().registerParameterSuggestions(String.class, (args, sender, command) -> {
-            if(command.hasAnnotation(SenderType.class)) {
-                return Arrays.asList("player", "staff", "console");
-            }
-            return null;
-        });
 
         //OfflinePlayer
         handler.registerValueResolver(0, OfflinePlayer.class, context -> {
@@ -58,6 +45,18 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                 throw new CommandErrorException("Le joueur " + value + " n''a jamais joué sur le serveur.");
             }
             return Bukkit.getOfflinePlayer(playerManager.getOfflinePlayerUUID(value));
+        });
+
+        handler.getAutoCompleter().registerSuggestionFactory(parameter -> {
+            if (parameter.hasAnnotation(Context.class)) {
+                return (args, sender, command) -> Arrays.asList("global", "bukkit", "proxy");
+            }
+
+            if (parameter.hasAnnotation(SenderType.class)) {
+                return (args, sender, command) -> Arrays.asList("player", "staff", "console");
+            }
+
+            return null;
         });
 
         handler.registerParameterValidator(OfflinePlayer.class, (value, parameter, actor) -> {

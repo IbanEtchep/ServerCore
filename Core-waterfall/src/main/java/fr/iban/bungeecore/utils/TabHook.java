@@ -3,8 +3,8 @@ package fr.iban.bungeecore.utils;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import me.neznamy.tab.api.TabAPI;
 import me.neznamy.tab.api.TabPlayer;
-import me.neznamy.tab.api.TablistFormatManager;
 import me.neznamy.tab.api.event.player.PlayerLoadEvent;
+import me.neznamy.tab.api.tablist.TabListFormatManager;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 public class TabHook {
@@ -19,7 +19,7 @@ public class TabHook {
     public void enable() {
         TabAPI.getInstance().getEventBus().register(PlayerLoadEvent.class, event -> {
             this.playerLoadEvent = event;
-            TablistFormatManager tablistFormatManager = TabAPI.getInstance().getTablistFormatManager();
+            TabListFormatManager tablistFormatManager = TabAPI.getInstance().getTabListFormatManager();
             TabPlayer tabPlayer = event.getPlayer();
             ProxiedPlayer player = plugin.getProxy().getPlayer(tabPlayer.getUniqueId());
 
@@ -30,7 +30,7 @@ public class TabHook {
                 }
             } else if (tablistFormatManager.getCustomSuffix(tabPlayer) != null
                     && tablistFormatManager.getCustomSuffix(tabPlayer).equals("#feca57 ✮")) {
-                tablistFormatManager.resetSuffix(tabPlayer);
+                tablistFormatManager.setSuffix(tabPlayer, null);
             }
         });
     }
