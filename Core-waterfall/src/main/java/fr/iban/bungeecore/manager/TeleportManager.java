@@ -53,7 +53,7 @@ public class TeleportManager {
     }
 
     public void delayedTeleport(ProxiedPlayer player, SLocation location, int delay) {
-        if (player.hasPermission("spartacube.tp.instant")) {
+        if (player.hasPermission("servercore.tp.instant")) {
             teleport(player, location);
             return;
         }

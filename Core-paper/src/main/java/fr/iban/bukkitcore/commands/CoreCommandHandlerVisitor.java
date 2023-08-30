@@ -5,8 +5,6 @@ import fr.iban.bukkitcore.commands.annotation.Context;
 import fr.iban.bukkitcore.commands.annotation.Online;
 import fr.iban.bukkitcore.commands.annotation.SenderType;
 import fr.iban.bukkitcore.manager.BukkitPlayerManager;
-import fr.iban.common.data.Account;
-import fr.iban.common.manager.PlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +14,10 @@ import revxrsal.commands.autocomplete.SuggestionProvider;
 import revxrsal.commands.autocomplete.SuggestionProviderFactory;
 import revxrsal.commands.exception.CommandErrorException;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Locale;
+import java.util.UUID;
 
 public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
 

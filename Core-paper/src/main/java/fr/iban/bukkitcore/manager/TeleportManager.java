@@ -5,6 +5,7 @@ import com.earth2me.essentials.User;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.event.PlayerPreTeleportEvent;
 import fr.iban.bukkitcore.plan.PlanDataManager;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.SLocationUtils;
@@ -52,8 +53,12 @@ public class TeleportManager {
      * @param delay delay in seconds
      */
     public void teleport(Player player, SLocation sloc, int delay) {
-        setLastLocation(player.getUniqueId());
-        plugin.getMessagingManager().sendMessage("TeleportToLocationBungee", new TeleportToLocation(player.getUniqueId(), sloc, delay));
+        UUID uuid = player.getUniqueId();
+        PlayerPreTeleportEvent teleportEvent = new PlayerPreTeleportEvent(player, delay);
+        if(teleportEvent.callEvent()) {
+            setLastLocation(uuid);
+            plugin.getMessagingManager().sendMessage("TeleportToLocationBungee", new TeleportToLocation(uuid, sloc, teleportEvent.getDelay()));
+        }
     }
 
     /**
@@ -73,8 +78,12 @@ public class TeleportManager {
      * @param delay  in seconds
      */
     public void teleport(UUID uuid, UUID target, int delay) {
-        setLastLocation(uuid);
-        plugin.getMessagingManager().sendMessage("TeleportToPlayerBungee", new TeleportToPlayer(uuid, target, delay));
+        Player player = Bukkit.getPlayer(uuid);
+        PlayerPreTeleportEvent teleportEvent = new PlayerPreTeleportEvent(player, delay);
+        if(teleportEvent.callEvent()) {
+            setLastLocation(uuid);
+            plugin.getMessagingManager().sendMessage("TeleportToPlayerBungee", new TeleportToPlayer(uuid, target, teleportEvent.getDelay()));
+        }
     }
 
     /**
@@ -242,7 +251,7 @@ public class TeleportManager {
                 });
             } else {
                 unsafeTpPending.put(player.getUniqueId(), loc);
-                player.sendMessage(Component.text("⚠ La zone de téléportation n'est pas sécurisée.\nSi vous souhaitez tout de même vous y téléporter, cliquez ici.")
+                player.sendMessage(Component.text("⚠ La zone de téléportation n'est pas sécurisée.\nSi vous souhaitez tout de même vous y téléporter, cliquez ici. (ou tapez /tplastunsafe)")
                         .color(NamedTextColor.RED)
                         .clickEvent(ClickEvent.runCommand("/tplastunsafe"))
                         .hoverEvent(HoverEvent.showText(Component.text("Se téléporter à vos risques et périls.", NamedTextColor.WHITE).decorate(TextDecoration.BOLD))));
