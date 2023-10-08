@@ -7,8 +7,10 @@ import fr.iban.bungeecore.utils.TabHook;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
 import fr.iban.common.data.sql.DbTables;
+import fr.iban.common.manager.GlobalLoggerManager;
 import fr.iban.common.manager.PlayerManager;
 import fr.iban.common.teleport.SLocation;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -21,10 +23,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Logger;
 
 public final class CoreBungeePlugin extends Plugin {
     private static CoreBungeePlugin instance;
@@ -37,6 +38,8 @@ public final class CoreBungeePlugin extends Plugin {
     private TreeMap<String, SLocation> currentEvents;
     private MessagingManager messagingManager;
     private AccountManager accountManager;
+    private GlobalLoggerManager.ConsoleLogHandler consoleLogHandler;
+
     @Override
     public void onEnable() {
         instance = this;
@@ -95,10 +98,13 @@ public final class CoreBungeePlugin extends Plugin {
 
         tabHook = new TabHook(this);
         tabHook.enable();
+
+        initLogger();
     }
 
     @Override
     public void onDisable() {
+        closeLogger();
         messagingManager.close();
         DbAccess.closePool();
         getProxy().unregisterChannel("proxy:chat");
@@ -160,6 +166,22 @@ public final class CoreBungeePlugin extends Plugin {
             }
         }
     }
+
+    public void initLogger() {
+        this.consoleLogHandler = new GlobalLoggerManager.ConsoleLogHandler(getServerName());
+        Logger globalLogger = ProxyServer.getInstance().getLogger();
+        globalLogger.addHandler(consoleLogHandler);
+    }
+
+    public void closeLogger() {
+        Logger globalLogger = ProxyServer.getInstance().getLogger();
+        globalLogger.removeHandler(consoleLogHandler);
+    }
+
+    public String getServerName() {
+        return "bungee";
+    }
+
     public AnnoncesManager getAnnounceManager() {
         return announceManager;
     }

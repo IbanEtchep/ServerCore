@@ -10,6 +10,7 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.TextCallback;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
+import fr.iban.common.manager.GlobalLoggerManager;
 import fr.iban.common.manager.TrustedCommandsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
@@ -20,166 +21,182 @@ import revxrsal.commands.bukkit.BukkitCommandHandler;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Logger;
 
 public final class CoreBukkitPlugin extends JavaPlugin {
 
-	private static CoreBukkitPlugin instance;
-	private String serverName;
-	private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
-	private TeleportManager teleportManager;
-	private Map<UUID, TextCallback> textInputs;
-	private Essentials essentials;
-	private RessourcesWorldManager ressourcesWorldManager;
-	private MessagingManager messagingManager;
-	private AccountManager accountManager;
-	private BukkitPlayerManager playerManager;
-	private TrustedCommandsManager trustedCommandManager;
-	private BukkitTrustedUserManager trustedUserManager;
-	private ApprovalManager approvalManager;
-	private PlanDataManager planDataManager;
+    private static CoreBukkitPlugin instance;
+    private String serverName;
+    private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
+    private TeleportManager teleportManager;
+    private Map<UUID, TextCallback> textInputs;
+    private Essentials essentials;
+    private RessourcesWorldManager ressourcesWorldManager;
+    private MessagingManager messagingManager;
+    private AccountManager accountManager;
+    private BukkitPlayerManager playerManager;
+    private TrustedCommandsManager trustedCommandManager;
+    private BukkitTrustedUserManager trustedUserManager;
+    private ApprovalManager approvalManager;
+    private PlanDataManager planDataManager;
+    private GlobalLoggerManager.ConsoleLogHandler consoleLogHandler;
 
-	public void onEnable() {
-    	instance = this;
-    	saveDefaultConfig();
-		this.serverName = getConfig().getString("servername");
-		if(getServer().getPluginManager().isPluginEnabled("Essentials")) {
-			essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
-			getServer().getPluginManager().registerEvents(new EssentialsListeners(this), this);
-		}
-    	
-    	try {
-    		DbAccess.initPool(new DbCredentials(getConfig().getString("database.host"), getConfig().getString("database.user"), getConfig().getString("database.password"), getConfig().getString("database.dbname"), getConfig().getInt("database.port")));
-    	}catch (Exception e) {
-    		getLogger().severe("Erreur lors de l'initialisation de la connexion sql.");
-			Bukkit.shutdown();
-		}
+    public void onEnable() {
+        instance = this;
+        saveDefaultConfig();
+        this.serverName = getConfig().getString("servername");
+
+        if (getServer().getPluginManager().isPluginEnabled("Essentials")) {
+            essentials = (Essentials) getServer().getPluginManager().getPlugin("Essentials");
+            getServer().getPluginManager().registerEvents(new EssentialsListeners(this), this);
+        }
+
+        try {
+            DbAccess.initPool(new DbCredentials(getConfig().getString("database.host"), getConfig().getString("database.user"), getConfig().getString("database.password"), getConfig().getString("database.dbname"), getConfig().getInt("database.port")));
+        } catch (Exception e) {
+            getLogger().severe("Erreur lors de l'initialisation de la connexion sql.");
+            Bukkit.shutdown();
+        }
 
         RewardsDAO.createTables();
-        
+
         textInputs = new HashMap<>();
 
-		this.accountManager = new AccountManager(this);
+        this.accountManager = new AccountManager(this);
         this.teleportManager = new TeleportManager(this);
         this.ressourcesWorldManager = new RessourcesWorldManager(this);
-		this.messagingManager = new MessagingManager(this);
-		this.trustedCommandManager = new TrustedCommandsManager();
-		Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
-		messagingManager.init();
-		this.playerManager = new BukkitPlayerManager(this);
-		this.trustedUserManager = new BukkitTrustedUserManager(this);
-		this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
-		this.planDataManager = new PlanDataManager(this);
+        this.messagingManager = new MessagingManager(this);
+        this.trustedCommandManager = new TrustedCommandsManager();
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
+        messagingManager.init();
+        this.playerManager = new BukkitPlayerManager(this);
+        this.trustedUserManager = new BukkitTrustedUserManager(this);
+        this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
+        this.planDataManager = new PlanDataManager(this);
 
         registerListeners(
-        		new HeadDatabaseListener(),
-        		new InventoryListener(),
-        		new AsyncChatListener(this),
-        		new JoinQuitListeners(this),
-        		new PlayerMoveListener(this),
-        		new DeathListener(this),
-        		new CommandsListener(this),
-				new CoreMessageListener(this)
-        		);
+                new HeadDatabaseListener(),
+                new InventoryListener(),
+                new AsyncChatListener(this),
+                new JoinQuitListeners(this),
+                new PlayerMoveListener(this),
+                new DeathListener(this),
+                new CommandsListener(this),
+                new CoreMessageListener(this)
+        );
 
-		registerCommands();
+        registerCommands();
+        initLogger();
 
         PluginMessageHelper.registerChannels(this);
     }
 
     @Override
     public void onDisable() {
-		messagingManager.close();
+        closeLogger();
+        messagingManager.close();
         DbAccess.closePool();
     }
 
-	private void registerCommands() {
-		BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
-		this.coreCommandHandlerVisitor = new CoreCommandHandlerVisitor(this);
-		commandHandler.accept(coreCommandHandlerVisitor);
-		commandHandler.register(new TeleportCommands(this));
-		commandHandler.register(new TrustCommandsCMD(this));
-		commandHandler.register(new ServerSwitchCommands(this));
-		commandHandler.registerBrigadier();
+    private void registerCommands() {
+        BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
+        this.coreCommandHandlerVisitor = new CoreCommandHandlerVisitor(this);
+        commandHandler.accept(coreCommandHandlerVisitor);
+        commandHandler.register(new TeleportCommands(this));
+        commandHandler.register(new TrustCommandsCMD(this));
+        commandHandler.register(new ServerSwitchCommands(this));
+        commandHandler.registerBrigadier();
 
-		getCommand("core").setExecutor(new CoreCMD(this));
-		getCommand("abbc").setExecutor(new ActionBarCMD());
-		getCommand("options").setExecutor(new OptionsCMD());
-		getCommand("recompenses").setExecutor(new RecompensesCMD());
-		getCommand("recompenses").setTabCompleter(new RecompensesCMD());
-		getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
-	}
+        getCommand("core").setExecutor(new CoreCMD(this));
+        getCommand("abbc").setExecutor(new ActionBarCMD());
+        getCommand("options").setExecutor(new OptionsCMD());
+        getCommand("recompenses").setExecutor(new RecompensesCMD());
+        getCommand("recompenses").setTabCompleter(new RecompensesCMD());
+        getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
+    }
 
-	private void registerListeners(Listener... listeners) {
+    private void registerListeners(Listener... listeners) {
 
-		PluginManager pm = Bukkit.getPluginManager();
+        PluginManager pm = Bukkit.getPluginManager();
 
-		for (Listener listener : listeners) {
-			pm.registerEvents(listener, this);
-		}
+        for (Listener listener : listeners) {
+            pm.registerEvents(listener, this);
+        }
 
-	}
+    }
 
-	public static CoreBukkitPlugin getInstance() {
-		return instance;
-	}
+    public void initLogger() {
+        this.consoleLogHandler = new GlobalLoggerManager.ConsoleLogHandler(serverName);
+        Logger globalLogger = Bukkit.getLogger();
+        globalLogger.addHandler(consoleLogHandler);
+    }
 
-	public String getServerName() {
-		return serverName;
-	}
+    public void closeLogger() {
+        Logger globalLogger = Bukkit.getLogger();
+        globalLogger.removeHandler(consoleLogHandler);
+    }
 
-	public void setServerName(String serverName) {
-		this.serverName = serverName;
-	}
+    public static CoreBukkitPlugin getInstance() {
+        return instance;
+    }
 
-	public boolean isSurvivalServer() {
-		return serverName.toLowerCase().startsWith("survie");
-	}
+    public String getServerName() {
+        return serverName;
+    }
 
-	public Map<UUID, TextCallback> getTextInputs() {
-		return textInputs;
-	}
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+    }
 
-	public AccountManager getAccountManager() {
-		return accountManager;
-	}
+    public boolean isSurvivalServer() {
+        return serverName.toLowerCase().startsWith("survie");
+    }
 
-	public TeleportManager getTeleportManager() {
-		return teleportManager;
-	}
-	
-	public Essentials getEssentials() {
-		return essentials;
-	}
+    public Map<UUID, TextCallback> getTextInputs() {
+        return textInputs;
+    }
 
-	public RessourcesWorldManager getRessourcesWorldManager() {
-		return ressourcesWorldManager;
-	}
+    public AccountManager getAccountManager() {
+        return accountManager;
+    }
 
-	public TrustedCommandsManager getTrustedCommandManager() {
-		return trustedCommandManager;
-	}
+    public TeleportManager getTeleportManager() {
+        return teleportManager;
+    }
 
-	public MessagingManager getMessagingManager() {
-		return messagingManager;
-	}
+    public Essentials getEssentials() {
+        return essentials;
+    }
 
-	public BukkitPlayerManager getPlayerManager() {
-		return playerManager;
-	}
+    public RessourcesWorldManager getRessourcesWorldManager() {
+        return ressourcesWorldManager;
+    }
 
-	public CoreCommandHandlerVisitor getCommandHandlerVisitor() {
-		return coreCommandHandlerVisitor;
-	}
+    public TrustedCommandsManager getTrustedCommandManager() {
+        return trustedCommandManager;
+    }
 
-	public BukkitTrustedUserManager getTrustedUserManager() {
-		return trustedUserManager;
-	}
+    public MessagingManager getMessagingManager() {
+        return messagingManager;
+    }
 
-	public ApprovalManager getApprovalManager() {
-		return approvalManager;
-	}
+    public BukkitPlayerManager getPlayerManager() {
+        return playerManager;
+    }
 
-	public PlanDataManager getPlanDataManager() {
-		return planDataManager;
-	}
+    public CoreCommandHandlerVisitor getCommandHandlerVisitor() {
+        return coreCommandHandlerVisitor;
+    }
+
+    public BukkitTrustedUserManager getTrustedUserManager() {
+        return trustedUserManager;
+    }
+
+    public ApprovalManager getApprovalManager() {
+        return approvalManager;
+    }
+
+    public PlanDataManager getPlanDataManager() {
+        return planDataManager;
+    }
 }

@@ -13,8 +13,9 @@ public class DbTables {
         createOptionsTable();
         createIgnoredPlayersTable();
         createOnlinePlayersTable();
-		createTrustedPlayersTable();
-		createTrustedCommandsTable();
+        createTrustedPlayersTable();
+        createTrustedCommandsTable();
+        createLogsTable();
     }
 
     /*
@@ -32,7 +33,7 @@ public class DbTables {
                 "  UNIQUE (id)," +
                 "  CONSTRAINT UC_sc_players_uuid" +
                 "  UNIQUE (uuid)" +
-                ") engine = InnoDB;");
+                ");");
     }
 
     private static void createOptionsTable() {
@@ -43,7 +44,7 @@ public class DbTables {
                 "  PRIMARY KEY (id, idOption)," +
                 "  CONSTRAINT FK_sc_options" +
                 "  FOREIGN KEY (id) REFERENCES sc_players(id)" +
-                ") engine = InnoDB;");
+                ");");
     }
 
     private static void createAnnounceBLTable() {
@@ -54,7 +55,7 @@ public class DbTables {
                 "  PRIMARY KEY (id, idAnnonce)," +
                 "  CONSTRAINT FK_sc_annonces" +
                 "  FOREIGN KEY (id) REFERENCES sc_players(id)" +
-                ") engine = InnoDB;");
+                ");");
     }
 
     private static void createIgnoredPlayersTable() {
@@ -65,7 +66,7 @@ public class DbTables {
                 "  PRIMARY KEY (id, uuidPlayer)," +
                 "  CONSTRAINT FK_sc_ignored" +
                 "  FOREIGN KEY (id) REFERENCES sc_players(id)" +
-                ") engine = InnoDB;");
+                ");");
     }
 
     private static void createIpTable() {
@@ -77,7 +78,7 @@ public class DbTables {
                 "  PRIMARY KEY (id, date_time)," +
                 "  CONSTRAINT FK_sc_logins" +
                 "  FOREIGN KEY (id) REFERENCES sc_players(id)" +
-                ") engine = InnoDB;");
+                ");");
     }
 
     private static void createOnlinePlayersTable() {
@@ -91,22 +92,32 @@ public class DbTables {
         createTable("CREATE TABLE IF NOT EXISTS sc_trusted_players (" +
                 "  uuid varchar(36)," +
                 "  ip VARCHAR(45)," +
-				"  date_time DATETIME DEFAULT NOW()," +
-				"  PRIMARY KEY (uuid, ip)" +
-                ") engine = InnoDB;");
+                "  date_time DATETIME DEFAULT NOW()," +
+                "  PRIMARY KEY (uuid, ip)" +
+                ");");
     }
 
-	private static void createTrustedCommandsTable() {
-		createTable("CREATE TABLE IF NOT EXISTS sc_trusted_commands (" +
-				"  command VARCHAR(255)," +
-				"  senderType VARCHAR(50)," +
-				"  `context` VARCHAR(50)," +
+    private static void createTrustedCommandsTable() {
+        createTable("CREATE TABLE IF NOT EXISTS sc_trusted_commands (" +
+                "  command VARCHAR(255)," +
+                "  senderType VARCHAR(50)," +
+                "  `context` VARCHAR(50)," +
                 "  PRIMARY KEY (command, senderType, context)" +
-                ") engine = InnoDB;");
-	}
+                ");");
+    }
+
+    // Logs - Table (sc_logs (id, date_time, server, message)
+    private static void createLogsTable() {
+        createTable("CREATE TABLE IF NOT EXISTS sc_logs (" +
+                "  id int auto_increment PRIMARY KEY," +
+                "  date_time DATETIME DEFAULT NOW()," +
+                "  server VARCHAR(50)," +
+                "  message TEXT" +
+                ");");
+    }
 
 
-	private static void createTable(String statement) {
+    private static void createTable(String statement) {
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement preparedStatemente = connection.prepareStatement(statement)) {
                 preparedStatemente.executeUpdate();
