@@ -26,6 +26,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ProxyJoinQuitListener implements Listener {
 
@@ -56,7 +57,11 @@ public class ProxyJoinQuitListener implements Listener {
         UUID uuid = player.getUniqueId();
         ProxyServer proxy = plugin.getProxy();
 
-        proxy.getScheduler().runAsync(plugin, () -> {
+        proxy.getScheduler().schedule(plugin, () -> {
+            if (!player.isConnected()) {
+                return;
+            }
+
             AccountManager accountManager = plugin.getAccountManager();
             Account account = accountManager.getAccount(uuid);
             account.setName(player.getName());
@@ -85,7 +90,7 @@ public class ProxyJoinQuitListener implements Listener {
             accountManager.saveAccount(account);
             plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
             plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerInfo(player.getUniqueId(), player.getName()));
-        });
+        }, 100, TimeUnit.MILLISECONDS);
 
     }
 
