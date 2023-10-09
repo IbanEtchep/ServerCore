@@ -1,7 +1,5 @@
 package fr.iban.survivalcore.commands;
 
-import java.util.*;
-
 import com.earth2me.essentials.utils.DateUtil;
 import fr.iban.survivalcore.SurvivalCorePlugin;
 import fr.iban.survivalcore.event.ItemRepairEvent;
@@ -12,9 +10,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.Damageable;
 import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.Default;
+import revxrsal.commands.annotation.DefaultFor;
 import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.bukkit.annotation.CommandPermission;
+
+import java.util.*;
 
 @Command("repair")
 public class RepairCMD {
@@ -28,26 +28,20 @@ public class RepairCMD {
         this.plugin = plugin;
     }
 
-    @Command("repair")
-    @CommandPermission("servercore.repair")
-    @Default
-    public void repair(Player sender) {
-        repairHand(sender);
-    }
-
     @Subcommand("hand")
+    @DefaultFor("repair")
     @CommandPermission("servercore.repair")
     public void repairHand(Player player) {
         ItemStack item = player.getInventory().getItemInMainHand();
 
-        if(hasRepairCooldown(player)) {
+        if (hasRepairCooldown(player)) {
             return;
         }
 
         if (isRepairable(item) && repairItem(item)) {
             player.sendMessage(ChatColor.GOLD + "§aRéparation effectuée.");
             repairCooldowns.put(player.getUniqueId(), System.currentTimeMillis());
-        }else {
+        } else {
             player.sendMessage(ChatColor.RED + "Erreur: " + ChatColor.DARK_RED + "Cet item n'est pas réparable");
         }
     }

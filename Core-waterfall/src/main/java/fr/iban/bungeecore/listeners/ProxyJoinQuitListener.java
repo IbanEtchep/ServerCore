@@ -36,15 +36,34 @@ public class ProxyJoinQuitListener implements Listener {
                     "%s s'est connecté !",
                     "%s est dans la place !",
                     "%s a rejoint le serveur !",
-                    "Un %s sauvage apparaît ! "
+                    "Un %s sauvage apparaît ! ",
+                    "Tout le monde, dites bonjour à %s !",
+                    "%s vient d'arriver, faites place !"
             };
 
     private final String[] quitMessages =
             {
                     "%s nous a quitté :(",
-                    "%s s'est déconnecté."
+                    "%s s'est déconnecté.",
+                    "%s a disparu dans l'ombre.",
+                    "Et voilà, %s est parti."
             };
 
+    private final String[] longAbsenceMessages = {
+            "%s est enfin de retour !",
+            "Oh mon dieu, %s est revenu !",
+            "Le prodige %s est de retour !",
+            "%s, notre légende perdue est enfin de retour !",
+            "Vous vous rappelez de %s ? Eh bien, devinez qui vient de revenir !"
+    };
+
+    private final String[] firstJoinMessages = {
+            "Bienvenue %s, content de te voir pour la première fois !",
+            "%s vient de franchir les portes du serveur pour la première fois !",
+            "C'est la grande première de %s sur le serveur !",
+            "Hey tout le monde, accueillons notre nouveau membre, %s !",
+            "Un nouveau visage ! Salut %s, bienvenue sur le serveur !"
+    };
 
     public ProxyJoinQuitListener(CoreBungeePlugin plugin) {
         this.plugin = plugin;
@@ -69,7 +88,14 @@ public class ProxyJoinQuitListener implements Listener {
 
             if (account.getLastSeen() != 0) {
                 if ((System.currentTimeMillis() - account.getLastSeen()) > 60000) {
-                    TextComponent message = new TextComponent("§8[§a+§8] §8" + String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName()));
+                    String joinMessage = "§8[§a+§8] §8";
+                    if ((System.currentTimeMillis() - account.getLastSeen()) > 2592000000L) {
+                        joinMessage += String.format(ArrayUtils.getRandomFromArray(longAbsenceMessages), player.getName());
+                    } else {
+                        joinMessage += String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName());
+                    }
+
+                    TextComponent message = new TextComponent(joinMessage);
                     message.setHoverEvent(ChatUtils.getShowTextHoverEvent(ChatColor.GRAY + "Vu pour la dernière fois " + getLastSeen(account.getLastSeen())));
 
                     proxy.getPlayers().forEach(p -> {
@@ -78,10 +104,11 @@ public class ProxyJoinQuitListener implements Listener {
                             p.sendMessage(message);
                         }
                     });
-                    proxy.getLogger().info("§8[§a+§8] §8" + String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getName()));
+                    proxy.getLogger().info(joinMessage);
                 }
             } else {
-                BaseComponent[] welcomponent = new ComponentBuilder("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !").event(ChatUtils.getShowTextHoverEvent("§7Clic !")).event(ChatUtils.getSuggestCommandClickEvent("Bienvenue " + player.getName())).create();
+                String firstJoinMessage = "§8≫ §7" + String.format(ArrayUtils.getRandomFromArray(firstJoinMessages), player.getName());
+                BaseComponent[] welcomponent = new ComponentBuilder(firstJoinMessage).event(ChatUtils.getShowTextHoverEvent("§7Clic !")).event(ChatUtils.getSuggestCommandClickEvent("Bienvenue " + player.getName())).create();
                 proxy.getPlayers().forEach(p -> p.sendMessage(welcomponent));
                 proxy.getLogger().info("§8≫ §7" + player.getName() + " s'est connecté pour la première fois !");
             }
