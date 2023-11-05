@@ -48,7 +48,8 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.PLAYER_QUIT_CHANNEL -> consumePlayerQuitMessage(message);
             case CoreChannel.VANISH_STATUS_CHANGE_CHANNEL -> consumeVanishStatusChangeMessage(message);
             case CoreChannel.LAST_SURVIVAL_SERVER -> consumeLastSurvivalServerMessage(message);
-            case CoreChannel.RANDOM_TELEPORT -> plugin.getTeleportManager().performRandomTeleport(message.getMessage(RandomTeleportMessage.class));
+            case CoreChannel.RANDOM_TELEPORT ->
+                    plugin.getTeleportManager().performRandomTeleport(message.getMessage(RandomTeleportMessage.class));
             case CoreChannel.SYNC_KIT_CLAIM -> consumeKitClaimMessage(message);
         }
     }
@@ -90,14 +91,14 @@ public class CoreMessageListener implements Listener {
 
     private void consumeLastSurvivalServerMessage(Message message) {
         PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
-        plugin.getTeleportManager().setLastSurvivalServer(msg.getUuid(), msg.getString());
+        plugin.getServerManager().setLastSurvivalServer(msg.getUuid(), msg.getString());
     }
 
     private void consumeKitClaimMessage(Message message) {
         PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
-        if(plugin.getEssentials() != null) {
+        if (plugin.getEssentials() != null) {
             User user = plugin.getEssentials().getUser(msg.getUuid());
-            if(user == null) return;
+            if (user == null) return;
             final Calendar time = new GregorianCalendar();
             user.setKitTimestamp(msg.getString(), time.getTimeInMillis());
         }

@@ -39,6 +39,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     private BukkitTrustedUserManager trustedUserManager;
     private ApprovalManager approvalManager;
     private PlanDataManager planDataManager;
+    private ServerManager serverManager;
     private GlobalLoggerManager.ConsoleLogHandler consoleLogHandler;
 
     public void onEnable() {
@@ -73,6 +74,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         this.trustedUserManager = new BukkitTrustedUserManager(this);
         this.approvalManager = new ApprovalManager(this, messagingManager, trustedUserManager);
         this.planDataManager = new PlanDataManager(this);
+        this.serverManager = new ServerManager(this);
 
         registerListeners(
                 new HeadDatabaseListener(),
@@ -127,13 +129,15 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     public void initLogger() {
         this.consoleLogHandler = new GlobalLoggerManager.ConsoleLogHandler(serverName);
-        Logger globalLogger = Bukkit.getLogger();
+        GlobalLoggerManager.initLogger();
+        Logger globalLogger = getServer().getLogger();
         globalLogger.addHandler(consoleLogHandler);
     }
 
     public void closeLogger() {
-        Logger globalLogger = Bukkit.getLogger();
+        Logger globalLogger = getServer().getLogger();
         globalLogger.removeHandler(consoleLogHandler);
+        GlobalLoggerManager.shutdownLogger();
     }
 
     public static CoreBukkitPlugin getInstance() {
@@ -146,10 +150,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
-    }
-
-    public boolean isSurvivalServer() {
-        return serverName.toLowerCase().startsWith("survie");
     }
 
     public Map<UUID, TextCallback> getTextInputs() {
@@ -198,5 +198,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     public PlanDataManager getPlanDataManager() {
         return planDataManager;
+    }
+
+    public ServerManager getServerManager() {
+        return serverManager;
     }
 }

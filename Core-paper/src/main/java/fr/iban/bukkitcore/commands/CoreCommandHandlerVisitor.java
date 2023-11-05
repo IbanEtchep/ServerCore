@@ -4,6 +4,7 @@ import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.commands.annotation.Context;
 import fr.iban.bukkitcore.commands.annotation.Online;
 import fr.iban.bukkitcore.commands.annotation.SenderType;
+import fr.iban.bukkitcore.commands.annotation.SurvivalServer;
 import fr.iban.bukkitcore.manager.BukkitPlayerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
@@ -57,6 +58,10 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                 return (args, sender, command) -> Arrays.asList("player", "staff", "console");
             }
 
+            if (parameter.hasAnnotation(SurvivalServer.class)) {
+                return (args, sender, command) -> plugin.getServerManager().getSurvivalServers();
+            }
+
             return null;
         });
 
@@ -66,7 +71,6 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
                     throw new CommandErrorException("Ce joueur n''est pas en ligne.");
             }
         });
-
 
 
         //UUID
@@ -85,5 +89,5 @@ public class CoreCommandHandlerVisitor implements CommandHandlerVisitor {
             }
         });
     }
-    
+
 }

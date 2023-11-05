@@ -11,7 +11,6 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.SLocationUtils;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.teleport.*;
-import io.papermc.lib.PaperLib;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -20,9 +19,6 @@ import net.kyori.adventure.text.format.TextDecoration;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -34,7 +30,6 @@ public class TeleportManager {
     private final ListMultimap<UUID, TpRequest> tpRequests = ArrayListMultimap.create();
     private final List<UUID> pendingTeleports = new ArrayList<>();
     private final Map<UUID, Location> unsafeTpPending = new HashMap<>();
-    private final Map<UUID, String> lastSurvivalServer = new HashMap<>();
 
     public TeleportManager(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -55,7 +50,7 @@ public class TeleportManager {
     public void teleport(Player player, SLocation sloc, int delay) {
         UUID uuid = player.getUniqueId();
         PlayerPreTeleportEvent teleportEvent = new PlayerPreTeleportEvent(player, delay);
-        if(teleportEvent.callEvent()) {
+        if (teleportEvent.callEvent()) {
             setLastLocation(uuid);
             plugin.getMessagingManager().sendMessage("TeleportToLocationBungee", new TeleportToLocation(uuid, sloc, teleportEvent.getDelay()));
         }
@@ -80,16 +75,38 @@ public class TeleportManager {
     public void teleport(UUID uuid, UUID target, int delay) {
         Player player = Bukkit.getPlayer(uuid);
         PlayerPreTeleportEvent teleportEvent = new PlayerPreTeleportEvent(player, delay);
-        if(teleportEvent.callEvent()) {
+        if (teleportEvent.callEvent()) {
             setLastLocation(uuid);
             plugin.getMessagingManager().sendMessage("TeleportToPlayerBungee", new TeleportToPlayer(uuid, target, teleportEvent.getDelay()));
         }
     }
 
+    public void teleport(Player player, String server) {
+        teleport(player, server, 0);
+    }
+
+    public void teleport(Player player, String server, int delay) {
+        PlayerPreTeleportEvent teleportEvent = new PlayerPreTeleportEvent(player, delay);
+
+        if (teleportEvent.callEvent()) {
+            if (teleportEvent.getDelay() <= 0) {
+                setLastLocation(player.getUniqueId());
+                PluginMessageHelper.sendPlayerToServer(player, server);
+            } else {
+                player.sendMessage("§aTéléportation dans " + delay + " secondes. §cNe bougez pas !");
+                pendingTeleports.add(player.getUniqueId());
+                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                    if (isTeleportWaiting(player.getUniqueId())) {
+                        setLastLocation(player.getUniqueId());
+                        PluginMessageHelper.sendPlayerToServer(player, server);
+                    }
+                }, delay * 20L);
+            }
+        }
+    }
+
     /**
      * Used for essentials /back
-     *
-     * @param uuid
      */
     private void setLastLocation(UUID uuid) {
         Essentials essentials = plugin.getEssentials();
@@ -206,6 +223,7 @@ public class TeleportManager {
         if (!plugin.getServerName().equalsIgnoreCase(rtpMessage.getTargetServer())) {
             return;
         }
+
         String world = switch (rtpMessage.getWorld()) {
             case "world" -> Bukkit.getWorlds().get(0).getName();
             case "world_nether" -> Bukkit.getWorlds().get(1).getName();
@@ -275,28 +293,27 @@ public class TeleportManager {
         }
     }
 
-    public String getLastSurvivalServer(UUID uuid) {
-        return lastSurvivalServer.get(uuid);
-    }
-
-    public void setLastSurvivalServer(UUID uuid, String server) {
-        lastSurvivalServer.put(uuid, server);
-    }
-
-    public void teleportToSurvivalServer(Player player) {
-        if (!plugin.isSurvivalServer()) {
-            if (getLastSurvivalServer(player.getUniqueId()) != null) {
-                PluginMessageHelper.sendPlayerToServer(player, getLastSurvivalServer(player.getUniqueId()));
+    public void teleportToSurvivalServer(Player player, String server) {
+        ServerManager serverManager = plugin.getServerManager();
+        if (server == null) {
+            if (!plugin.getServerManager().isSurvivalServer()) {
+                String lastSurvivalServer = serverManager.getLastSurvivalServer(player.getUniqueId());
+                if (lastSurvivalServer != null) {
+                    server = lastSurvivalServer;
+                } else {
+                    server = serverManager.getDefaultSurvivalServer();
+                }
             } else {
-                PluginMessageHelper.sendPlayerToServer(player, getDefaultSurvivalServer());
+                player.sendMessage("§cVous êtes déjà dans un serveur survie.");
+                return;
             }
-        } else {
-            player.sendMessage("§cVous êtes déjà dans un serveur survie.");
         }
+
+        teleport(player, server);
     }
 
     public void randomTeleportToSurvivalServer(Player player) {
-        randomTeleport(player, determineTargetServer(getSurvivalServers()), "world");
+        randomTeleport(player, determineTargetServer(plugin.getServerManager().getSurvivalServers()), "world");
     }
 
     public void randomTeleport(Player player, String server, String world) {
@@ -305,10 +322,9 @@ public class TeleportManager {
             performRandomTeleport(randomTeleportMessage);
         } else {
             plugin.getMessagingManager().sendMessage(CoreChannel.RANDOM_TELEPORT, randomTeleportMessage);
-            PluginMessageHelper.sendPlayerToServer(player, server);
+            teleport(player, server, 3);
         }
     }
-
 
     /**
      * Get the less played server or random if plan is not hooked
@@ -329,13 +345,5 @@ public class TeleportManager {
 
         Collections.shuffle(possibleTargets);
         return possibleTargets.get(0);
-    }
-
-    private List<String> getSurvivalServers() {
-        return plugin.getConfig().getStringList("survival-servers");
-    }
-
-    private String getDefaultSurvivalServer() {
-        return plugin.getConfig().getString("survie-servername", "survie");
     }
 }

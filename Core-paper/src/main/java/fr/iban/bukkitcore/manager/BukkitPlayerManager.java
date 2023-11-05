@@ -6,8 +6,6 @@ import fr.iban.common.manager.PlayerManager;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.message.PlayerBoolean;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;

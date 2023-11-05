@@ -1,13 +1,16 @@
 package fr.iban.bukkitcore.commands;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.commands.annotation.SurvivalServer;
 import fr.iban.bukkitcore.manager.RessourcesWorldManager;
 import fr.iban.bukkitcore.manager.TeleportManager;
 import fr.iban.bukkitcore.menu.RessourceMenu;
 import fr.iban.bukkitcore.menu.ServeurMenu;
-import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import org.bukkit.entity.Player;
-import revxrsal.commands.annotation.*;
+import revxrsal.commands.annotation.AutoComplete;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Cooldown;
+import revxrsal.commands.annotation.Optional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -23,8 +26,8 @@ public class ServerSwitchCommands {
     }
 
     @Command("survie")
-    public void survie(Player sender) {
-        teleportManager.teleportToSurvivalServer(sender);
+    public void survie(Player sender, @Optional @SurvivalServer String server) {
+        teleportManager.teleportToSurvivalServer(sender, server);
     }
 
     @Command("serveur")
@@ -35,15 +38,15 @@ public class ServerSwitchCommands {
     @Command("ressources")
     @AutoComplete("world|nether|end|lastpos")
     public void ressources(Player sender, @Optional String world) {
-        if(world == null){
+        if (world == null) {
             new RessourceMenu(sender).open();
-        }else {
-            final RessourcesWorldManager ressourcesWorldManager = CoreBukkitPlugin.getInstance().getRessourcesWorldManager();
+        } else {
+            RessourcesWorldManager ressourcesWorldManager = plugin.getRessourcesWorldManager();
             switch (world) {
                 case "world" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_world");
                 case "nether" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_nether");
                 case "end" -> ressourcesWorldManager.randomTpResourceWorld(sender, "resource_end");
-                case "lastpos" -> PluginMessageHelper.sendPlayerToServer(sender, ressourcesWorldManager.getResourceServerName());
+                case "lastpos" -> teleportManager.teleport(sender, ressourcesWorldManager.getResourceServerName());
                 default -> sender.sendMessage("§cCe type de monde n'existe pas.");
             }
         }

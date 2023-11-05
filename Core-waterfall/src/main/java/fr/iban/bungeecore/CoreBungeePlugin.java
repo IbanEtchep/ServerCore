@@ -169,6 +169,7 @@ public final class CoreBungeePlugin extends Plugin {
 
     public void initLogger() {
         this.consoleLogHandler = new GlobalLoggerManager.ConsoleLogHandler(getServerName());
+        GlobalLoggerManager.initLogger();
         Logger globalLogger = ProxyServer.getInstance().getLogger();
         globalLogger.addHandler(consoleLogHandler);
     }
@@ -176,6 +177,7 @@ public final class CoreBungeePlugin extends Plugin {
     public void closeLogger() {
         Logger globalLogger = ProxyServer.getInstance().getLogger();
         globalLogger.removeHandler(consoleLogHandler);
+        GlobalLoggerManager.shutdownLogger();
     }
 
     public String getServerName() {

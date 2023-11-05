@@ -1,7 +1,6 @@
 package fr.iban.survivalcore;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
-import fr.iban.bukkitcore.listeners.EssentialsListeners;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.commands.*;
 import fr.iban.survivalcore.listeners.*;
@@ -12,9 +11,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import revxrsal.commands.bukkit.BukkitCommandHandler;
-import revxrsal.commands.exception.CommandErrorException;
-
-import java.util.Objects;
 
 public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
