@@ -246,7 +246,7 @@ public class TeleportManager {
 
                 count++;
 
-                if (count > 20) {
+                if (count > 200) {
                     cancel();
                 }
 

@@ -12,7 +12,7 @@ database:
   password: password
 
 #sql or redis
-messanging: redis
+messenger: redis
 
 motd:
   - "motd"
@@ -26,7 +26,7 @@ messages:
   discord: "url du discord"
   grades: "url des info sur les grades"
 
-multipaper-servers: []
+multipaper-servers: [ ]
 
 tabcomplete:
   global:

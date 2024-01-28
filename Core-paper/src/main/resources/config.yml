@@ -12,6 +12,9 @@ database:
   dbname: dbname
   password: password
 
+# sql or redis
+messenger: sql
+
 servername: "Survie"
 survival-servers:
   - "survie"
@@ -23,3 +26,6 @@ world:
   end: "world_the_end"
 
 plan-rtp-balancer: true
+
+# Send approval request to discord on each non whitelisted commad by non-trusted users.
+command-approval: false

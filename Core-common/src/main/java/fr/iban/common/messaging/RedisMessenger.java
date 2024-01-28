@@ -30,6 +30,7 @@ public class RedisMessenger extends AbstractMessenger {
         this.jedisPool = new JedisPool(redisCredentials.toRedisURL());
         this.sub = new Subscription();
         subscribeExecutor.execute(this.sub);
+        System.out.println("Redis pubsub connection established");
     }
 
     @Override
@@ -45,8 +46,8 @@ public class RedisMessenger extends AbstractMessenger {
             long now = System.nanoTime();
             try (Jedis jedis = this.jedisPool.getResource()) {
                 jedis.publish(CHANNEL, gson.toJson(message));
-                if(debugMode) {
-                    System.out.println("OUT : " + "("+ message.getChannel() +") " + message.getMessage() + " envoyé à " + System.currentTimeMillis() + " en " + (System.nanoTime()-now)/1000000.0 +"ms");
+                if (debugMode) {
+                    System.out.println("OUT : " + "(" + message.getChannel() + ") " + message.getMessage() + " envoyé à " + System.currentTimeMillis() + " en " + (System.nanoTime() - now) / 1000000.0 + "ms");
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -104,8 +105,8 @@ public class RedisMessenger extends AbstractMessenger {
                 Message message = gson.fromJson(msg, Message.class);
                 if (messageConsumer != null) {
                     messageConsumer.accept(message);
-                    if(debugMode) {
-                        System.out.println("IN : " + "("+ message.getChannel() +") " + message.getMessage() + " lu à " + System.currentTimeMillis() + " en " + (System.nanoTime()-now)/1000000.0 +"ms");
+                    if (debugMode) {
+                        System.out.println("IN : " + "(" + message.getChannel() + ") " + message.getMessage() + " lu à " + System.currentTimeMillis() + " en " + (System.nanoTime() - now) / 1000000.0 + "ms");
                     }
                 }
             });

@@ -4,6 +4,7 @@ import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.commands.*;
 import fr.iban.survivalcore.listeners.*;
+import fr.iban.survivalcore.manager.AnnounceManager;
 import fr.iban.survivalcore.utils.HourlyReward;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.Listener;
@@ -16,6 +17,7 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     private static SurvivalCorePlugin instance;
     private Economy econ;
+    private AnnounceManager announceManager;
 
 
     @Override
@@ -39,7 +41,9 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
                 new PrepareResultListener(),
                 new ServiceListeners(this),
                 new JoinQuitListeners(this),
-                new PlayerRespawnListener()
+                new PlayerRespawnListener(),
+                new FishingListener(),
+                new CoreMessageListener(this)
         );
 
         Plugin betterrtp = getServer().getPluginManager().getPlugin("BetterRTP");
@@ -54,6 +58,8 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
         HourlyReward hourlyReward = new HourlyReward(this);
         hourlyReward.init();
+
+        announceManager = new AnnounceManager(this);
     }
 
     public static SurvivalCorePlugin getInstance() {
@@ -62,7 +68,6 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     private void registerCommands() {
         getCommand("dolphin").setExecutor(new DolphinCMD());
-        getCommand("annonce").setExecutor(new AnnonceCMD(this));
         getCommand("pvp").setExecutor(new PvPCMD(CoreBukkitPlugin.getInstance()));
 
         BukkitCommandHandler commandHandler = BukkitCommandHandler.create(this);
@@ -71,6 +76,7 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
         commandHandler.register(new RepairCMD(this));
         commandHandler.register(new FeedCMD(this));
         commandHandler.register(new ShowGroupsCMD());
+        commandHandler.register(new AnnounceCMD(this));
         commandHandler.registerBrigadier();
     }
 
@@ -95,5 +101,9 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     public Economy getEconomy() {
         return econ;
+    }
+
+    public AnnounceManager getAnnounceManager() {
+        return announceManager;
     }
 }
