@@ -42,7 +42,7 @@ public class PlayerManager {
                             UUID uuid = UUID.fromString(rs.getString("uuid"));
                             String name = rs.getString("name");
                             proxyPlayers.put(name, uuid);
-                        }catch (IllegalArgumentException e) {
+                        } catch (IllegalArgumentException e) {
                             System.out.println("Core : UUID invalide :" + rs.getString("uuid"));
                         }
                     }
@@ -55,7 +55,7 @@ public class PlayerManager {
     }
 
     public void addOnlinePlayerToDB(UUID uuid) {
-        String sql = "INSERT INTO sc_online_players (player_id) VALUES ((SELECT id FROM sc_players WHERE uuid=?));";
+        String sql = "INSERT INTO sc_online_players (player_id) VALUES ((SELECT id FROM sc_players WHERE uuid=?)) ON DUPLICATE KEY UPDATE player_id=player_id;";
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
