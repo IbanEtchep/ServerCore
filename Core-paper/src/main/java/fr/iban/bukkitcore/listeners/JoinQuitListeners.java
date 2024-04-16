@@ -3,10 +3,10 @@ package fr.iban.bukkitcore.listeners;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
+import fr.iban.bukkitcore.utils.Scheduler;
 import fr.iban.common.manager.GlobalLoggerManager;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.message.PlayerStringMessage;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -29,7 +29,7 @@ public class JoinQuitListeners implements Listener {
         Player player = e.getPlayer();
         e.setJoinMessage(null);
         if (plugin.getServerName().equals("null")) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> PluginMessageHelper.askServerName(player), 10L);
+            Scheduler.runLater(() -> PluginMessageHelper.askServerName(player), 10L);
         }
         RewardsDAO.getRewardsAsync(player.getUniqueId()).thenAccept(list -> {
             if (!list.isEmpty()) {

@@ -7,6 +7,7 @@ import fr.iban.bukkitcore.manager.*;
 import fr.iban.bukkitcore.plan.PlanDataManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
+import fr.iban.bukkitcore.utils.Scheduler;
 import fr.iban.bukkitcore.utils.TextCallback;
 import fr.iban.common.data.sql.DbAccess;
 import fr.iban.common.data.sql.DbCredentials;
@@ -68,7 +69,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         this.ressourcesWorldManager = new RessourcesWorldManager(this);
         this.messagingManager = new MessagingManager(this);
         this.trustedCommandManager = new TrustedCommandsManager();
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
+        Scheduler.runAsync(() -> getTrustedCommandManager().loadTrustedCommands());
         messagingManager.init();
         this.playerManager = new BukkitPlayerManager(this);
         this.trustedUserManager = new BukkitTrustedUserManager(this);

@@ -3,9 +3,9 @@ package fr.iban.bukkitcore.commands;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.commands.annotation.Context;
 import fr.iban.bukkitcore.commands.annotation.SenderType;
+import fr.iban.bukkitcore.utils.Scheduler;
 import fr.iban.common.TrustedCommand;
 import fr.iban.common.manager.TrustedCommandsManager;
-import org.bukkit.Bukkit;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.annotation.Default;
 import revxrsal.commands.annotation.Named;
@@ -32,7 +32,7 @@ public class TrustCommandsCMD {
                                   @Named("context") @Default("global") @Context String context) {
 
         TrustedCommand trustedCommand = new TrustedCommand(command, senderType, context);
-        if(trustedCommandsManager.getTrustedCommands().contains(trustedCommand)) {
+        if (trustedCommandsManager.getTrustedCommands().contains(trustedCommand)) {
             sender.reply("§cCette commande est déjà ajoutée.");
             return;
         }
@@ -48,7 +48,7 @@ public class TrustCommandsCMD {
             @Named("senderType") @SenderType String senderType,
             @Named("context") @Default("global") @Context String context) {
         TrustedCommand trustedCommand = new TrustedCommand(command, senderType, context);
-        if(!trustedCommandsManager.getTrustedCommands().contains(trustedCommand)) {
+        if (!trustedCommandsManager.getTrustedCommands().contains(trustedCommand)) {
             sender.reply("§cCette n'est pas dans la liste.");
             return;
         }
@@ -69,7 +69,7 @@ public class TrustCommandsCMD {
 
     @Subcommand("reload")
     public void reload(BukkitCommandActor sender) {
-        Bukkit.getScheduler().runTask(plugin, trustedCommandsManager::loadTrustedCommands);
+        Scheduler.run(trustedCommandsManager::loadTrustedCommands);
         sender.reply("§aCommandes rechargées.");
     }
 
