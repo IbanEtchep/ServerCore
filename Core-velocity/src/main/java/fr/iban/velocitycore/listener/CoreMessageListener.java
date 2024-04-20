@@ -1,8 +1,9 @@
-package fr.iban.bungeecore.listeners;
+package fr.iban.velocitycore.listener;
 
 import com.google.gson.Gson;
-import fr.iban.bungeecore.CoreBungeePlugin;
-import fr.iban.bungeecore.event.CoreMessageEvent;
+import com.velocitypowered.api.event.Subscribe;
+import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.ProxyServer;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.Message;
 import fr.iban.common.messaging.message.EventAnnounce;
@@ -12,29 +13,37 @@ import fr.iban.common.teleport.RequestType;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import fr.iban.common.teleport.TpRequest;
-import net.md_5.bungee.api.chat.ClickEvent;
-import net.md_5.bungee.api.chat.ComponentBuilder;
-import net.md_5.bungee.api.chat.TextComponent;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.api.plugin.Listener;
-import net.md_5.bungee.event.EventHandler;
+import fr.iban.velocitycore.CoreVelocityPlugin;
+import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
+
+import java.util.Optional;
 import java.util.UUID;
 
-public class CoreMessageListener implements Listener {
+public class CoreMessageListener {
 
-    private final CoreBungeePlugin plugin;
+    private final CoreVelocityPlugin plugin;
+    private ProxyServer server;
     private final Gson gson = new Gson();
 
-    public CoreMessageListener(CoreBungeePlugin plugin) {
+    public CoreMessageListener(CoreVelocityPlugin plugin) {
         this.plugin = plugin;
+        this.server = plugin.getServer();
     }
 
-    @EventHandler
-    public void onCoreMessage(CoreMessageEvent e) {
-        Message message = e.getMessage();
+    @Subscribe
+    public void onPluginMessage(PluginMessageEvent event) {
+        if (!(event.getSource() instanceof Player)) {
+            return;
+        }
 
-        switch (e.getMessage().getChannel()) {
+        Message message = gson.fromJson(new String(event.getData()), Message.class);
+
+        switch (message.getChannel()) {
             case "EventAnnounce" -> consumeAnnounceMessage(message);
             case "DeathLocation" -> consumeDeathLocationMessage(message);
             case "LastRTPLocation" -> consumeLastRTPLocationMessage(message);
@@ -50,6 +59,7 @@ public class CoreMessageListener implements Listener {
         }
     }
 
+
     public void consumeRemoveTpRequestMessage(Message message) {
         TpRequest request = gson.fromJson(message.getMessage(), TpRequest.class);
         plugin.getTeleportManager().getTpRequests().remove(request.getPlayerTo(), request);
@@ -57,7 +67,7 @@ public class CoreMessageListener implements Listener {
 
     private void consumeTeleportToLocationBungeeMessage(Message message) {
         TeleportToLocation teleportToLocation = gson.fromJson(message.getMessage(), TeleportToLocation.class);
-        ProxiedPlayer player = plugin.getProxy().getPlayer(teleportToLocation.getUuid());
+        Player player = plugin.getServer().getPlayer(teleportToLocation.getUuid()).orElse(null);
         if (player != null) {
             if (teleportToLocation.getDelay() == 0) {
                 plugin.getTeleportManager().teleport(player, teleportToLocation.getLocation());
@@ -69,26 +79,35 @@ public class CoreMessageListener implements Listener {
 
     private void consumeTeleportToPlayerBungeeMessage(Message message) {
         TeleportToPlayer teleportToPlayer = gson.fromJson(message.getMessage(), TeleportToPlayer.class);
-        ProxiedPlayer player = plugin.getProxy().getPlayer(teleportToPlayer.getUuid());
-        if (player != null) {
-            if (teleportToPlayer.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
-                plugin.getTeleportManager().teleport(player, plugin.getProxy().getPlayer(teleportToPlayer.getTargetId()));
-            } else {
-                plugin.getTeleportManager().delayedTeleport(player, plugin.getProxy().getPlayer(teleportToPlayer.getTargetId()), Math.abs(teleportToPlayer.getDelay()));
-            }
-        }
+        Optional<Player> optionalPlayer = plugin.getServer().getPlayer(teleportToPlayer.getUuid());
+        Optional<Player> optionalTarget = plugin.getServer().getPlayer(teleportToPlayer.getTargetId());
+
+        optionalPlayer.ifPresent(player -> {
+            optionalTarget.ifPresent(target -> {
+                if (teleportToPlayer.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
+                    plugin.getTeleportManager().teleport(player, target);
+                } else {
+                    plugin.getTeleportManager().delayedTeleport(player, target, Math.abs(teleportToPlayer.getDelay()));
+                }
+            });
+        });
     }
+
 
     private void consumeTeleportRequestBungeeMessage(Message message) {
         TpRequest request = gson.fromJson(message.getMessage(), TpRequest.class);
-        ProxiedPlayer from = plugin.getProxy().getPlayer(request.getPlayerFrom());
-        ProxiedPlayer to = plugin.getProxy().getPlayer(request.getPlayerTo());
+        Optional<Player> optFrom = plugin.getServer().getPlayer(request.getPlayerFrom());
+        Optional<Player> optTo = plugin.getServer().getPlayer(request.getPlayerTo());
 
-        if (request.getRequestType() == RequestType.TP) {
-            plugin.getTeleportManager().sendTeleportRequest(from, to);
-        } else if (request.getRequestType() == RequestType.TPHERE) {
-            plugin.getTeleportManager().sendTeleportHereRequest(from, to);
-        }
+        optFrom.ifPresent(from -> {
+            optTo.ifPresent(to -> {
+                if (request.getRequestType() == RequestType.TP) {
+                    plugin.getTeleportManager().sendTeleportRequest(from, to);
+                } else if (request.getRequestType() == RequestType.TPHERE) {
+                    plugin.getTeleportManager().sendTeleportHereRequest(from, to);
+                }
+            });
+        });
     }
 
     private void consumeDeathLocationMessage(Message message) {
@@ -114,15 +133,16 @@ public class CoreMessageListener implements Listener {
 
         if (!plugin.getCurrentEvents().containsKey(key)) {
             plugin.getCurrentEvents().put(key, announce.getLocation());
-            plugin.getProxy().broadcast(new ComponentBuilder(getLine(30)).create());
-            plugin.getProxy().broadcast(new ComponentBuilder("§5§l" + announce.getHostName() + " a lancé un event " + announce.getName()).create());
+            broadcastLine(30);
+            server.sendMessage(Component.text(announce.getHostName() + " a lancé un event " + announce.getName(), NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
         }
 
-        plugin.getProxy().broadcast(new ComponentBuilder(getCentered("§f §5§l" + announce.getName() + " ", 30)).create());
-        plugin.getProxy().broadcast(TextComponent.fromLegacyText(announce.getDesc()));
-        plugin.getProxy().broadcast(TextComponent.fromLegacyText("§fArene : " + announce.getArena()));
-        plugin.getProxy().broadcast(new ComponentBuilder("§d§lCliquez pour rejoindre §7ou tapez /joinevent").event(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/joinevent " + key)).create());
-        plugin.getProxy().broadcast(new ComponentBuilder(getLine(30)).create());
+        server.sendMessage(getCenteredText(" " + announce.getName() + " ", 30, NamedTextColor.WHITE, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
+        server.sendMessage(Component.text(announce.getDesc(), NamedTextColor.WHITE));
+        server.sendMessage(Component.text("Arene : " + announce.getArena(), NamedTextColor.WHITE));
+        server.sendMessage(Component.text("Cliquez pour rejoindre ou tapez /joinevent", NamedTextColor.DARK_PURPLE, TextDecoration.BOLD)
+                .clickEvent(ClickEvent.runCommand("/joinevent " + key)));
+        broadcastLine(30);
     }
 
 
@@ -130,20 +150,15 @@ public class CoreMessageListener implements Listener {
     UTILS
      */
 
-    private String getLine(int length) {
-        StringBuilder sb = new StringBuilder("§8§m");
-        sb.append("-".repeat(Math.max(0, length)));
-        return sb.toString();
+
+    private void broadcastLine(int length) {
+        String line = "-".repeat(Math.max(0, length));
+        plugin.getServer().sendMessage(Component.text(line, NamedTextColor.GRAY));
     }
 
-    private String getCentered(String string, int lineLength) {
-        StringBuilder sb = new StringBuilder("§8§m");
-        int line = (lineLength - string.length()) / 2 + 2;
-        sb.append("-".repeat(Math.max(0, line)));
-        sb.append(string);
-        sb.append("§8§m");
-        sb.append("-".repeat(Math.max(0, line)));
-        return sb.toString();
+    private Component getCenteredText(String text, int length, NamedTextColor textColor, NamedTextColor bgColor, TextDecoration... decorations) {
+        String padding = " ".repeat(Math.max(0, (length - text.length()) / 2));
+        return Component.text(padding + text + padding, textColor).decorate(decorations);
     }
 
     private void consumeVanishStatusChangeMessage(Message message) {

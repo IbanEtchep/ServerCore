@@ -21,8 +21,7 @@ public class IgnoreListCMD extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (sender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
+        if (sender instanceof ProxiedPlayer player) {
             if (args.length == 0) {
                 AccountManager accountManager = plugin.getAccountManager();
                 Account account = accountManager.getAccount(player.getUniqueId());

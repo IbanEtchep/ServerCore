@@ -2,11 +2,11 @@ package fr.iban.common.data.sql;
 
 public class DbCredentials {
     
-	private String host;
-	private String user;
-	private String pass;
-	private String dbName;
-	private int port;
+	private final String host;
+	private final String user;
+	private final String pass;
+	private final String dbName;
+	private final int port;
 	
 	
 	public DbCredentials(String host, String user, String pass, String dbName, int port) {
@@ -18,17 +18,7 @@ public class DbCredentials {
 	}
 	
 	public String toURI(){
-		final StringBuilder sb = new StringBuilder();
-		
-		
-		sb.append("jdbc:mysql://")
-		.append(host)
-		.append(":")
-		.append(port)
-		.append("/")
-		.append(dbName);
-		
-		return sb.toString();
+        return "jdbc:mysql://" + host + ":" + port + "/" + dbName;
 	}
 	
 	public String getUser(){

@@ -11,6 +11,7 @@ public class DbAccess {
 
 	public static void initPool(DbCredentials credentials) {
 		HikariConfig hikariConfig = new HikariConfig();
+		hikariConfig.setDriverClassName("com.mysql.cj.jdbc.Driver");
 		hikariConfig.setJdbcUrl(credentials.toURI());
 		hikariConfig.setUsername(credentials.getUser());
 		hikariConfig.setPassword(credentials.getPass());

@@ -1,0 +1,62 @@
+file-version: 1.0
+
+redis:
+  host: 172.18.0.1
+  port: 6380
+  password: pass
+  clientName: Serveur_mc
+
+database:
+  host: 172.18.0.1
+  port: 3306
+  user: user
+  dbname: dbname
+  password: password
+
+#sql or redis
+messenger: redis
+
+motd:
+  - "motd"
+chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'
+ping-color: '#fdcb6e'
+chat-hover: 'test'
+
+messages:
+  site: "url du site"
+  vote: "url pour voter"
+  discord: "url du discord"
+  grades: "url des info sur les grades"
+
+multipaper-servers: [ ]
+
+tabcomplete:
+  global:
+    - tpa
+    - tpahere
+    - tpyes
+    - tpaccept
+    - back
+    - msg
+    - r
+    - reply
+    - oab
+    - find
+  moderation:
+    - oab
+    - tphere
+    - ban
+    - tempban
+    - tempmute
+    - history
+    - warn
+    - tempwarn
+    - unban
+    - unmute
+    - tp
+    - s
+    - server
+    - sctoggle
+    - kick
+    - announceevent
+    - chat

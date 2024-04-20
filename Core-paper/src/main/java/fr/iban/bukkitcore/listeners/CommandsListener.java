@@ -15,7 +15,6 @@ import org.bukkit.event.player.PlayerCommandSendEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 public class CommandsListener implements Listener {
@@ -48,6 +47,7 @@ public class CommandsListener implements Listener {
     @EventHandler
     public void onCommand(PlayerCommandPreprocessEvent e) {
         Player player = e.getPlayer();
+        String ip = player.getAddress() != null ? player.getAddress().getHostString() : "unknown";
 
         if (!plugin.getConfig().getBoolean("command-approval", true)) {
             return;
@@ -67,14 +67,14 @@ public class CommandsListener implements Listener {
             approvedCommands.remove(player.getUniqueId(), command);
             return;
         }
-
-        Command bukkitCommand = Bukkit.getServer().getPluginCommand(command);
+        
+        Command bukkitCommand = Bukkit.getCommandMap().getCommand(command);
         if (bukkitCommand != null) {
             if (!bukkitCommand.testPermission(player)) return;
             e.setCancelled(true);
             player.sendMessage("§cApprobation requise.");
             plugin.getApprovalManager().sendRequest(player,
-                    player.getName() + " (" + Objects.requireNonNull(player.getAddress()).getHostString() + ") essaye d'exécuter la commande " + e.getMessage() + ".",
+                    player.getName() + " (" + ip + ") essaye d'exécuter la commande " + e.getMessage() + ".",
                     result -> {
                         if (result) {
                             Bukkit.getScheduler().runTask(plugin, () -> {
@@ -82,7 +82,8 @@ public class CommandsListener implements Listener {
                                 player.chat(e.getMessage());
                             });
                         }
-                    });
+                    }
+            );
         }
     }
 
