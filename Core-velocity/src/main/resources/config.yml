@@ -18,8 +18,9 @@ messenger: redis
 
 motd:
   - "motd"
-chat-format: '#feca57%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'
-ping-color: '#fdcb6e'
+chat-format: '&#feca57&%premium%&r%lp_suffix%%lp_prefix% %player% %lp_suffix% ➤ &r'
+staff-chat-format: '&8[&3&lStaff&8] &#feca57&%premium%&r%vault_suffix%%vault_prefix% %player% %vault_suffix% ➤ &r'
+ping-prefix: '&#fdcb6e&@'
 chat-hover: 'test'
 
 messages:

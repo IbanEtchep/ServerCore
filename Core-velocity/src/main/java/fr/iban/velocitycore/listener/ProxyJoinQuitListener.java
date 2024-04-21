@@ -6,7 +6,7 @@ import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.scheduler.ScheduledTask;
+import de.themoep.minedown.adventure.MineDown;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.common.messaging.CoreChannel;
@@ -16,6 +16,7 @@ import fr.iban.velocitycore.CoreVelocityPlugin;
 import fr.iban.velocitycore.command.ReplyCMD;
 import fr.iban.velocitycore.manager.AccountManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.ocpsoft.prettytime.PrettyTime;
@@ -29,6 +30,8 @@ import java.util.concurrent.TimeUnit;
 public class ProxyJoinQuitListener {
 
     private final CoreVelocityPlugin plugin;
+    private final AccountManager accountManager;
+
     private final String[] joinMessages =
             {
                     "%s s'est connecté !",
@@ -65,6 +68,7 @@ public class ProxyJoinQuitListener {
 
     public ProxyJoinQuitListener(CoreVelocityPlugin plugin) {
         this.plugin = plugin;
+        this.accountManager = plugin.getAccountManager();
     }
 
 
@@ -74,41 +78,39 @@ public class ProxyJoinQuitListener {
         UUID uuid = player.getUniqueId();
         ProxyServer proxy = plugin.getServer();
 
-        ScheduledTask task = proxy.getScheduler().buildTask(plugin, () -> {
-            if (!player.isActive()) {
-                return;
-            }
-
-            AccountManager accountManager = plugin.getAccountManager();
+        proxy.getScheduler().buildTask(plugin, () -> {
             Account account = accountManager.getAccount(uuid);
             account.setName(player.getUsername());
             account.setIp(player.getRemoteAddress().getHostString());
 
             if (account.getLastSeen() != 0) {
                 if ((System.currentTimeMillis() - account.getLastSeen()) > 60000) {
-                    String joinMessage = "§8[§a+§8] §8";
+                    String joinMessage = "&8[&a+&8] &8";
                     if ((System.currentTimeMillis() - account.getLastSeen()) > 2592000000L) {
                         joinMessage += String.format(ArrayUtils.getRandomFromArray(longAbsenceMessages), player.getUsername());
                     } else {
                         joinMessage += String.format(ArrayUtils.getRandomFromArray(joinMessages), player.getUsername());
                     }
 
-                    Component message = Component.text(joinMessage)
-                            .hoverEvent(HoverEvent.showText(Component.text("Vu pour la dernière fois " + getLastSeen(account.getLastSeen()), NamedTextColor.GRAY)));
+                    Component message = MineDown.parse(joinMessage).hoverEvent(HoverEvent.showText(Component.text("Vu pour la dernière fois " + getLastSeen(account.getLastSeen()), NamedTextColor.GRAY)));
 
                     proxy.getAllPlayers().forEach(p -> {
-                        Account account2 = accountManager.getAccount(p.getUniqueId());
-                        if (account2.getOption(Option.JOIN_MESSAGE) && !account2.getIgnoredPlayers().contains(player.getUniqueId())) {
+                        Account receiverAccount = accountManager.getAccount(p.getUniqueId());
+                        if (receiverAccount.getOption(Option.JOIN_MESSAGE) && !receiverAccount.getIgnoredPlayers().contains(player.getUniqueId())) {
                             p.sendMessage(message);
                         }
                     });
-                    plugin.getLogger().info(joinMessage);
+
+                    plugin.getServer().getConsoleCommandSource().sendMessage(message);
                 }
             } else {
-                String firstJoinMessage = "§8≫ §7" + String.format(ArrayUtils.getRandomFromArray(firstJoinMessages), player.getUsername());
-                Component welcomeComponent = Component.text(firstJoinMessage).hoverEvent(HoverEvent.showText(Component.text("Clic !")));
-                proxy.getAllPlayers().forEach(p -> p.sendMessage(welcomeComponent));
-                plugin.getLogger().info("§8≫ §7" + player.getUsername() + " s'est connecté pour la première fois !");
+                String firstJoinMessage = "&8≫ &7" + String.format(ArrayUtils.getRandomFromArray(firstJoinMessages), player.getUsername());
+                Component welcomeComponent = Component.text(firstJoinMessage)
+                        .hoverEvent(HoverEvent.showText(Component.text("Clic !")))
+                        .clickEvent(ClickEvent.suggestCommand(" Bienvenue " + player.getUsername()));
+
+                proxy.sendMessage(welcomeComponent);
+                plugin.getServer().getConsoleCommandSource().sendMessage(welcomeComponent);
             }
 
             account.setLastSeen(System.currentTimeMillis());
@@ -148,26 +150,24 @@ public class ProxyJoinQuitListener {
     public void onDisconnect(DisconnectEvent e) {
         Player player = e.getPlayer();
         ProxyServer proxy = plugin.getServer();
+        Account account = accountManager.getAccount(player.getUniqueId());
+        String quitMessage = "&8[&c-&8] &8" + String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getUsername());
+        Component quitMessageComponent = MineDown.parse(quitMessage);
 
-        proxy.getScheduler().buildTask(plugin, () -> {
-            AccountManager accountManager = plugin.getAccountManager();
-            Account account = accountManager.getAccount(player.getUniqueId());
+        if ((System.currentTimeMillis() - account.getLastSeen()) > 60000) {
+            proxy.getAllPlayers().forEach(p -> {
+                Account account2 = accountManager.getAccount(p.getUniqueId());
+                if (account2.getOption(Option.LEAVE_MESSAGE) && !account2.getIgnoredPlayers().contains(player.getUniqueId())) {
+                    p.sendMessage(quitMessageComponent);
+                }
+            });
+            plugin.getServer().getConsoleCommandSource().sendMessage(quitMessageComponent);
+        }
 
-            if ((System.currentTimeMillis() - account.getLastSeen()) > 60000) {
-                proxy.getAllPlayers().forEach(p -> {
-                    Account account2 = accountManager.getAccount(p.getUniqueId());
-                    if (account2.getOption(Option.LEAVE_MESSAGE) && !account2.getIgnoredPlayers().contains(player.getUniqueId())) {
-                        p.sendMessage(Component.text(String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getUsername()), NamedTextColor.GRAY));
-                    }
-                });
-                plugin.getLogger().info(String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getUsername()));
-            }
-
-            account.setLastSeen(System.currentTimeMillis());
-            accountManager.saveAccount(account);
-            plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
-            plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
-        }).schedule();
+        account.setLastSeen(System.currentTimeMillis());
+        accountManager.saveAccount(account);
+        plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
+        plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
     }
 
     private String getLastSeen(long time) {

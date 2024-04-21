@@ -41,6 +41,10 @@
                             <pattern>com.mysql.cj</pattern>
                             <shadedPattern>fr.iban.velocitycore.libs.mysql</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>org.apache.commons.pool2</pattern>
+                            <shadedPattern>fr.iban.velocitycore.libs.commons.pool2</shadedPattern>
+                        </relocation>
                     </relocations>
                 </configuration>
                 <executions>
@@ -114,6 +118,11 @@
         <repository>
             <id>minebench-repo</id>
             <url>https://repo.minebench.de/</url>
+        </repository>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
         </repository>
     </repositories>
 
@@ -196,6 +205,11 @@
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.33</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+            <version>2.12.0</version>
         </dependency>
     </dependencies>
 </project>

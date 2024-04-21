@@ -23,9 +23,10 @@ public class TabCompleteCMD {
     @Command("addtabcomplete")
     @CommandPermission("servercore.addtabcomplete")
     @Description("Ajoute une commande à l'auto-complétion des groupes spécifiés.")
-    @AutoComplete("@completions")
     @Usage("/addtabcomplete <global/moderation> <commandeSansSlash>")
-    public void execute(@NotSender Player sender, String[] args) throws SenderNotPlayerException, IOException {
+    public void execute(Player sender, String message) throws IOException {
+        String[] args = message.split(" ");
+
         if (args.length <= 1) {
             sender.sendMessage(Component.text("/addtabcomplete global/moderation commandeSansSlash", NamedTextColor.RED));
         } else if (args.length == 2) {

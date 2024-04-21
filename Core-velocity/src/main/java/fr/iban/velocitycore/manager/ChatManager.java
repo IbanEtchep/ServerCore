@@ -3,6 +3,7 @@ package fr.iban.velocitycore.manager;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import de.themoep.minedown.adventure.MineDown;
+import de.themoep.minedown.adventure.MineDownParser;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.velocitycore.CoreVelocityPlugin;
@@ -14,113 +15,110 @@ import me.neznamy.tab.shared.platform.TabPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.luckperms.api.LuckPerms;
-import net.luckperms.api.LuckPermsProvider;
-import net.luckperms.api.cacheddata.CachedMetaData;
-import net.luckperms.api.model.user.User;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.UUID;
 
 public class ChatManager {
 
+    private static final Logger log = LoggerFactory.getLogger(ChatManager.class);
     private final CoreVelocityPlugin plugin;
+    private final AccountManager accountManager;
     private final ProxyServer server;
     private boolean isMuted = false;
-    private final TextColor pingColor;
-    private LuckPerms luckapi = LuckPermsProvider.get();
+    private final String pingPrefix;
 
     public ChatManager(CoreVelocityPlugin plugin) {
         this.plugin = plugin;
         this.server = plugin.getServer();
-        this.pingColor = TextColor.fromHexString(plugin.getConfig().getString("ping-color"));
+        this.accountManager = plugin.getAccountManager();
+        this.pingPrefix = plugin.getConfig().getString("ping-prefix", "&e");
     }
 
-    public void sendGlobalMessage(UUID uuid, String message) {
-        Player player = server.getPlayer(uuid).orElse(null);
+    public void sendGlobalMessage(UUID senderUUID, String message) {
+        Player sender = server.getPlayer(senderUUID).orElseThrow();
+        String chatFormat = replacePlaceHolders(plugin.getConfig().getString("chat-format"), sender);
+        Component prefixComponent = MineDown.parse(chatFormat);
 
-        if (player == null) {
+        if (message.startsWith("$") && sender.hasPermission("servercore.staffchat")) {
+            sendStaffMessage(sender, message.substring(1));
             return;
         }
 
-        if(player.hasPermission("servercore.colors")){
-//            message = HexColor.translateColorCodes(message);
-        }
-
-        if (message.startsWith("$") && player.hasPermission("servercore.staffchat")) {
-            sendStaffMessage(player, message.substring(1));
+        if (isMuted && !sender.hasPermission("servercore.chatmanage")) {
             return;
         }
 
-        if (isMuted && !player.hasPermission("servercore.chatmanage")) {
+        if(sender.hasPermission("servercore.colors")) {
+            message = componentToLegacy(parseMineDownInlineFormatting(message));
+        }
+
+        Account senderAccount = accountManager.getAccount(senderUUID);
+
+        if (!senderAccount.getOption(Option.TCHAT)) {
+            sender.sendMessage(MineDown.parse("&cVous ne pouvez pas envoyer ce message car votre tchat est désactivé"));
+            logMessage(MineDown.parse("§8[§CDÉSACTIVÉ§8]§r " + message));
             return;
         }
 
-        AccountManager accountManager = plugin.getAccountManager();
-        Account account = accountManager.getAccount(player.getUniqueId());
-
-        String prefix = plugin.getConfig().getString("chat-format");
-        prefix = prefix.replace("%player%", player.getUsername());
-        prefix = prefix.replace("%lp_prefix%", getPrefix(player));
-        prefix = prefix.replace("%lp_suffix%", getSuffix(player));
-        prefix = prefix.replace("%premium%", getPremiumString(player));
-        prefix = replacePlaceHolders(prefix, uuid);
-        message = prefix + message;
-
-        if (!account.getOption(Option.TCHAT)) {
-            player.sendMessage(MineDown.parse("&cVous ne pouvez pas envoyer ce message car votre tchat est désactivé"));
-            plugin.getLogger().info("§8[§CDÉSACTIVÉ§8]§r " + message);
-            return;
-        }
-
-        for (Player p : server.getAllPlayers()) {
+        for (Player receiverPlayer : server.getAllPlayers()) {
             String pmessage = message;
-            Account account2 = accountManager.getAccount(p.getUniqueId());
-            if (!account2.getOption(Option.TCHAT)) continue;
+            UUID receiverUUID = receiverPlayer.getUniqueId();
+            Account receiverAccount = accountManager.getAccount(receiverUUID);
+            String receiverUsername = receiverPlayer.getUsername();
 
-            if (!p.getUniqueId().equals(player.getUniqueId()) && pmessage.toLowerCase().contains(p.getUsername().toLowerCase()) && account2.getOption(Option.MENTION)) {
-                String ping = pingColor + "@" + p.getUsername() + "§r";
-                pmessage = pmessage.replace(p.getUsername(), ping);
+            if (!receiverAccount.getOption(Option.TCHAT) || receiverAccount.getIgnoredPlayers().contains(sender.getUniqueId())) {
+                continue;
             }
 
-            if (!account2.getIgnoredPlayers().contains(player.getUniqueId())) {
-                p.sendMessage(getComponentMessage(pmessage, uuid, player.getUsername(), p.getUsername()));
+            if (!receiverUUID.equals(senderUUID) && pmessage.toLowerCase().contains(receiverUsername.toLowerCase()) && receiverAccount.getOption(Option.MENTION)) {
+                String ping = pingPrefix + receiverUsername + "&r";
+                pmessage = pmessage.replace(receiverUsername, componentToLegacy(MineDown.parse(ping)));
             }
 
+            Component finalPrefix = addPrefixComponent(prefixComponent, sender, receiverPlayer);
+            Component finalMessageComponent = componentFromLegacy(pmessage);
+
+            receiverPlayer.sendMessage(finalPrefix.append(finalMessageComponent));
         }
 
-        plugin.getLogger().info(message);
+        logMessage(prefixComponent.append(componentFromLegacy(message)));
     }
 
-    private Component getComponentMessage(String message, UUID uuid, String senderName, String targetName) {
-        Component textComponent = Component.text(message);
-
+    private Component addPrefixComponent(Component prefix, Player sender, Player receiver) {
         String chatHover = plugin.getConfig().getString("chat-hover");
         String chatHoverSendMessage = plugin.getConfig().getString("chat-hover-send-message", "");
 
-        if (!targetName.equals(senderName)) {
+        if (!receiver.equals(sender)) {
             if (!chatHoverSendMessage.isEmpty()) {
                 chatHover += "\n" + chatHoverSendMessage;
             }
-            textComponent = textComponent.clickEvent(ClickEvent.suggestCommand("/msg " + senderName + " "));
+            prefix = prefix.clickEvent(ClickEvent.suggestCommand("/msg " + sender.getUsername() + " "));
         }
 
         if (!chatHover.isEmpty()) {
-            String replacedHover = replacePlaceHolders(chatHover, uuid);
-            textComponent = textComponent.hoverEvent(HoverEvent.showText(Component.text(replacedHover)));
+            String replacedHover = replacePlaceHolders(chatHover, sender);
+            prefix = prefix.hoverEvent(HoverEvent.showText(MineDown.parse(replacedHover)));
         }
 
-        return textComponent;
+        return prefix;
     }
 
-    private String replacePlaceHolders(String message, UUID uuid) {
+    private String replacePlaceHolders(String message, Player sender) {
+        message = message.replace("%player%", sender.getUsername());
+        message = message.replace("%premium%", getPremiumString(sender));
+
         TabAPI tabAPI = TabAPI.getInstance();
-        TabPlayer tabPlayer = TAB.getInstance().getPlayer(uuid);
+        TabPlayer tabPlayer = TAB.getInstance().getPlayer(sender.getUniqueId());
         PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
+
         for (String placeholderIdentifier : placeholderManager.detectPlaceholders(message)) {
             message = message.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));
         }
+
         return message;
     }
 
@@ -136,16 +134,21 @@ public class ChatManager {
         }
 
 
-        plugin.getServer().sendMessage(MineDown.parse("#f07e71§lAnnonce de #fbb29e§l" + player.getUsername() + " #f07e71➤ #7bc8fe§l" + annonce));
+        plugin.getServer().sendMessage(MineDown.parse("&#f07e71&&lAnnonce de &#fbb29e&&l" + player.getUsername() + " &#f07e71&➤ &#7bc8fe&&l" + annonce));
     }
 
     private void sendStaffMessage(Player sender, String message) {
+        String prefix = plugin.getConfig().getString("staff-chat-format");
+        prefix = replacePlaceHolders(prefix, sender);
+        Component fullMessage = MineDown.parse(prefix + message);
+
         plugin.getServer().getAllPlayers().forEach(p -> {
             if (p.hasPermission("servercore.staffchat")) {
-                p.sendMessage(LegacyComponentSerializer.legacySection().deserialize("§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getUsername() + " §8§l➤ " + getSuffix(sender) + "§l" + message));
+                p.sendMessage(fullMessage);
             }
         });
-        plugin.getLogger().info("§8[§3§lStaff§8] " + getSuffix(sender) + "§l" + getPrefix(sender) + "§l " + sender.getUsername() + " §8§l➤ " + getSuffix(sender) + "§l" + message);
+
+        logMessage(fullMessage);
     }
 
     public void toggleChat(Player sender) {
@@ -161,59 +164,38 @@ public class ChatManager {
         UUID senderUUID = sender.getUniqueId();
         String senderName = sender.getUsername();
         String targetName = target.getUsername();
-
-        AccountManager accountManager = plugin.getAccountManager();
         Account account = accountManager.getAccount(senderUUID);
+
         if (account.getOption(Option.MSG) || sender.hasPermission("servercore.msgtogglebypass")) {
             if (!account.getIgnoredPlayers().contains(senderUUID)) {
+                Component senderComponent;
+                Component targetComponent;
+
                 if (target.hasPermission("servercore.staff")) {
-                    sender.sendMessage(LegacyComponentSerializer.legacySection().deserialize("§8Moi §7➔ §8[§6Staff§8] §c" + targetName + " §6➤§7 " + message));
+                    senderComponent = MineDown.parse("&8Moi &7➔ &8[&6Staff&8] &c" + targetName + " &6➤&7 " + message);
                 } else {
-                    sender.sendMessage(LegacyComponentSerializer.legacySection().deserialize("§8Moi §7➔ §c" + targetName + " §6➤§7 " + message));
+                    senderComponent = MineDown.parse("&8Moi &7➔ &c" + targetName + " &6➤&7 " + message);
                 }
                 if (sender.hasPermission("servercore.staff")) {
-                    target.sendMessage(getSendMessageComponent("§8[§6Staff§8] §c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
+                    targetComponent = MineDown.parse("&8[&6Staff&8] &c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
                 } else {
-                    target.sendMessage(getSendMessageComponent("§c" + senderName + " §7➔ §8Moi §6➤§7 " + message, senderName));
+                    targetComponent = MineDown.parse("&c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
                 }
-                plugin.getLogger().info("§c" + senderName + " §7 ➔  " + "§8" + targetName + " §6➤ " + "§7 " + message);
+
+                targetComponent = targetComponent
+                        .hoverEvent(HoverEvent.showText(Component.text("Cliquez pour répondre")))
+                        .clickEvent(ClickEvent.suggestCommand("/msg " + senderName));
+
+                sender.sendMessage(senderComponent);
+                target.sendMessage(targetComponent);
+                logMessage(MineDown.parse("&c" + senderName + " &7 ➔  " + "&8" + targetName + " &6➤ " + "&7 " + message));
             }
         } else {
-            sender.sendMessage(LegacyComponentSerializer.legacySection().deserialize("§c" + target.getUsername() + " a désactivé ses messages"));
+            sender.sendMessage(MineDown.parse("&c" + target.getUsername() + " a désactivé ses messages"));
         }
 
         ReplyCMD.getReplies().put(sender, target);
         ReplyCMD.getReplies().put(target, sender);
-    }
-
-
-    private Component getSendMessageComponent(String message, String senderName) {
-        String chatHoverSendMessage = plugin.getConfig().getString("chat-hover-send-message", "");
-
-        return MineDown.parse(
-                "[{msg}](suggest_command:/msg {sender}, show_text={chat_hover_send_message}",
-                "msg", message,
-                "sender", senderName,
-                "chat_hover_send_message", chatHoverSendMessage
-        );
-    }
-
-    private User loadUser(Player player) {
-        return luckapi.getUserManager().getUser(player.getUniqueId());
-    }
-
-    private CachedMetaData playerMeta(Player player) {
-        return loadUser(player).getCachedData().getMetaData(luckapi.getContextManager().getQueryOptions(player));
-    }
-
-    private String getPrefix(Player player) {
-        String prefix = playerMeta(player).getPrefix();
-        return (prefix != null) ? prefix : "";
-    }
-
-    private String getSuffix(Player player) {
-        String suffix = playerMeta(player).getSuffix();
-        return (suffix != null) ? suffix : "";
     }
 
     private String getPremiumString(Player player) {
@@ -224,4 +206,23 @@ public class ChatManager {
         }
     }
 
+    private Component parseMineDownInlineFormatting(String message, String... replacements) {
+        return new MineDown(message)
+                .disable(MineDownParser.Option.ADVANCED_FORMATTING)
+                .disable(MineDownParser.Option.SIMPLE_FORMATTING)
+                .replace(replacements)
+                .toComponent();
+    }
+
+    private String componentToLegacy(Component component) {
+        return LegacyComponentSerializer.legacySection().serialize(component);
+    }
+
+    private Component componentFromLegacy(String legacy) {
+        return LegacyComponentSerializer.legacySection().deserialize(legacy);
+    }
+
+    private void logMessage(Component message) {
+        server.getConsoleCommandSource().sendMessage(message);
+    }
 }

@@ -11,6 +11,7 @@ import revxrsal.commands.annotation.*;
 import revxrsal.commands.velocity.VelocityCommandHandler;
 import revxrsal.commands.velocity.annotation.CommandPermission;
 
+@Command("ignore")
 public class IgnoreCommand {
 
     private final CoreVelocityPlugin plugin;
@@ -21,7 +22,8 @@ public class IgnoreCommand {
         this.server = plugin.getServer();
     }
 
-    @Command("ignore")
+    @Subcommand("help")
+    @DefaultFor("ignore")
     @Description("Affiche les options de la commande ignore.")
     public void ignore(Player player) {
         Component message = Component.text("Utilisez ", NamedTextColor.GRAY)
@@ -34,7 +36,6 @@ public class IgnoreCommand {
 
     @Subcommand("add")
     @Description("Ajoute un joueur à la liste des ignorés.")
-    @CommandPermission("servercore.ignore.add")
     @Usage("/ignore add <joueur>")
     public void addIgnore(Player player, @Named("joueur") Player target) {
         if (!player.getUniqueId().equals(target.getUniqueId())) {
@@ -58,7 +59,6 @@ public class IgnoreCommand {
 
     @Subcommand("remove")
     @Description("Retire un joueur de la liste des ignorés.")
-    @CommandPermission("servercore.ignore.remove")
     @Usage("/ignore remove <joueur>")
     public void removeIgnore(Player player, @Named("joueur") Player target) {
         AccountManager accountManager = plugin.getAccountManager();

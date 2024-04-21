@@ -1,6 +1,7 @@
 package fr.iban.velocitycore;
 
 import com.google.inject.Inject;
+import com.velocitypowered.api.event.EventManager;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
@@ -97,19 +98,22 @@ public class CoreVelocityPlugin {
         channelRegistrar.register(MinecraftChannelIdentifier.from("proxy:annonce"));
         channelRegistrar.register(MinecraftChannelIdentifier.from("proxy:send"));
 
-        server.getEventManager().register(this, new PluginMessageListener(this));
-        server.getEventManager().register(this, new ProxyJoinQuitListener(this));
-        server.getEventManager().register(this, new CoreMessageListener(this));
-        server.getEventManager().register(this, new ProxyPingListener(this));
-
         messagingManager = new MessagingManager(this);
         messagingManager.init();
         announceManager = new AnnoncesManager(this);
-        chatManager = new ChatManager(this);
         teleportManager = new TeleportManager(this);
         playerManager = new PlayerManager();
         playerManager.clearOnlinePlayersFromDB();
         accountManager = new AccountManager(this);
+        chatManager = new ChatManager(this);
+
+        EventManager eventManager = server.getEventManager();
+        eventManager.register(this, new PluginMessageListener(this));
+        eventManager.register(this, new ProxyJoinQuitListener(this));
+        eventManager.register(this, new CoreMessageListener(this));
+        eventManager.register(this, new ProxyPingListener(this));
+
+        registerCommands();
 
         tabHook = new TabHook(this);
         tabHook.enable();
@@ -118,7 +122,6 @@ public class CoreVelocityPlugin {
     @Subscribe
     public void onProxyShutdown(ProxyShutdownEvent event) {
         messagingManager.close();
-        tabHook.disable();
         DbAccess.closePool();
     }
 

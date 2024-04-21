@@ -5,13 +5,12 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import fr.iban.velocitycore.CoreVelocityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import revxrsal.commands.annotation.Command;
-import revxrsal.commands.annotation.Dependency;
-import revxrsal.commands.annotation.Description;
-import revxrsal.commands.annotation.Subcommand;
+import revxrsal.commands.annotation.*;
 import revxrsal.commands.velocity.VelocityCommandHandler;
 import revxrsal.commands.velocity.annotation.CommandPermission;
 
+@Command("chat")
+@CommandPermission("servercore.chatmanage")
 public class ChatCMD {
 
     private final CoreVelocityPlugin plugin;
@@ -22,7 +21,8 @@ public class ChatCMD {
         this.server = plugin.getServer();
     }
 
-    @Command("chat")
+    @Subcommand("help")
+    @DefaultFor("chat")
     @Description("Affiche les commandes de gestion du chat.")
     public void chat(Player player) {
         player.sendMessage(Component.text("Commandes chat :", NamedTextColor.GREEN));
@@ -30,7 +30,6 @@ public class ChatCMD {
     }
 
     @Subcommand("clear")
-    @CommandPermission("servercore.chatmanage")
     @Description("Efface le chat pour tous les utilisateurs.")
     public void clearChat(Player player) {
         Component emptyMessage = Component.empty();
@@ -43,7 +42,6 @@ public class ChatCMD {
     }
 
     @Subcommand("toggle")
-    @CommandPermission("servercore.chatmanage")
     @Description("Active ou désactive le chat.")
     public void toggleChat(Player player) {
         plugin.getChatManager().toggleChat(player);

@@ -28,7 +28,6 @@ public class IgnoreListCMD {
 
     @Command("ignorelist")
     @Description("Affiche la liste des joueurs ignorés par le joueur.")
-    @CommandPermission("servercore.ignorelist")
     public void execute(Player player) throws SenderNotPlayerException {
         AccountManager accountManager = plugin.getAccountManager();
         Account account = accountManager.getAccount(player.getUniqueId());

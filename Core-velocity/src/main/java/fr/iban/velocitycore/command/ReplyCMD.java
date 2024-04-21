@@ -24,11 +24,9 @@ public class ReplyCMD {
     }
 
     @Command({"reply", "r"})
-    @AutoComplete("@playerNames")
-    @CommandPermission("servercore.reply")
     @Description("Répondre au dernier joueur qui vous a contacté.")
     @Usage("/reply <message> - Répond au dernier message reçu.")
-    public void reply(Player player, @Default(" ") @Named("message") String message) {
+    public void reply(Player player, @Default("") @Named("message") String message) {
         if (message.isEmpty()) {
             player.sendMessage(Component.text("Utilisation: /r <message>").color(NamedTextColor.YELLOW));
             return;
@@ -49,20 +47,5 @@ public class ReplyCMD {
 
     public static Map<Player, Player> getReplies() {
         return replies;
-    }
-
-    private List<String> suggestPlayers(Player player) {
-        List<String> suggestions = new ArrayList<>();
-        for (Player p : plugin.getServer().getAllPlayers()) {
-            if (!player.equals(p) && p.isActive()) {
-                suggestions.add(p.getUsername());
-            }
-        }
-        return suggestions;
-    }
-
-    public void setupCommands(VelocityCommandHandler handler) {
-        handler.register(this);
-        handler.getAutoCompleter().registerSuggestion("playerNames", (args, sender, command) -> suggestPlayers((Player) sender));
     }
 }

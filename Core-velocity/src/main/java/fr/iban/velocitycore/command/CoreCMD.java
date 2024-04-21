@@ -11,6 +11,8 @@ import revxrsal.commands.velocity.annotation.CommandPermission;
 
 import java.io.IOException;
 
+@Command("bcore")
+@CommandPermission("servercore.admin")
 public class CoreCMD {
 
     private final CoreVelocityPlugin plugin;
@@ -19,7 +21,8 @@ public class CoreCMD {
         this.plugin = plugin;
     }
 
-    @Command("bcore")
+    @Subcommand("help")
+    @DefaultFor("bcore")
     @Description("Affiche les options de commande pour le serveur.")
     public void core(Player player) {
         Component message = Component.text("Utilisez ", NamedTextColor.GRAY)
@@ -31,7 +34,6 @@ public class CoreCMD {
     }
 
     @Subcommand("reload")
-    @CommandPermission("servercore.reload")
     @Description("Recharge la configuration du serveur.")
     @Usage("/bcore reload")
     public void reloadConfig(Player player) throws IOException {
@@ -40,7 +42,6 @@ public class CoreCMD {
     }
 
     @Subcommand("debug")
-    @CommandPermission("servercore.debug")
     @Description("Active ou désactive le mode débogage.")
     @Usage("/bcore debug")
     public void toggleDebug(Player player) {

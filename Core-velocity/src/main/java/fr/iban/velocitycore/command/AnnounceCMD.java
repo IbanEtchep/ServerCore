@@ -23,7 +23,6 @@ public class AnnounceCMD {
     }
 
     @Subcommand("listdisabled")
-    @CommandPermission("announce.listdisabled")
     @Description("Liste toutes les annonces désactivées par l'utilisateur.")
     public void listDisabledAnnouncements(VelocityCommandActor actor, Player player) {
         AccountManager accountManager = plugin.getAccountManager();
@@ -34,7 +33,6 @@ public class AnnounceCMD {
     }
 
     @Subcommand("disable")
-    @CommandPermission("announce.disable")
     @Description("Désactive une annonce spécifique pour l'utilisateur.")
     public void disableAnnouncement(VelocityCommandActor actor, Player player, @Default("0") int id) {
         AnnoncesManager announceManager = plugin.getAnnounceManager();

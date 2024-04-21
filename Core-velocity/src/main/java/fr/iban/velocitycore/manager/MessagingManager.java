@@ -46,6 +46,6 @@ public class MessagingManager extends AbstractMessagingManager {
 
     @Override
     protected String getServerName() {
-        return "bungee";
+        return plugin.getServerName();
     }
 }

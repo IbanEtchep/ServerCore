@@ -19,7 +19,6 @@ public class JoinEventCMD {
 
     @Command("joinevent")
     @Description("Rejoignez un événement en cours ou spécifique si un nom est fourni.")
-    @CommandPermission("servercore.joinevent")
     @Usage("/joinevent <event>")
     public void joinEvent(VelocityCommandActor actor, @Optional @Named("event") String eventName) {
         if (!(actor instanceof Player player)) {

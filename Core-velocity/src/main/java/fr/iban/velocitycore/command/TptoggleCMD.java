@@ -21,7 +21,7 @@ public class TptoggleCMD {
 
     @Command("tptoggle")
     @Description("Active ou désactive les demandes de téléportation pour le joueur.")
-    @CommandPermission("velocitycore.tptoggle")
+    @CommandPermission("servercore.tptoggle")
     public void execute(Player player) {
         AccountManager accountManager = plugin.getAccountManager();
         Account account = accountManager.getAccount(player.getUniqueId());

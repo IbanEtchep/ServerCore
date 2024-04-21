@@ -3,7 +3,6 @@ package fr.iban.velocitycore.command;
 import com.velocitypowered.api.proxy.Player;
 import de.themoep.minedown.adventure.MineDown;
 import fr.iban.velocitycore.CoreVelocityPlugin;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import revxrsal.commands.annotation.Command;
 import revxrsal.commands.velocity.VelocityCommandActor;
 import revxrsal.commands.velocity.VelocityCommandHandler;
