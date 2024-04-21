@@ -1,10 +1,9 @@
 package fr.iban.bukkitcore.manager;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
+import fr.iban.bukkitcore.utils.Scheduler;
 import fr.iban.common.TrustedUser;
 import fr.iban.common.manager.TrustedUserManager;
-import fr.iban.common.messaging.message.PlayerInfo;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.net.InetSocketAddress;
@@ -20,14 +19,14 @@ public class BukkitTrustedUserManager extends TrustedUserManager {
 
     @Override
     public void loadTrustedUsers() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, super::loadTrustedUsers);
+        Scheduler.runAsync(super::loadTrustedUsers);
     }
 
     public boolean isTrusted(Player player) {
         for (TrustedUser user : trustedUsers) {
             InetSocketAddress inetSocketAddress = player.getAddress();
-            if(inetSocketAddress == null) continue;
-            if(user.getUuid().equals(player.getUniqueId()) && player.getAddress().getHostString().equals(user.getIp())){
+            if (inetSocketAddress == null) continue;
+            if (user.getUuid().equals(player.getUniqueId()) && player.getAddress().getHostString().equals(user.getIp())) {
                 return true;
             }
         }

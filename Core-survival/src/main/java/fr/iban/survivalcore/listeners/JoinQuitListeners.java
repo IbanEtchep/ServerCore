@@ -1,7 +1,7 @@
 package fr.iban.survivalcore.listeners;
 
 import fr.iban.survivalcore.SurvivalCorePlugin;
-import org.bukkit.Bukkit;
+import fr.iban.survivalcore.utils.Scheduler;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +20,6 @@ public class JoinQuitListeners implements Listener {
         Player player = e.getPlayer();
         player.setInvulnerable(true);
 
-        Bukkit.getScheduler().runTaskLater(plugin, () -> player.setInvulnerable(false), 200);
+        Scheduler.runLater(() -> player.setInvulnerable(false), 200);
     }
 }
