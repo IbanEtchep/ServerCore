@@ -16,7 +16,6 @@ import java.util.Map;
 
 public class ReplyCMD {
 
-    private static final Map<Player, Player> replies = new HashMap<>();
     private final CoreVelocityPlugin plugin;
 
     public ReplyCMD(CoreVelocityPlugin plugin) {
@@ -32,20 +31,12 @@ public class ReplyCMD {
             return;
         }
 
-        if (replies.containsKey(player)) {
-            Player target = replies.get(player);
-            if (target == null || !target.isActive()) {
-                player.sendMessage(Component.text("Le joueur est hors-ligne!", NamedTextColor.RED));
-                return;
-            }
+        Player target = plugin.getChatManager().getPlayerToReply(player);
 
+        if (target != null) {
             plugin.getChatManager().sendMessage(player, target, message.trim());
         } else {
             player.sendMessage(Component.text("Tu ne peux pas répondre, car personne ne t'a écrit.", NamedTextColor.RED));
         }
-    }
-
-    public static Map<Player, Player> getReplies() {
-        return replies;
     }
 }

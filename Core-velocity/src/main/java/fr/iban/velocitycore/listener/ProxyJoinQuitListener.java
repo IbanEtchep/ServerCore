@@ -121,18 +121,6 @@ public class ProxyJoinQuitListener {
     }
 
     @Subscribe
-    public void onQuit(DisconnectEvent event) {
-        Player p = event.getPlayer();
-        Map<Player, Player> replies = ReplyCMD.getReplies();
-        if (replies.containsKey(p)) {
-            Player target = replies.get(p);
-            if (target != null && replies.get(target) == p)
-                replies.remove(target);
-            replies.remove(p);
-        }
-    }
-
-    @Subscribe
     public void bungeeChat(PlayerChatEvent event) {
         if (event.getPlayer() == null) {
             return;
@@ -168,6 +156,7 @@ public class ProxyJoinQuitListener {
         accountManager.saveAccount(account);
         plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
         plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
+        plugin.getChatManager().clearPlayerReplies(player);
     }
 
     private String getLastSeen(long time) {

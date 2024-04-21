@@ -16,20 +16,20 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
-import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class ChatManager {
 
-    private static final Logger log = LoggerFactory.getLogger(ChatManager.class);
     private final CoreVelocityPlugin plugin;
     private final AccountManager accountManager;
     private final ProxyServer server;
     private boolean isMuted = false;
     private final String pingPrefix;
+    private final Map<Player, Player> replies = new HashMap<>();
 
     public ChatManager(CoreVelocityPlugin plugin) {
         this.plugin = plugin;
@@ -184,7 +184,7 @@ public class ChatManager {
 
                 targetComponent = targetComponent
                         .hoverEvent(HoverEvent.showText(Component.text("Cliquez pour répondre")))
-                        .clickEvent(ClickEvent.suggestCommand("/msg " + senderName));
+                        .clickEvent(ClickEvent.suggestCommand("/msg " + senderName + " "));
 
                 sender.sendMessage(senderComponent);
                 target.sendMessage(targetComponent);
@@ -194,8 +194,8 @@ public class ChatManager {
             sender.sendMessage(MineDown.parse("&c" + target.getUsername() + " a désactivé ses messages"));
         }
 
-        ReplyCMD.getReplies().put(sender, target);
-        ReplyCMD.getReplies().put(target, sender);
+        replies.put(sender, target);
+        replies.put(target, sender);
     }
 
     private String getPremiumString(Player player) {
@@ -224,5 +224,20 @@ public class ChatManager {
 
     private void logMessage(Component message) {
         server.getConsoleCommandSource().sendMessage(message);
+    }
+
+    @Nullable
+    public Player getPlayerToReply(Player player) {
+        return replies.get(player);
+    }
+
+    public void clearPlayerReplies(Player player) {
+        replies.remove(player);
+
+        for (Map.Entry<Player, Player> entry : replies.entrySet()) {
+            if(entry.getValue().equals(player)) {
+                replies.remove(entry.getKey());
+            }
+        }
     }
 }
