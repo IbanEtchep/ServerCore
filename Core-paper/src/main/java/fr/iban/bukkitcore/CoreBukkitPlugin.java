@@ -6,6 +6,7 @@ import fr.iban.bukkitcore.listeners.*;
 import fr.iban.bukkitcore.manager.*;
 import fr.iban.bukkitcore.plan.PlanDataManager;
 import fr.iban.bukkitcore.rewards.RewardsDAO;
+import fr.iban.bukkitcore.utils.EnderChestUtils;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.bukkitcore.utils.Scheduler;
 import fr.iban.bukkitcore.utils.TextCallback;
@@ -36,6 +37,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     private MessagingManager messagingManager;
     private AccountManager accountManager;
     private BukkitPlayerManager playerManager;
+    private EnderChestUtils enderChestManager;
     private TrustedCommandsManager trustedCommandManager;
     private BukkitTrustedUserManager trustedUserManager;
     private ApprovalManager approvalManager;
@@ -79,7 +81,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
         registerListeners(
                 new HeadDatabaseListener(),
-                new InventoryListener(),
+                new InventoryListener(this),
                 new AsyncChatListener(this),
                 new JoinQuitListeners(this),
                 new PlayerMoveListener(this),
@@ -108,6 +110,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         commandHandler.register(new TeleportCommands(this));
         commandHandler.register(new TrustCommandsCMD(this));
         commandHandler.register(new ServerSwitchCommands(this));
+        commandHandler.register(new EnderChestCMD(this));
         commandHandler.registerBrigadier();
 
         getCommand("core").setExecutor(new CoreCMD(this));
@@ -204,4 +207,8 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     public ServerManager getServerManager() {
         return serverManager;
     }
+    public EnderChestUtils getEnderChestManager() {
+        return enderChestManager;
+    }
+
 }
