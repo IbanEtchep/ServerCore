@@ -93,7 +93,7 @@ public class TeleportManager {
 
 
     public void delayedTeleport(Player player, Player target, int delay) {
-        player.sendMessage(MineDown.parse("&aTéléportation dans {delay} secondes. &cNe bougez pas !", "delay", String.valueOf(delay)));
+        player.sendMessage(MineDown.parse("&aTéléportation dans %delay% secondes. &cNe bougez pas !", "delay", String.valueOf(delay)));
         if (isTeleportWaiting(player)) {
             player.sendMessage(MineDown.parse("&cUne seule téléportation à la fois !"));
             return;
@@ -111,19 +111,16 @@ public class TeleportManager {
 
     public void sendTeleportRequest(Player from, Player to) {
         from.sendMessage(MineDown.parse("&aRequête de téléportation envoyée, en attente d'une réponse..."));
-        String bar = "&7&m---------------------------------------------";
-
         String minedownMessage = """
-                {bar}
-                &6{fromName}&f souhaite se téléporter à vous.
-                &fVous pouvez [&aACCEPTER](clickEvent: /tpyes {fromName}, hoverEvent:show_text: {acceptHover}) ou [&cREFUSER](clickEvent: /tpno {fromName}, hoverEvent:show_text: {denyHover}).
-                {bar}
+                &7&m---------------------------------------------
+                &6%fromName%&f souhaite se téléporter à vous.
+                &fVous pouvez [&aACCEPTER](&aCliquez pour accepter la demande run_command=/tpyes %fromName%) ou [&cREFUSER](&cCliquez pour refuser la demande run_command=/tpno %fromName%).
+                &7&m---------------------------------------------
                 """;
 
-        to.sendMessage(MineDown.parse(minedownMessage,
-                "from", from.getUsername(),
-                "acceptHover", "&aCliquez pour accepter la demande",
-                "denyHover", "&cCliquez pour refuser la demande"
+        to.sendMessage(MineDown.parse(
+                minedownMessage,
+                "fromName", from.getUsername()
         ));
 
         //Retirer la requête déjà existante si il y en a une.
@@ -138,7 +135,7 @@ public class TeleportManager {
             TpRequest req2 = getTpRequestFrom(from, to);
             if (req2 != null) {
                 removeTpRequest(to.getUniqueId(), req2);
-                from.sendMessage(MineDown.parse("&cVotre requête de téléportation envoyée à {player} a expiré.", "player", to.getUsername()));
+                from.sendMessage(MineDown.parse("&cVotre requête de téléportation envoyée à %player% a expiré.", "player", to.getUsername()));
             }
         }).delay(2, TimeUnit.MINUTES).schedule();
     }
@@ -148,17 +145,15 @@ public class TeleportManager {
         String bar = "&7&m---------------------------------------------";
 
         String minedownMessage = """
-                {bar}
-                &6{fromName}&f souhaite que vous vous téléportiez à lui.
-                &fVous pouvez [&aACCEPTER](clickEvent: /tpyes {fromName}, hoverEvent:show_text: {acceptHover}) ou [&cREFUSER](clickEvent: /tpno {fromName}, hoverEvent:show_text: {denyHover}).
-                {bar}
+                &7&m---------------------------------------------
+                &6%fromName%&f souhaite que vous vous téléportiez à lui.
+                &fVous pouvez [&aACCEPTER](&aCliquez pour accepter la demande run_command=/tpyes %fromName%) ou [&cREFUSER](&cCliquez pour refuser la demande run_command=/tpno %fromName%).
+                &7&m---------------------------------------------
                 """;
 
         to.sendMessage(MineDown.parse(
                 minedownMessage,
-                "from", from.getUsername(),
-                "acceptHover", "&aCliquez pour accepter la demande",
-                "denyHover", "&cCliquez pour refuser la demande"
+                "fromName", from.getUsername()
         ));
 
         //Retirer la requête déjà existante si il y en a une.
@@ -173,7 +168,7 @@ public class TeleportManager {
             TpRequest req2 = getTpRequestFrom(to, from);
             if (req2 != null) {
                 removeTpRequest(to.getUniqueId(), req2);
-                from.sendMessage(MineDown.parse("&cVotre requête de téléportation envoyée à {player} a expiré.", "player", to.getUsername()));
+                from.sendMessage(MineDown.parse("&cVotre requête de téléportation envoyée à %player% a expiré.", "player", to.getUsername()));
             }
         }).delay(2, TimeUnit.MINUTES).schedule();
     }

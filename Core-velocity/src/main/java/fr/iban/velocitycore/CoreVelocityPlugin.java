@@ -3,6 +3,7 @@ package fr.iban.velocitycore;
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
+import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Dependency;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -112,6 +113,13 @@ public class CoreVelocityPlugin {
 
         tabHook = new TabHook(this);
         tabHook.enable();
+    }
+
+    @Subscribe
+    public void onProxyShutdown(ProxyShutdownEvent event) {
+        messagingManager.close();
+        tabHook.disable();
+        DbAccess.closePool();
     }
 
     public void registerCommands() {

@@ -15,6 +15,7 @@ import fr.iban.common.teleport.TeleportToPlayer;
 import fr.iban.common.teleport.TpRequest;
 import fr.iban.velocitycore.CoreVelocityPlugin;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
+import fr.iban.velocitycore.event.CoreMessageEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -27,7 +28,7 @@ import java.util.UUID;
 public class CoreMessageListener {
 
     private final CoreVelocityPlugin plugin;
-    private ProxyServer server;
+    private final ProxyServer server;
     private final Gson gson = new Gson();
 
     public CoreMessageListener(CoreVelocityPlugin plugin) {
@@ -36,12 +37,8 @@ public class CoreMessageListener {
     }
 
     @Subscribe
-    public void onPluginMessage(PluginMessageEvent event) {
-        if (!(event.getSource() instanceof Player)) {
-            return;
-        }
-
-        Message message = gson.fromJson(new String(event.getData()), Message.class);
+    public void oneCoreMessage(CoreMessageEvent event) {
+        Message message = event.message();
 
         switch (message.getChannel()) {
             case "EventAnnounce" -> consumeAnnounceMessage(message);
@@ -68,6 +65,7 @@ public class CoreMessageListener {
     private void consumeTeleportToLocationBungeeMessage(Message message) {
         TeleportToLocation teleportToLocation = gson.fromJson(message.getMessage(), TeleportToLocation.class);
         Player player = plugin.getServer().getPlayer(teleportToLocation.getUuid()).orElse(null);
+
         if (player != null) {
             if (teleportToLocation.getDelay() == 0) {
                 plugin.getTeleportManager().teleport(player, teleportToLocation.getLocation());
@@ -79,35 +77,37 @@ public class CoreMessageListener {
 
     private void consumeTeleportToPlayerBungeeMessage(Message message) {
         TeleportToPlayer teleportToPlayer = gson.fromJson(message.getMessage(), TeleportToPlayer.class);
-        Optional<Player> optionalPlayer = plugin.getServer().getPlayer(teleportToPlayer.getUuid());
-        Optional<Player> optionalTarget = plugin.getServer().getPlayer(teleportToPlayer.getTargetId());
+        Player player = plugin.getServer().getPlayer(teleportToPlayer.getUuid()).orElse(null);
+        Player target = plugin.getServer().getPlayer(teleportToPlayer.getTargetId()).orElse(null);
 
-        optionalPlayer.ifPresent(player -> {
-            optionalTarget.ifPresent(target -> {
-                if (teleportToPlayer.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
-                    plugin.getTeleportManager().teleport(player, target);
-                } else {
-                    plugin.getTeleportManager().delayedTeleport(player, target, Math.abs(teleportToPlayer.getDelay()));
-                }
-            });
-        });
+        if (player == null || target == null) {
+            return;
+        }
+
+        if (teleportToPlayer.getDelay() == 0 || player.hasPermission("bungeeteleport.instant")) {
+            plugin.getTeleportManager().teleport(player, target);
+        } else {
+            plugin.getTeleportManager().delayedTeleport(player, target, Math.abs(teleportToPlayer.getDelay()));
+        }
     }
 
 
     private void consumeTeleportRequestBungeeMessage(Message message) {
         TpRequest request = gson.fromJson(message.getMessage(), TpRequest.class);
-        Optional<Player> optFrom = plugin.getServer().getPlayer(request.getPlayerFrom());
-        Optional<Player> optTo = plugin.getServer().getPlayer(request.getPlayerTo());
+        Player playerFrom = plugin.getServer().getPlayer(request.getPlayerFrom()).orElse(null);
+        Player playerTo = plugin.getServer().getPlayer(request.getPlayerTo()).orElse(null);
 
-        optFrom.ifPresent(from -> {
-            optTo.ifPresent(to -> {
-                if (request.getRequestType() == RequestType.TP) {
-                    plugin.getTeleportManager().sendTeleportRequest(from, to);
-                } else if (request.getRequestType() == RequestType.TPHERE) {
-                    plugin.getTeleportManager().sendTeleportHereRequest(from, to);
-                }
-            });
-        });
+        if (playerFrom == null || playerTo == null) {
+            return;
+        }
+
+        System.out.println("Received request from " + playerFrom.getUsername() + " to " + playerTo.getUsername() + " with type " + request.getRequestType());
+
+        if (request.getRequestType() == RequestType.TP) {
+            plugin.getTeleportManager().sendTeleportRequest(playerFrom, playerTo);
+        } else if (request.getRequestType() == RequestType.TPHERE) {
+            plugin.getTeleportManager().sendTeleportHereRequest(playerFrom, playerTo);
+        }
     }
 
     private void consumeDeathLocationMessage(Message message) {

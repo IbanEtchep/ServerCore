@@ -31,7 +31,6 @@ public class MessagingManager extends AbstractMessagingManager {
         }
 
         messenger.setOnMessageListener(message -> {
-            System.out.println("Received message from " + message.getServerFrom());
             if(!message.getServerFrom().equals(getServerName())) {
                 plugin.getServer().getEventManager().fire(new CoreMessageEvent(message));
             }
