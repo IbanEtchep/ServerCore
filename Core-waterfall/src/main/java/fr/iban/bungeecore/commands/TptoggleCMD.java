@@ -20,8 +20,7 @@ public class TptoggleCMD extends Command {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if (sender instanceof ProxiedPlayer) {
-            ProxiedPlayer player = (ProxiedPlayer) sender;
+        if (sender instanceof ProxiedPlayer player) {
             AccountManager accountManager = plugin.getAccountManager();
             Account account = accountManager.getAccount(player.getUniqueId());
             account.toggleOption(Option.TP);
