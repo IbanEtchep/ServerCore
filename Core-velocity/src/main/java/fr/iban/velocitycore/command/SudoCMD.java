@@ -3,19 +3,11 @@ package fr.iban.velocitycore.command;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import fr.iban.velocitycore.CoreVelocityPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
-import net.kyori.adventure.text.event.HoverEvent;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.md_5.bungee.api.ChatColor;
-import revxrsal.commands.annotation.*;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Description;
+import revxrsal.commands.annotation.Usage;
 import revxrsal.commands.velocity.VelocityCommandActor;
-import revxrsal.commands.velocity.VelocityCommandHandler;
 import revxrsal.commands.velocity.annotation.CommandPermission;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class SudoCMD {
 

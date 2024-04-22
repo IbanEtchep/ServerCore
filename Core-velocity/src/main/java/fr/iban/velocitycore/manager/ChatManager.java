@@ -7,20 +7,17 @@ import de.themoep.minedown.adventure.MineDownParser;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.velocitycore.CoreVelocityPlugin;
-import fr.iban.velocitycore.command.ReplyCMD;
-import me.neznamy.tab.api.TabAPI;
-import me.neznamy.tab.shared.TAB;
-import me.neznamy.tab.shared.features.PlaceholderManagerImpl;
-import me.neznamy.tab.shared.platform.TabPlayer;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
+import net.william278.papiproxybridge.api.PlaceholderAPI;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class ChatManager {
 
@@ -40,8 +37,6 @@ public class ChatManager {
 
     public void sendGlobalMessage(UUID senderUUID, String message) {
         Player sender = server.getPlayer(senderUUID).orElseThrow();
-        String chatFormat = replacePlaceHolders(plugin.getConfig().getString("chat-format"), sender);
-        Component prefixComponent = MineDown.parse(chatFormat);
 
         if (message.startsWith("$") && sender.hasPermission("servercore.staffchat")) {
             sendStaffMessage(sender, message.substring(1));
@@ -52,7 +47,7 @@ public class ChatManager {
             return;
         }
 
-        if(sender.hasPermission("servercore.colors")) {
+        if (sender.hasPermission("servercore.colors")) {
             message = componentToLegacy(parseMineDownInlineFormatting(message));
         }
 
@@ -64,62 +59,47 @@ public class ChatManager {
             return;
         }
 
-        for (Player receiverPlayer : server.getAllPlayers()) {
-            String pmessage = message;
-            UUID receiverUUID = receiverPlayer.getUniqueId();
-            Account receiverAccount = accountManager.getAccount(receiverUUID);
-            String receiverUsername = receiverPlayer.getUsername();
+        String finalMessage = message;
+        replacePlaceHolders(plugin.getConfig().getString("chat-format").trim(), sender).thenAccept(chatFormat -> {
+            Component prefixComponent = MineDown.parse(chatFormat);
 
-            if (!receiverAccount.getOption(Option.TCHAT) || receiverAccount.getIgnoredPlayers().contains(sender.getUniqueId())) {
-                continue;
+            for (Player receiverPlayer : server.getAllPlayers()) {
+                String pmessage = finalMessage;
+                UUID receiverUUID = receiverPlayer.getUniqueId();
+                Account receiverAccount = accountManager.getAccount(receiverUUID);
+                String receiverUsername = receiverPlayer.getUsername();
+
+                if (!receiverAccount.getOption(Option.TCHAT) || receiverAccount.getIgnoredPlayers().contains(sender.getUniqueId())) {
+                    continue;
+                }
+
+                if (!receiverUUID.equals(senderUUID) && pmessage.toLowerCase().contains(receiverUsername.toLowerCase()) && receiverAccount.getOption(Option.MENTION)) {
+                    String ping = pingPrefix + receiverUsername + "&r";
+                    pmessage = pmessage.replace(receiverUsername, componentToLegacy(MineDown.parse(ping)));
+                }
+
+                Component finalPrefix = prefixComponent;
+                if(receiverUUID.equals(senderUUID)) {
+                    finalPrefix = prefixComponent.hoverEvent(null);
+                    finalPrefix = finalPrefix.clickEvent(null);
+                }
+
+                Component finalMessageComponent = componentFromLegacy(pmessage);
+
+                receiverPlayer.sendMessage(finalPrefix.append(finalMessageComponent));
             }
 
-            if (!receiverUUID.equals(senderUUID) && pmessage.toLowerCase().contains(receiverUsername.toLowerCase()) && receiverAccount.getOption(Option.MENTION)) {
-                String ping = pingPrefix + receiverUsername + "&r";
-                pmessage = pmessage.replace(receiverUsername, componentToLegacy(MineDown.parse(ping)));
-            }
-
-            Component finalPrefix = addPrefixComponent(prefixComponent, sender, receiverPlayer);
-            Component finalMessageComponent = componentFromLegacy(pmessage);
-
-            receiverPlayer.sendMessage(finalPrefix.append(finalMessageComponent));
-        }
-
-        logMessage(prefixComponent.append(componentFromLegacy(message)));
+            logMessage(prefixComponent.append(componentFromLegacy(finalMessage)));
+        });
     }
 
-    private Component addPrefixComponent(Component prefix, Player sender, Player receiver) {
-        String chatHover = plugin.getConfig().getString("chat-hover");
-        String chatHoverSendMessage = plugin.getConfig().getString("chat-hover-send-message", "");
-
-        if (!receiver.equals(sender)) {
-            if (!chatHoverSendMessage.isEmpty()) {
-                chatHover += "\n" + chatHoverSendMessage;
-            }
-            prefix = prefix.clickEvent(ClickEvent.suggestCommand("/msg " + sender.getUsername() + " "));
-        }
-
-        if (!chatHover.isEmpty()) {
-            String replacedHover = replacePlaceHolders(chatHover, sender);
-            prefix = prefix.hoverEvent(HoverEvent.showText(MineDown.parse(replacedHover)));
-        }
-
-        return prefix;
-    }
-
-    private String replacePlaceHolders(String message, Player sender) {
+    private CompletableFuture<String> replacePlaceHolders(String message, Player sender) {
+        final PlaceholderAPI api = PlaceholderAPI.createInstance();
         message = message.replace("%player%", sender.getUsername());
         message = message.replace("%premium%", getPremiumString(sender));
 
-        TabAPI tabAPI = TabAPI.getInstance();
-        TabPlayer tabPlayer = TAB.getInstance().getPlayer(sender.getUniqueId());
-        PlaceholderManagerImpl placeholderManager = (PlaceholderManagerImpl) tabAPI.getPlaceholderManager();
+        return api.formatPlaceholders(message, sender.getUniqueId());
 
-        for (String placeholderIdentifier : placeholderManager.detectPlaceholders(message)) {
-            message = message.replace(placeholderIdentifier, placeholderManager.getPlaceholder(placeholderIdentifier).getLastValue(tabPlayer));
-        }
-
-        return message;
     }
 
     public void sendAnnonce(UUID uuid, String annonce) {
@@ -139,16 +119,17 @@ public class ChatManager {
 
     private void sendStaffMessage(Player sender, String message) {
         String prefix = plugin.getConfig().getString("staff-chat-format");
-        prefix = replacePlaceHolders(prefix, sender);
-        Component fullMessage = MineDown.parse(prefix + message);
+        replacePlaceHolders(prefix, sender).thenAccept(chatFormat -> {
+            Component fullMessage = MineDown.parse(chatFormat + message);
 
-        plugin.getServer().getAllPlayers().forEach(p -> {
-            if (p.hasPermission("servercore.staffchat")) {
-                p.sendMessage(fullMessage);
-            }
+            plugin.getServer().getAllPlayers().forEach(p -> {
+                if (p.hasPermission("servercore.staffchat")) {
+                    p.sendMessage(fullMessage);
+                }
+            });
+
+            logMessage(fullMessage);
         });
-
-        logMessage(fullMessage);
     }
 
     public void toggleChat(Player sender) {
@@ -235,7 +216,7 @@ public class ChatManager {
         replies.remove(player);
 
         for (Map.Entry<Player, Player> entry : replies.entrySet()) {
-            if(entry.getValue().equals(player)) {
+            if (entry.getValue().equals(player)) {
                 replies.remove(entry.getKey());
             }
         }

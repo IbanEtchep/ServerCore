@@ -46,6 +46,7 @@ import java.util.TreeMap;
         dependencies = {
                 @Dependency(id = "tab", optional = true),
                 @Dependency(id = "luckperms", optional = false),
+                @Dependency(id = "papiproxybridge", optional = false),
         }
 )
 public class CoreVelocityPlugin {
@@ -100,12 +101,13 @@ public class CoreVelocityPlugin {
 
         messagingManager = new MessagingManager(this);
         messagingManager.init();
-        announceManager = new AnnoncesManager(this);
         teleportManager = new TeleportManager(this);
         playerManager = new PlayerManager();
         playerManager.clearOnlinePlayersFromDB();
         accountManager = new AccountManager(this);
         chatManager = new ChatManager(this);
+        announceManager = new AnnoncesManager(this);
+
 
         EventManager eventManager = server.getEventManager();
         eventManager.register(this, new PluginMessageListener(this));

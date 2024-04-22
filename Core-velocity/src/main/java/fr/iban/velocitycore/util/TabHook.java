@@ -21,12 +21,12 @@ public class TabHook {
     public void enable() {
         EventBus eventBus = TabAPI.getInstance().getEventBus();
 
-        if(eventBus == null) {
+        if (eventBus == null) {
             plugin.getLogger().info("TabAPI not found, disabling TabHook.");
             return;
         }
 
-         eventBus.register(PlayerLoadEvent.class, event -> {
+        eventBus.register(PlayerLoadEvent.class, event -> {
             TabListFormatManager tablistFormatManager = TabAPI.getInstance().getTabListFormatManager();
             TabPlayer tabPlayer = event.getPlayer();
             Player player = plugin.getServer().getPlayer(tabPlayer.getUniqueId()).orElse(null);

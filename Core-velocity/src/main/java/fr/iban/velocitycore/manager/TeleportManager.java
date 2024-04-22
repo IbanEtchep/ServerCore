@@ -142,7 +142,6 @@ public class TeleportManager {
 
     public void sendTeleportHereRequest(Player from, Player to) {
         from.sendMessage(MineDown.parse("&aRequête de téléportation envoyée, en attente d'une réponse..."));
-        String bar = "&7&m---------------------------------------------";
 
         String minedownMessage = """
                 &7&m---------------------------------------------
