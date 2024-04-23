@@ -3,7 +3,9 @@ package fr.iban.velocitycore.listener;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.proxy.ProxyPingEvent;
 import com.velocitypowered.api.proxy.server.ServerPing;
+import de.themoep.minedown.adventure.MineDown;
 import fr.iban.velocitycore.CoreVelocityPlugin;
+import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 import java.util.List;
@@ -22,11 +24,11 @@ public class ProxyPingListener {
     public void onPing(ProxyPingEvent e) {
         ServerPing serverPing = e.getPing().asBuilder().build();
         List<String> motd = plugin.getConfig().getStringList("motd");
+        Component randomMotd = MineDown.parse(motd.get(random.nextInt(motd.size())));
+
         serverPing = serverPing.asBuilder()
                 .maximumPlayers(100)
-                .description(LegacyComponentSerializer.legacySection().deserialize(
-                        motd.get(random.nextInt(motd.size()))
-                ))
+                .description(randomMotd)
                 .build();
 
         e.setPing(serverPing);
