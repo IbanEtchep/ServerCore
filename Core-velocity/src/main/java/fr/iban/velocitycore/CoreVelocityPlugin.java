@@ -24,10 +24,7 @@ import fr.iban.common.manager.GlobalLoggerManager;
 import fr.iban.common.manager.PlayerManager;
 import fr.iban.common.teleport.SLocation;
 import fr.iban.velocitycore.command.*;
-import fr.iban.velocitycore.listener.CoreMessageListener;
-import fr.iban.velocitycore.listener.PluginMessageListener;
-import fr.iban.velocitycore.listener.ProxyJoinQuitListener;
-import fr.iban.velocitycore.listener.ProxyPingListener;
+import fr.iban.velocitycore.listener.*;
 import fr.iban.velocitycore.manager.*;
 import fr.iban.velocitycore.util.TabHook;
 import org.slf4j.Logger;
@@ -51,6 +48,7 @@ import java.util.TreeMap;
 )
 public class CoreVelocityPlugin {
 
+    private static CoreVelocityPlugin instance;
     private final Logger logger;
     private final ProxyServer server;
     private YamlDocument config;
@@ -64,7 +62,6 @@ public class CoreVelocityPlugin {
 
     private TabHook tabHook;
     private final TreeMap<String, SLocation> currentEvents = new TreeMap<>();
-    private GlobalLoggerManager.ConsoleLogHandler consoleLogHandler;
 
     @Inject
     public CoreVelocityPlugin(Logger logger, ProxyServer server, @DataDirectory Path dataDirectory) {
@@ -92,6 +89,7 @@ public class CoreVelocityPlugin {
 
     @Subscribe
     public void onProxyInitialization(ProxyInitializeEvent event) {
+        instance = this;
         initDatabase();
 
         ChannelRegistrar channelRegistrar = getServer().getChannelRegistrar();
@@ -114,6 +112,7 @@ public class CoreVelocityPlugin {
         eventManager.register(this, new ProxyJoinQuitListener(this));
         eventManager.register(this, new CoreMessageListener(this));
         eventManager.register(this, new ProxyPingListener(this));
+        eventManager.register(this, new CommandListener(this));
 
         registerCommands();
 
@@ -164,6 +163,10 @@ public class CoreVelocityPlugin {
         }
 
         DbTables.createTables();
+    }
+
+    public static CoreVelocityPlugin getInstance() {
+        return instance;
     }
 
     public Logger getLogger() {

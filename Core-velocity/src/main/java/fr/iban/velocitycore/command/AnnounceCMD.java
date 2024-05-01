@@ -34,7 +34,7 @@ public class AnnounceCMD {
 
     @Subcommand("disable")
     @Description("Désactive une annonce spécifique pour l'utilisateur.")
-    public void disableAnnouncement(VelocityCommandActor actor, Player player, @Default("0") int id) {
+    public void disableAnnouncement(Player player, @Default("0") int id) {
         AnnoncesManager announceManager = plugin.getAnnounceManager();
         if (announceManager.getAnnonces().containsKey(id)) {
             AccountManager accountManager = plugin.getAccountManager();
