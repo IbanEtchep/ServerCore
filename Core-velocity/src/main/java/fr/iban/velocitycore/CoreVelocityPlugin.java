@@ -141,7 +141,7 @@ public class CoreVelocityPlugin {
         handler.register(new MiscellaneousCommands());
         handler.register(new MsgToggleCMD(this));
         handler.register(new ReplyCMD(this));
-        handler.register(new StaffChatToggle());
+        handler.register(new StaffChatToggle(this));
         handler.register(new SudoCMD(this));
         handler.register(new TabCompleteCMD(this));
         handler.register(new TeleportCommands(this));

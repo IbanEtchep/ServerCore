@@ -15,7 +15,9 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.william278.papiproxybridge.api.PlaceholderAPI;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,6 +31,7 @@ public class ChatManager {
     private final String pingPrefix;
     private final Map<Player, Player> replies = new ConcurrentHashMap<>();
     private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.builder().hexColors().extractUrls().build();
+    private final Set<UUID> staffChatDisabledPlayers = new HashSet<>();
 
     public ChatManager(CoreVelocityPlugin plugin) {
         this.plugin = plugin;
@@ -125,7 +128,7 @@ public class ChatManager {
             Component fullMessage = componentFromLegacy(chatPrefix + messageComponent);
 
             plugin.getServer().getAllPlayers().forEach(p -> {
-                if (p.hasPermission("servercore.staffchat")) {
+                if (p.hasPermission("servercore.staffchat") && !staffChatDisabledPlayers.contains(p.getUniqueId())) {
                     p.sendMessage(fullMessage);
                 }
             });
@@ -148,35 +151,39 @@ public class ChatManager {
         String senderName = sender.getUsername();
         String targetName = target.getUsername();
         Account account = accountManager.getAccount(senderUUID);
+        Account targetAccount = accountManager.getAccount(target.getUniqueId());
 
-        if (account.getOption(Option.MSG) || sender.hasPermission("servercore.msgtogglebypass")) {
-            if (!account.getIgnoredPlayers().contains(senderUUID)) {
-                Component senderComponent;
-                Component targetComponent;
-
-                if (target.hasPermission("servercore.staff")) {
-                    senderComponent = MineDown.parse("&8Moi &7➔ &8[&6Staff&8] &c" + targetName + " &6➤&7 " + message);
-                } else {
-                    senderComponent = MineDown.parse("&8Moi &7➔ &c" + targetName + " &6➤&7 " + message);
-                }
-                if (sender.hasPermission("servercore.staff")) {
-                    targetComponent = MineDown.parse("&8[&6Staff&8] &c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
-                } else {
-                    targetComponent = MineDown.parse("&c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
-                }
-
-                targetComponent = targetComponent
-                        .hoverEvent(HoverEvent.showText(Component.text("Cliquez pour répondre")))
-                        .clickEvent(ClickEvent.suggestCommand("/msg " + senderName + " "));
-
-                sender.sendMessage(senderComponent);
-                target.sendMessage(targetComponent);
-                logMessage(MineDown.parse("&c" + senderName + " &7 ➔  " + "&8" + targetName + " &6➤ " + "&7 " + message));
-            }
-        } else {
+        if (!targetAccount.getOption(Option.MSG) && sender.hasPermission("servercore.msgtogglebypass")) {
             sender.sendMessage(MineDown.parse("&c" + target.getUsername() + " a désactivé ses messages"));
+            return;
         }
 
+        if (account.getIgnoredPlayers().contains(senderUUID)) {
+            sender.sendMessage(MineDown.parse("&cVous ne pouvez pas envoyer de message à ce joueur"));
+            return;
+        }
+
+        Component senderComponent;
+        Component targetComponent;
+
+        if (target.hasPermission("servercore.staff")) {
+            senderComponent = MineDown.parse("&8Moi &7➔ &8[&6Staff&8] &c" + targetName + " &6➤&7 " + message);
+        } else {
+            senderComponent = MineDown.parse("&8Moi &7➔ &c" + targetName + " &6➤&7 " + message);
+        }
+        if (sender.hasPermission("servercore.staff")) {
+            targetComponent = MineDown.parse("&8[&6Staff&8] &c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
+        } else {
+            targetComponent = MineDown.parse("&c" + senderName + " &7➔ &8Moi &6➤&7 " + message);
+        }
+
+        targetComponent = targetComponent
+                .hoverEvent(HoverEvent.showText(Component.text("Cliquez pour répondre")))
+                .clickEvent(ClickEvent.suggestCommand("/msg " + senderName + " "));
+
+        sender.sendMessage(senderComponent);
+        target.sendMessage(targetComponent);
+        logMessage(MineDown.parse("&c" + senderName + " &7 ➔  " + "&8" + targetName + " &6➤ " + "&7 " + message));
         replies.put(sender, target);
         replies.put(target, sender);
     }
@@ -221,6 +228,16 @@ public class ChatManager {
             if (entry.getValue().equals(player)) {
                 replies.remove(entry.getKey());
             }
+        }
+    }
+
+    public void toggleStaffChat(Player player) {
+        if (staffChatDisabledPlayers.contains(player.getUniqueId())) {
+            staffChatDisabledPlayers.remove(player.getUniqueId());
+            player.sendMessage(MineDown.parse("&aVous pouvez à nouveau recevoir des messages du staff"));
+        } else {
+            staffChatDisabledPlayers.add(player.getUniqueId());
+            player.sendMessage(MineDown.parse("&cVous ne pouvez plus recevoir les messages du staff"));
         }
     }
 }
