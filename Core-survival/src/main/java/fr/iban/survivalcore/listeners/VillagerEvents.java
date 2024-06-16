@@ -28,29 +28,24 @@ public class VillagerEvents implements Listener {
 
 	@EventHandler
 	public void onVillagerInteract(final PlayerInteractAtEntityEvent e){
-		if (!(e.getRightClicked() instanceof Villager)) return;
+		if (!(e.getRightClicked() instanceof Villager villager)) return;
 
-		Villager villager = (Villager) e.getRightClicked();
+        List<MerchantRecipe> recipes = Lists.newArrayList(villager.getRecipes());
 
-		List<MerchantRecipe> recipes = Lists.newArrayList(villager.getRecipes());
+        for (MerchantRecipe recipe : recipes) {
 
-		Iterator<MerchantRecipe> recipeIterator = recipes.iterator();
-		while(recipeIterator.hasNext()) {
+            if (recipe.getResult().getType().equals(Material.ENCHANTED_BOOK)) {
+                EnchantmentStorageMeta meta = (EnchantmentStorageMeta) recipe.getResult().getItemMeta();
 
-			MerchantRecipe recipe = recipeIterator.next();
-
-			if (recipe.getResult().getType().equals(Material.ENCHANTED_BOOK)) {
-				EnchantmentStorageMeta meta = (EnchantmentStorageMeta) recipe.getResult().getItemMeta();
-
-				if (meta.hasStoredEnchant(Enchantment.MENDING)) {
-					recipe.setMaxUses(1);
-					int initialPrice = plugin.getConfig().getInt("mending-trade-price");
-					ItemStack diams = new ItemStack(Material.valueOf(plugin.getConfig().getString("mending-trade-material")), initialPrice);
-					recipe.setIngredients(Arrays.asList(diams));
-					recipe.setIgnoreDiscounts(true);
-				}
-			}
-		}
+                if (meta.hasStoredEnchant(Enchantment.MENDING)) {
+                    recipe.setMaxUses(1);
+                    int initialPrice = plugin.getConfig().getInt("mending-trade-price");
+                    ItemStack diams = new ItemStack(Material.valueOf(plugin.getConfig().getString("mending-trade-material")), initialPrice);
+                    recipe.setIngredients(List.of(diams));
+                    recipe.setIgnoreDiscounts(true);
+                }
+            }
+        }
 
 		villager.setRecipes(recipes);
 	}

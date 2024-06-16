@@ -1,6 +1,7 @@
 package fr.iban.velocitycore.command;
 
 import com.velocitypowered.api.proxy.Player;
+import fr.iban.velocitycore.CoreVelocityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import revxrsal.commands.annotation.Command;
@@ -13,19 +14,17 @@ import java.util.List;
 
 public class StaffChatToggle {
 
-    public static List<Player> sc = new ArrayList<>();
+    private final CoreVelocityPlugin plugin;
+
+    public StaffChatToggle(CoreVelocityPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Command({"sctoggle", "staffchattoggle"})
     @CommandPermission("servercore.sctoggle")
     @Description("Permet de basculer la réception des messages du staff.")
     public void toggleStaffChat(Player player) {
-        if (sc.contains(player)) {
-            sc.remove(player);
-            player.sendMessage(Component.text("Vous pouvez à nouveau recevoir des messages du staff", NamedTextColor.GREEN));
-        } else {
-            sc.add(player);
-            player.sendMessage(Component.text("Vous ne pouvez plus recevoir les messages du staff", NamedTextColor.RED));
-        }
+        plugin.getChatManager().toggleStaffChat(player);
     }
 
     public void setupCommands(VelocityCommandHandler handler) {
