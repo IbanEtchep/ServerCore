@@ -135,7 +135,6 @@ public class CoreVelocityPlugin {
         handler.register(new CoreCMD(this));
         handler.register(new CoreCommands(this));
         handler.register(new IgnoreCommand(this));
-        handler.register(new IgnoreListCMD(this));
         handler.register(new JoinEventCMD(this));
         handler.register(new MessageCMD(this));
         handler.register(new MiscellaneousCommands());

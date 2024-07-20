@@ -153,12 +153,12 @@ public class ChatManager {
         Account account = accountManager.getAccount(senderUUID);
         Account targetAccount = accountManager.getAccount(target.getUniqueId());
 
-        if (!targetAccount.getOption(Option.MSG) && sender.hasPermission("servercore.msgtogglebypass")) {
+        if (!targetAccount.getOption(Option.MSG) && !sender.hasPermission("servercore.msgtogglebypass")) {
             sender.sendMessage(MineDown.parse("&c" + target.getUsername() + " a désactivé ses messages"));
             return;
         }
 
-        if (account.getIgnoredPlayers().contains(senderUUID)) {
+        if (targetAccount.getIgnoredPlayers().contains(senderUUID)) {
             sender.sendMessage(MineDown.parse("&cVous ne pouvez pas envoyer de message à ce joueur"));
             return;
         }

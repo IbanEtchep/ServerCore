@@ -133,10 +133,10 @@ public class CoreMessageListener {
 
         if (!plugin.getCurrentEvents().containsKey(key)) {
             plugin.getCurrentEvents().put(key, announce.getLocation());
-            broadcastLine(30);
             server.sendMessage(Component.text(announce.getHostName() + " a lancé un event " + announce.getName(), NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
         }
 
+        broadcastLine(30);
         server.sendMessage(getCenteredText(" " + announce.getName() + " ", 30, NamedTextColor.WHITE, NamedTextColor.DARK_PURPLE, TextDecoration.BOLD));
         server.sendMessage(Component.text(announce.getDesc(), NamedTextColor.WHITE));
         server.sendMessage(Component.text("Arene : " + announce.getArena(), NamedTextColor.WHITE));
