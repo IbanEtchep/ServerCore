@@ -162,9 +162,10 @@ public class TeleportManager {
     }
 
     public void performTeleportToLocation(TeleportToLocation teleportToLocation) {
-        if (!teleportToLocation.getLocation().getServer().equals(CoreBukkitPlugin.getInstance().getServerName())) {
+        if (!teleportToLocation.getLocation().getServer().equalsIgnoreCase(CoreBukkitPlugin.getInstance().getServerName())) {
             return;
         }
+
         SLocation sloc = teleportToLocation.getLocation();
         Location loc = SLocationUtils.getLocation(sloc);
         new BukkitRunnable() {

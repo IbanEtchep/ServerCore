@@ -21,9 +21,8 @@ public class DamageListeners implements Listener {
 	public void onDamage(EntityDamageEvent e) {
 		if(e instanceof EntityDamageByEntityEvent) {
 			EntityDamageByEntityEvent event = (EntityDamageByEntityEvent) e;
-			if(e.getEntity() instanceof Player) {
-				Player damaged = (Player)e.getEntity();
-				Player damager = getPlayerDamager(event);
+			if(e.getEntity() instanceof Player damaged) {
+                Player damager = getPlayerDamager(event);
 				if(damager != null && !canPVP(damaged.getUniqueId(), damager.getUniqueId())) {
 					e.setCancelled(true);
 				}
@@ -33,9 +32,8 @@ public class DamageListeners implements Listener {
 
 	private Player getPlayerDamager(EntityDamageByEntityEvent event) {
 		Player player = null;
-		if(event.getCause() == DamageCause.PROJECTILE && event.getDamager() instanceof Projectile) {
-			Projectile projectile = (Projectile) event.getDamager();
-			if(projectile.getShooter() instanceof Player) {
+		if(event.getCause() == DamageCause.PROJECTILE && event.getDamager() instanceof Projectile projectile) {
+            if(projectile.getShooter() instanceof Player) {
 				player = (Player)projectile.getShooter();
 			}
 		}

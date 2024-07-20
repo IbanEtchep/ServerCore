@@ -3,6 +3,7 @@ package fr.iban.velocitycore.command;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import fr.iban.common.data.Account;
+import fr.iban.common.data.AccountDAO;
 import fr.iban.velocitycore.CoreVelocityPlugin;
 import fr.iban.velocitycore.manager.AccountManager;
 import net.kyori.adventure.text.Component;
@@ -10,6 +11,8 @@ import net.kyori.adventure.text.format.NamedTextColor;
 import revxrsal.commands.annotation.*;
 import revxrsal.commands.velocity.VelocityCommandHandler;
 import revxrsal.commands.velocity.annotation.CommandPermission;
+
+import java.util.UUID;
 
 @Command("ignore")
 public class IgnoreCommand {
@@ -66,8 +69,25 @@ public class IgnoreCommand {
         if (account.getIgnoredPlayers().contains(target.getUniqueId())) {
             account.getIgnoredPlayers().remove(target.getUniqueId());
             player.sendMessage(Component.text("Vous n'ignorez plus " + target.getUsername() + ".", NamedTextColor.GREEN));
+            new AccountDAO().removeIgnoredPlayerFromDB(target.getUniqueId(), target.getUniqueId());
         } else {
             player.sendMessage(Component.text("Ce joueur n'est pas ignoré.", NamedTextColor.RED));
+        }
+    }
+
+    @Subcommand("list")
+    @Description("Affiche la liste des joueurs ignorés.")
+    public void ignoreList(Player player) {
+        AccountManager accountManager = plugin.getAccountManager();
+        Account account = accountManager.getAccount(player.getUniqueId());
+        if (!account.getIgnoredPlayers().isEmpty()) {
+            player.sendMessage(Component.text("|| Joueurs Ignorés ||").color(NamedTextColor.GRAY));
+            for (UUID ignoredPlayer : account.getIgnoredPlayers()) {
+                String playerName = server.getPlayer(ignoredPlayer).map(Player::getUsername).orElse("Joueur Inconnu");
+                player.sendMessage(Component.text("- " + playerName, NamedTextColor.GREEN));
+            }
+        } else {
+            player.sendMessage(Component.text("Vous n'ignorez personne.", NamedTextColor.RED));
         }
     }
 

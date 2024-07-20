@@ -3,6 +3,7 @@ package fr.iban.velocitycore.listener;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
+import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.PlayerChatEvent;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -13,17 +14,16 @@ import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.message.PlayerInfo;
 import fr.iban.common.utils.ArrayUtils;
 import fr.iban.velocitycore.CoreVelocityPlugin;
-import fr.iban.velocitycore.command.ReplyCMD;
 import fr.iban.velocitycore.manager.AccountManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.ocpsoft.prettytime.PrettyTime;
 
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
@@ -105,12 +105,11 @@ public class ProxyJoinQuitListener {
                 }
             } else {
                 String firstJoinMessage = "&8≫ &7" + String.format(ArrayUtils.getRandomFromArray(firstJoinMessages), player.getUsername());
-                Component welcomeComponent = Component.text(firstJoinMessage)
+                Component welcomeComponent = MineDown.parse(firstJoinMessage)
                         .hoverEvent(HoverEvent.showText(Component.text("Clic !")))
                         .clickEvent(ClickEvent.suggestCommand(" Bienvenue " + player.getUsername()));
 
                 proxy.sendMessage(welcomeComponent);
-                plugin.getServer().getConsoleCommandSource().sendMessage(welcomeComponent);
             }
 
             account.setLastSeen(System.currentTimeMillis());
@@ -118,20 +117,6 @@ public class ProxyJoinQuitListener {
             plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
             plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerInfo(player.getUniqueId(), player.getUsername()));
         }).delay(100, TimeUnit.MILLISECONDS).schedule();
-    }
-
-    @Subscribe
-    public void bungeeChat(PlayerChatEvent event) {
-        if (event.getPlayer() == null) {
-            return;
-        }
-
-        Player player = event.getPlayer();
-        String message = event.getMessage().toLowerCase();
-        if (message.startsWith("/luckpermsbungee:") || message.startsWith("/bperm") || message.startsWith("/lpb") || message.startsWith("/luckpermsbungee")) {
-            event.setResult(PlayerChatEvent.ChatResult.denied());
-            player.sendMessage(Component.text("Cette commande est désactivée", NamedTextColor.RED));
-        }
     }
 
     @Subscribe
@@ -165,4 +150,19 @@ public class ProxyJoinQuitListener {
         return prettyTime.format(new Date(time));
     }
 
+    @Subscribe
+    public void onKick(KickedFromServerEvent event) {
+        Player player = event.getPlayer();
+        Component serverKickReason = event.getServerKickReason().orElse(null);
+
+        if(serverKickReason == null) {
+            return;
+        }
+
+        String message = PlainTextComponentSerializer.plainText().serialize(serverKickReason);
+
+        if(message.contains("expulsé")) {
+            player.disconnect(serverKickReason);
+        }
+    }
 }

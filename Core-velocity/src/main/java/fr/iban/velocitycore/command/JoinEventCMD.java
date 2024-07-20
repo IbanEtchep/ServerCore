@@ -20,11 +20,7 @@ public class JoinEventCMD {
     @Command("joinevent")
     @Description("Rejoignez un événement en cours ou spécifique si un nom est fourni.")
     @Usage("/joinevent <event>")
-    public void joinEvent(VelocityCommandActor actor, @Optional @Named("event") String eventName) {
-        if (!(actor instanceof Player player)) {
-            return;
-        }
-
+    public void joinEvent(Player player, @Optional @Named("event") String eventName) {
         if (eventName == null) {
             handleJoinEvent(player, plugin.getCurrentEvents().lastKey());
         } else {

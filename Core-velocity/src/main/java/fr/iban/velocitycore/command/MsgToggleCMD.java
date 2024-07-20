@@ -5,6 +5,7 @@ import com.velocitypowered.api.proxy.ProxyServer;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.velocitycore.CoreVelocityPlugin;
+import fr.iban.velocitycore.manager.AccountManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import revxrsal.commands.annotation.Command;
@@ -25,7 +26,8 @@ public class MsgToggleCMD {
     @CommandPermission("servercore.msgtoggle")
     @Description("Permet d'activer ou désactiver la réception de messages de la part des autres joueurs.")
     public void execute(Player player) {
-        Account account = plugin.getAccountManager().getAccount(player.getUniqueId());
+        AccountManager accountManager = plugin.getAccountManager();
+        Account account = accountManager.getAccount(player.getUniqueId());
 
         if (account.getOption(Option.MSG)) {
             account.setOption(Option.MSG, false);
@@ -34,6 +36,8 @@ public class MsgToggleCMD {
             account.setOption(Option.MSG, true);
             player.sendMessage(Component.text("Vous pouvez à nouveau recevoir les messages des joueurs", NamedTextColor.GREEN));
         }
+
+        accountManager.saveAccount(account);
     }
 
     public void setupCommands(VelocityCommandHandler handler) {

@@ -29,13 +29,13 @@ public class PluginMessageListener {
         byte[] data = event.getData();
 
         if ("proxy:chat".equals(channel)) {
-            handleChatMessage(player, data);
+            handleChatMessage(data);
         } else if ("proxy:annonce".equals(channel)) {
-            handleAnnonceMessage(player, data);
+            handleAnnonceMessage(data);
         }
     }
 
-    private void handleChatMessage(Player player, byte[] data) {
+    private void handleChatMessage(byte[] data) {
         ByteArrayDataInput in = ByteStreams.newDataInput(data);
         String sub = in.readUTF();
         if ("Global".equals(sub)) {
@@ -45,7 +45,7 @@ public class PluginMessageListener {
         }
     }
 
-    private void handleAnnonceMessage(Player player, byte[] data) {
+    private void handleAnnonceMessage(byte[] data) {
         ByteArrayDataInput in = ByteStreams.newDataInput(data);
         String sub = in.readUTF();
         if ("Annonce".equals(sub)) {

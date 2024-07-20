@@ -26,6 +26,7 @@ public class AsyncChatListener implements Listener {
 			e.setCancelled(true);
 			return;
 		}
+
 		if(!e.isCancelled()) {
 			PluginMessageHelper.sendGlobalMessage(player, e.getMessage());
 			e.setCancelled(true);

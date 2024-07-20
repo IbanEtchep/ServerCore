@@ -67,6 +67,7 @@ public class TeleportManager {
 
         plugin.getServer().getScheduler().buildTask(plugin, () -> {
             if (isTeleportWaiting(player)) {
+                teleport(player, location);
                 removeTeleportWaiting(player.getUniqueId());
             }
         }).delay(delay, TimeUnit.SECONDS).schedule();
