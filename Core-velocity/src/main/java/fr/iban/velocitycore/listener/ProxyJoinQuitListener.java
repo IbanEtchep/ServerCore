@@ -114,7 +114,7 @@ public class ProxyJoinQuitListener {
 
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
-            plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
+            plugin.getPlayerManager().addOnlinePlayer(uuid);
             plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerInfo(player.getUniqueId(), player.getUsername()));
         }).delay(100, TimeUnit.MILLISECONDS).schedule();
     }
@@ -123,6 +123,11 @@ public class ProxyJoinQuitListener {
     public void onDisconnect(DisconnectEvent e) {
         Player player = e.getPlayer();
         ProxyServer proxy = plugin.getServer();
+
+        if(!plugin.getPlayerManager().isOnline(player.getUniqueId())) {
+            return;
+        }
+
         Account account = accountManager.getAccount(player.getUniqueId());
         String quitMessage = "&8[&c-&8] &8" + String.format(ArrayUtils.getRandomFromArray(quitMessages), player.getUsername());
         Component quitMessageComponent = MineDown.parse(quitMessage);
@@ -139,7 +144,7 @@ public class ProxyJoinQuitListener {
 
         account.setLastSeen(System.currentTimeMillis());
         accountManager.saveAccount(account);
-        plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
+        plugin.getPlayerManager().removeOnlinePlayer(player.getUniqueId());
         plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
         plugin.getChatManager().clearPlayerReplies(player);
     }

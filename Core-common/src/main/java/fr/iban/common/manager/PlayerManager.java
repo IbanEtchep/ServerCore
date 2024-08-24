@@ -10,7 +10,8 @@ import java.util.*;
 
 public class PlayerManager {
 
-    protected final List<UUID> vanishedPlayers = new ArrayList<>();
+    protected final Set<UUID> vanishedPlayers = new HashSet<>();
+    protected final Set<UUID> connectedPlayers = new HashSet<>();
 
     public Map<UUID, String> getProxyPlayerNamesFromDB() {
         String sql = "SELECT uuid, name FROM sc_players P JOIN sc_online_players OP ON P.id=OP.player_id;";
@@ -54,8 +55,11 @@ public class PlayerManager {
         return proxyPlayers;
     }
 
-    public void addOnlinePlayerToDB(UUID uuid) {
+    public void addOnlinePlayer(UUID uuid) {
         String sql = "INSERT INTO sc_online_players (player_id) VALUES ((SELECT id FROM sc_players WHERE uuid=?)) ON DUPLICATE KEY UPDATE player_id=player_id;";
+
+        connectedPlayers.add(uuid);
+
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
@@ -66,8 +70,11 @@ public class PlayerManager {
         }
     }
 
-    public void removeOnlinePlayerFromDB(UUID uuid) {
+    public void removeOnlinePlayer(UUID uuid) {
         String sql = "DELETE FROM sc_online_players WHERE player_id=(SELECT id FROM sc_players WHERE uuid=?);";
+
+        connectedPlayers.remove(uuid);
+
         try (Connection connection = DbAccess.getDataSource().getConnection()) {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, uuid.toString());
@@ -76,6 +83,10 @@ public class PlayerManager {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isOnline(UUID uuid) {
+        return connectedPlayers.contains(uuid);
     }
 
     public void clearOnlinePlayersFromDB() {
