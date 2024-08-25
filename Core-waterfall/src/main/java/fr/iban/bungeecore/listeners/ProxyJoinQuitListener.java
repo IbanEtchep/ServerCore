@@ -115,7 +115,7 @@ public class ProxyJoinQuitListener implements Listener {
 
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
-            plugin.getPlayerManager().addOnlinePlayerToDB(uuid);
+            plugin.getPlayerManager().addOnlinePlayer(uuid);
             plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_JOIN_CHANNEL, new PlayerInfo(player.getUniqueId(), player.getName()));
         }, 100, TimeUnit.MILLISECONDS);
 
@@ -163,7 +163,7 @@ public class ProxyJoinQuitListener implements Listener {
 
             account.setLastSeen(System.currentTimeMillis());
             accountManager.saveAccount(account);
-            plugin.getPlayerManager().removeOnlinePlayerFromDB(player.getUniqueId());
+            plugin.getPlayerManager().removeOnlinePlayer(player.getUniqueId());
             plugin.getMessagingManager().sendMessage(CoreChannel.PLAYER_QUIT_CHANNEL, player.getUniqueId().toString());
         });
     }

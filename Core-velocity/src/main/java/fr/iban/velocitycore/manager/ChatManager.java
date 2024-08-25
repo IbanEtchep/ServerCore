@@ -7,6 +7,8 @@ import de.themoep.minedown.adventure.MineDownParser;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.velocitycore.CoreVelocityPlugin;
+import net.kyori.adventure.key.Key;
+import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.event.HoverEvent;
@@ -81,6 +83,7 @@ public class ChatManager {
                 if (pmessage.toLowerCase().contains(receiverUsername.toLowerCase()) && receiverAccount.getOption(Option.MENTION)) {
                     String ping = pingPrefix + receiverUsername;
                     String legacyFormattedPing = componentToLegacy(MineDown.parse(ping));
+                    receiverPlayer.playSound(Sound.sound(Key.key("block.note_block.guitar"), Sound.Source.MASTER, 1f, 0.5f));
                     pmessage = pmessage.replace(receiverUsername, legacyFormattedPing + "§f");
                 }
 
