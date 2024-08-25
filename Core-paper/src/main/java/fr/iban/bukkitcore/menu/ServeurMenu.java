@@ -25,7 +25,7 @@ public class ServeurMenu extends Menu {
     @Override
     public void handleMenu(InventoryClickEvent e) {
         if (e.getClickedInventory() == e.getView().getTopInventory() && e.getCurrentItem() != null) {
-            if (e.getCurrentItem().getType() == Material.GRASS) {
+            if (e.getCurrentItem().getType() == Material.GRASS_BLOCK) {
                 CoreBukkitPlugin.getInstance().getTeleportManager().teleportToSurvivalServer(player, null);
             } else if (e.getCurrentItem().getType() == Material.IRON_PICKAXE) {
                 new RessourceMenu(player).open();
@@ -35,7 +35,7 @@ public class ServeurMenu extends Menu {
 
     @Override
     public void setMenuItems() {
-        inventory.setItem(2, new ItemBuilder(Material.GRASS).setName("§2§lSurvie").setLore("§aCliquez pour rejoindre le serveur survie.").build());
+        inventory.setItem(2, new ItemBuilder(Material.GRASS_BLOCK).setName("§2§lSurvie").setLore("§aCliquez pour rejoindre le serveur survie.").build());
         inventory.setItem(6, new ItemBuilder(Material.IRON_PICKAXE).setName("§2§lRessources").setLore("§aCliquez pour rejoindre le serveur ressources.").build());
         for (int i = 0; i < inventory.getSize(); i++) {
             if (inventory.getItem(i) == null)

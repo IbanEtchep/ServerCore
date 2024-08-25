@@ -1,5 +1,7 @@
 package fr.iban.bukkitcore.listeners;
 
+import io.papermc.paper.event.player.AsyncChatEvent;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -12,23 +14,26 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 
 public class AsyncChatListener implements Listener {
 
-	private CoreBukkitPlugin plugin;
+	private final CoreBukkitPlugin plugin;
+	private final LegacyComponentSerializer legacyComponentSerializer = LegacyComponentSerializer.builder().hexColors().extractUrls().build();
 
 	public AsyncChatListener(CoreBukkitPlugin plugin) {
 		this.plugin = plugin;
 	}
 
 	@EventHandler(priority = EventPriority.MONITOR)
-	public void onChat(AsyncPlayerChatEvent e) {
+	public void onChat(AsyncChatEvent e) {
 		Player player = e.getPlayer();
+		String message = legacyComponentSerializer.serialize(e.message());
+
 		if(plugin.getTextInputs().containsKey(player.getUniqueId())) {
-			Bukkit.getScheduler().runTask(plugin, () -> plugin.getTextInputs().get(player.getUniqueId()).call(e.getMessage()));
+			Bukkit.getScheduler().runTask(plugin, () -> plugin.getTextInputs().get(player.getUniqueId()).call(message));
 			e.setCancelled(true);
 			return;
 		}
 
 		if(!e.isCancelled()) {
-			PluginMessageHelper.sendGlobalMessage(player, e.getMessage());
+			PluginMessageHelper.sendGlobalMessage(player, message);
 			e.setCancelled(true);
 		}
 	}
