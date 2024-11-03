@@ -1,6 +1,7 @@
 package fr.iban.survivalcore.listeners;
 
 import fr.iban.bukkitcore.event.CoreMessageEvent;
+import fr.iban.common.messaging.CoreChannel;
 import fr.iban.survivalcore.SurvivalCorePlugin;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public class CoreMessageListener implements Listener {
 
-    private SurvivalCorePlugin plugin;
+    private final SurvivalCorePlugin plugin;
 
     public CoreMessageListener(SurvivalCorePlugin plugin) {
         this.plugin = plugin;
@@ -20,7 +21,7 @@ public class CoreMessageListener implements Listener {
         String channel = e.getMessage().getChannel();
         String message = e.getMessage().getMessage();
 
-        if (channel.equals("SYNC_ANNOUNCE_COOLDOWN_CHANNEL")) {
+        if (channel.equals(CoreChannel.SYNC_ANNOUNCE_COOLDOWN_CHANNEL)) {
             UUID playerUUID = UUID.fromString(message);
             plugin.getAnnounceManager().getCooldowns().put(playerUUID, System.currentTimeMillis());
         }

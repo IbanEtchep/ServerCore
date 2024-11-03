@@ -18,9 +18,9 @@ public class AnnounceEventCMD extends Command {
 	public void execute(CommandSender sender, String[] args) {
 		if(sender.hasPermission("spartacube.announceevent") && args.length >= 1) {
 			StringBuilder bc = new StringBuilder();
-			for (int i = 0; i < args.length; i++) {
-				bc.append(args[i] + " ");
-			}
+            for (String arg : args) {
+                bc.append(arg).append(" ");
+            }
 			plugin.getProxy().broadcast(TextComponent.fromLegacyText("§cE§6V§eE§aN§9T§5 : §6" + bc.toString()));
 		}else {
 			sender.sendMessage(TextComponent.fromLegacyText("§cVous n'avez pas la permission de faire ça."));

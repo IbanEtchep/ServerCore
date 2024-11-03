@@ -1,5 +1,6 @@
 package fr.iban.survivalcore;
 
+import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.survivalcore.commands.*;
@@ -29,16 +30,13 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
         setupEconomy();
 
         registerEvents(
-                new ServerListPingListener(),
-                new PlayerFishListener(),
                 new EntityDeathListener(),
                 new CommandListener(),
                 new VillagerEvents(this),
                 new RaidTriggerListener(),
-                new PortalListeners(),
+                new PortalListeners(this),
                 new DamageListeners(),
-                new InteractListeners(this),
-                new PrepareResultListener(),
+                new InteractListeners(),
                 new ServiceListeners(this),
                 new JoinQuitListeners(this),
                 new PlayerRespawnListener(),
@@ -105,5 +103,9 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
 
     public AnnounceManager getAnnounceManager() {
         return announceManager;
+    }
+
+    public PlatformScheduler getScheduler() {
+        return CoreBukkitPlugin.getInstance().getScheduler();
     }
 }

@@ -27,12 +27,15 @@ public class AsyncChatListener implements Listener {
 		String message = legacyComponentSerializer.serialize(e.message());
 
 		if(plugin.getTextInputs().containsKey(player.getUniqueId())) {
-			Bukkit.getScheduler().runTask(plugin, () -> plugin.getTextInputs().get(player.getUniqueId()).call(message));
+			plugin.getScheduler().runAtEntity(
+					player,
+					task -> plugin.getTextInputs().get(player.getUniqueId()).call(message)
+			);
 			e.setCancelled(true);
 			return;
 		}
 
-		if(!e.isCancelled()) {
+		if(!e.isCancelled() && plugin.getConfig().getBoolean("global-chat", true)) {
 			PluginMessageHelper.sendGlobalMessage(player, message);
 			e.setCancelled(true);
 		}

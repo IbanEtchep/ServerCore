@@ -20,7 +20,7 @@ public class BukkitTrustedUserManager extends TrustedUserManager {
 
     @Override
     public void loadTrustedUsers() {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, super::loadTrustedUsers);
+        plugin.getScheduler().runAsync(task -> super.loadTrustedUsers());
     }
 
     public boolean isTrusted(Player player) {

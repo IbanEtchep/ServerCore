@@ -3,53 +3,47 @@ package fr.iban.bukkitcore.commands;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.ChatUtils;
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.scheduler.BukkitRunnable;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.bukkit.BukkitCommandActor;
+import revxrsal.commands.bukkit.annotation.CommandPermission;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-public class ActionBarCMD implements CommandExecutor {
+public class ActionBarCMD {
 	
 	private final List<String> queue = new ArrayList<>();
+	private final CoreBukkitPlugin plugin;
 
-	@Override
-	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(args.length >= 1) {
-			StringBuilder bc = new StringBuilder();
-			for (String arg : args) {
-				bc.append(arg).append(" ");
-			}
-			String message = bc.toString();
-			
-			if(queue.isEmpty()) {
-				sendActionBar(message);
-			}
-			queue.add(message);
+	public ActionBarCMD(CoreBukkitPlugin plugin) {
+		this.plugin = plugin;
+	}
+
+	@Command("abbc")
+	@CommandPermission("servercore.abbc")
+	public void broadcastActionBar(BukkitCommandActor actor, String message) {
+		if(queue.isEmpty()) {
+			sendActionBar(message);
 		}
-		return false;
+
+		queue.add(message);
 	}
 	
 	private void sendActionBar(String message) {
-		new BukkitRunnable() {
-			int time = 0;
-			@Override
-			public void run() {
-				Bukkit.getOnlinePlayers().forEach(p -> p.sendActionBar(ChatUtils.translateColors(message)));
-				time++;
-				if(time == 4) {
-					cancel();
-					queue.remove(0);
-					if(!queue.isEmpty()) {
-						sendActionBar(queue.get(0));
-					}
+		AtomicInteger time = new AtomicInteger();
+		plugin.getScheduler().runTimer(task -> {
+			Bukkit.getOnlinePlayers().forEach(p -> p.sendActionBar(ChatUtils.translateColors(message)));
+			time.getAndIncrement();
+
+			if(time.get() == 4) {
+				queue.remove(0);
+				if(!queue.isEmpty()) {
+					sendActionBar(queue.get(0));
 				}
+
+				task.cancel();
 			}
-		}.runTaskTimer(CoreBukkitPlugin.getInstance(), 0, 20L);
+		}, 0, 20L);
 	}
-
-
-
 }

@@ -27,15 +27,14 @@ public class JoinQuitListeners implements Listener {
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
-        e.setJoinMessage(null);
-        if (plugin.getServerName().equals("null")) {
-            Bukkit.getScheduler().runTaskLater(plugin, () -> PluginMessageHelper.askServerName(player), 10L);
-        }
+        e.joinMessage(null);
         RewardsDAO.getRewardsAsync(player.getUniqueId()).thenAccept(list -> {
             if (!list.isEmpty()) {
                 player.sendMessage("§aVous avez une ou plusieurs récompenses en attente ! (recompenses)");
             }
         });
+
+        plugin.getScheduler().runAsync(task -> plugin.getAccountManager().loadAccount(player.getUniqueId()));
 
         GlobalLoggerManager.saveLog(plugin.getServerName(), player.getName() + " (" + Objects.requireNonNull(player.getAddress()).getHostString() + ") logged in at " + player.getLocation());
     }
@@ -43,7 +42,7 @@ public class JoinQuitListeners implements Listener {
     @EventHandler
     public void onQuit(PlayerQuitEvent e) {
         Player player = e.getPlayer();
-        e.setQuitMessage(null);
+        e.quitMessage(null);
         plugin.getTextInputs().remove(player.getUniqueId());
         if (plugin.getServerName().toLowerCase().startsWith("survie")) {
             plugin.getMessagingManager().sendMessage(CoreChannel.LAST_SURVIVAL_SERVER, new PlayerStringMessage(player.getUniqueId(), plugin.getServerName()));

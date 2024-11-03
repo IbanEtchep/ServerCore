@@ -1,18 +1,18 @@
 package fr.iban.bungeecore.manager;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import fr.iban.bungeecore.CoreBungeePlugin;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountDAO;
 import fr.iban.common.messaging.CoreChannel;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountManager {
 
     private final CoreBungeePlugin plugin;
-    private final LoadingCache<UUID, Account> accounts = Caffeine.newBuilder().build(uuid -> new AccountDAO().getAccount(uuid));
+    private final Map<UUID, Account> accounts = new ConcurrentHashMap<>();
 
     public AccountManager(CoreBungeePlugin plugin) {
         this.plugin = plugin;
@@ -23,8 +23,9 @@ public class AccountManager {
     }
 
     public void reloadAccount(UUID uuid) {
-        accounts.invalidate(uuid);
-        plugin.getProxy().getScheduler().runAsync(plugin, () -> accounts.get(uuid));
+        plugin.getProxy().getScheduler().runAsync(plugin, () -> {
+            accounts.put(uuid, new AccountDAO().getAccount(uuid));
+        });
     }
 
     public void saveAccount(Account account) {

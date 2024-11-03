@@ -77,7 +77,7 @@ public class CommandsListener implements Listener {
                     player.getName() + " (" + ip + ") essaye d'exécuter la commande " + e.getMessage() + ".",
                     result -> {
                         if (result) {
-                            Bukkit.getScheduler().runTask(plugin, () -> {
+                            plugin.getScheduler().runAtEntity(player, task -> {
                                 approvedCommands.put(player.getUniqueId(), command);
                                 player.chat(e.getMessage());
                             });

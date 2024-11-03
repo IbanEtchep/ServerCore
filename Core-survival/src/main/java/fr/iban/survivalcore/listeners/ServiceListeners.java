@@ -1,8 +1,6 @@
 package fr.iban.survivalcore.listeners;
 
-import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.survivalcore.SurvivalCorePlugin;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.ServiceRegisterEvent;

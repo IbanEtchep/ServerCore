@@ -7,11 +7,7 @@ softdepend: [Essentials, Plan]
 
 commands:
   options:
-  core:
-    permission: servercore.papercore.reload
   recompenses:
-  abbc:
-    permission: servercore.abbc
   bungeebroadcast:
     aliases:
       - bbc

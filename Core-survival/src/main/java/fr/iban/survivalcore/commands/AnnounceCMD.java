@@ -7,7 +7,7 @@ import revxrsal.commands.annotation.Command;
 
 public class AnnounceCMD {
 
-    private SurvivalCorePlugin plugin;
+    private final SurvivalCorePlugin plugin;
 
     public AnnounceCMD(SurvivalCorePlugin plugin) {
         this.plugin = plugin;

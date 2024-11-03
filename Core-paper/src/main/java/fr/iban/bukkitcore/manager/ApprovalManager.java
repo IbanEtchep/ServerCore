@@ -62,9 +62,9 @@ public class ApprovalManager implements Listener {
     }
 
     private void startCleaningTask() {
-        Bukkit.getScheduler().runTaskTimer(plugin, () ->
-                requests.removeIf(request -> System.currentTimeMillis() - request.getCreatedAt() > 600000L),
-                1200L, 1200L);
+        plugin.getScheduler().runTimerAsync(task -> {
+            requests.removeIf(request -> System.currentTimeMillis() - request.getCreatedAt() > 600000L);
+        }, 1200L, 1200L);
     }
 
     @EventHandler

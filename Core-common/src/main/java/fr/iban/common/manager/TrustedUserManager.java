@@ -46,18 +46,4 @@ public abstract class TrustedUserManager {
         }
         loadTrustedUsers();
     }
-
-//    public void unTrustUser(TrustedUser user) {
-//        String sql = "INSERT INTO sc_trusted_players WHERE uuid=? AND senderType=?;";
-//        try (Connection connection = DbAccess.getDataSource().getConnection()) {
-//            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-//                ps.setString(1, user.getUuid().toString());
-//                ps.setString(2, user.getIp());
-//                ps.executeUpdate();
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        loadTrustedUsers();
-//    }
 }

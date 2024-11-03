@@ -6,6 +6,12 @@ import fr.iban.bukkitcore.utils.ChatUtils;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.Option;
 import fr.iban.survivalcore.SurvivalCorePlugin;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
+import net.kyori.adventure.text.event.HoverEvent;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -100,8 +106,7 @@ public class EntityDeathListener implements Listener {
                 message += "a subi la colère du Dragon !";
                 break;
             case THORNS:
-                if (damageCause instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent entity = (EntityDamageByEntityEvent) damageCause;
+                if (damageCause instanceof EntityDamageByEntityEvent entity) {
                     if (entity.getDamager() instanceof Player) {
                         killer = (Player) entity.getDamager();
                         message += "s'est tué en frappant " + killer.getName() + " !";
@@ -113,8 +118,7 @@ public class EntityDeathListener implements Listener {
                 }
                 break;
             case ENTITY_ATTACK:
-                if (damageCause instanceof EntityDamageByEntityEvent) {
-                    EntityDamageByEntityEvent entity = (EntityDamageByEntityEvent) damageCause;
+                if (damageCause instanceof EntityDamageByEntityEvent entity) {
                     if (entity.getDamager() instanceof Player) {
                         killer = (Player) entity.getDamager();
                         Material weapon = killer.getInventory().getItemInMainHand().getType();
@@ -162,7 +166,12 @@ public class EntityDeathListener implements Listener {
                 " §bZ : §f" + (int) location.getZ());
 
         if(core.getServerName().equalsIgnoreCase("ressources")) {
-            player.sendMessage(new ComponentBuilder("§b§lVous pouvez vous téléporter à la position de votre dernière téléportation aléatoire en cliquant sur ce message ou en exécutant la commande /lastrtp.").event(ChatUtils.getShowTextHoverEvent("§lClic ici !")).event(ChatUtils.getCommandClickEvent("/lastrtp")).create());
+            String miniMessageText = "<aqua><bold>Vous pouvez vous téléporter à la position de votre dernière téléportation aléatoire en cliquant sur ce message ou en exécutant la commande /lastrtp."
+                    + "<hover:show_text:'<bold>Clic ici !'>"
+                    + "<click:run_command:/lastrtp>";
+
+            Component message = MiniMessage.miniMessage().deserialize(miniMessageText);
+            player.sendMessage(message);
         }
     }
 }

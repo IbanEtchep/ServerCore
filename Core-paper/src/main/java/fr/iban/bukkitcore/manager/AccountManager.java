@@ -1,19 +1,18 @@
 package fr.iban.bukkitcore.manager;
 
-import com.github.benmanes.caffeine.cache.Caffeine;
-import com.github.benmanes.caffeine.cache.LoadingCache;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.common.data.Account;
 import fr.iban.common.data.AccountDAO;
 import fr.iban.common.messaging.CoreChannel;
-import org.bukkit.Bukkit;
 
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class AccountManager {
 
     private final CoreBukkitPlugin plugin;
-    private final LoadingCache<UUID, Account> accounts = Caffeine.newBuilder().build(uuid -> new AccountDAO().getAccount(uuid));
+    private final Map<UUID, Account> accounts = new ConcurrentHashMap<>();
 
     public AccountManager(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -24,8 +23,12 @@ public class AccountManager {
     }
 
     public void reloadAccount(UUID uuid) {
-        accounts.invalidate(uuid);
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> accounts.get(uuid));
+        accounts.put(uuid, new AccountDAO().getAccount(uuid));
+    }
+
+    public void loadAccount(UUID uuid) {
+        Account account = new AccountDAO().getAccount(uuid);
+        accounts.put(uuid, account);
     }
 
     public void saveAccount(Account account) {
@@ -35,6 +38,6 @@ public class AccountManager {
     }
 
     public void saveAccountAsync(Account account) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> saveAccount(account));
+        plugin.getScheduler().runAsync(task -> saveAccount(account));
     }
 }

@@ -15,7 +15,7 @@ public class PlayerRespawnListener implements Listener {
     @EventHandler
     public void onPostRespawn(PlayerPostRespawnEvent e) {
         Player player = e.getPlayer();
-        Location bedLocation = player.getBedSpawnLocation();
+        Location bedLocation = player.getRespawnLocation();
 
         if (bedLocation != null && e.getRespawnedLocation().equals(bedLocation)) {
             return;

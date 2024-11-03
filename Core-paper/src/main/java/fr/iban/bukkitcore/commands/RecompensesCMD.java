@@ -18,13 +18,19 @@ import fr.iban.bukkitcore.rewards.RewardsDAO;
 
 public class RecompensesCMD implements CommandExecutor, TabCompleter {
 
+	private final CoreBukkitPlugin plugin;
+
+	public RecompensesCMD(CoreBukkitPlugin plugin) {
+		this.plugin = plugin;
+	}
+
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
 		if(args.length == 0 && sender instanceof Player) {
 			Player player = (Player)sender;
 			RewardsDAO.getRewardsAsync(player.getUniqueId()).thenAccept(rewards -> {
 				if(!rewards.isEmpty()) {
-					Bukkit.getScheduler().runTask(CoreBukkitPlugin.getInstance(), () -> new RewardsMenu(player, rewards).open());
+					plugin.getScheduler().runAtEntity(player, task -> new RewardsMenu(player, rewards).open());
 				}else {
 					player.sendMessage("§cVous n'avez pas de récompense en attente.");
 				}

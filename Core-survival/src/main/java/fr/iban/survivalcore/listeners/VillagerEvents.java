@@ -20,7 +20,7 @@ import java.util.List;
 
 public class VillagerEvents implements Listener {
 
-	private SurvivalCorePlugin plugin;
+	private final SurvivalCorePlugin plugin;
 
 	public VillagerEvents(SurvivalCorePlugin plugin) {
 		this.plugin = plugin;

@@ -62,7 +62,7 @@ public class RewardsMenu extends PaginatedMenu {
                 Bukkit.dispatchCommand(Bukkit.getConsoleSender(), reward.getCommand().replace("{player}", player.getName()));
                 player.sendMessage("§aVous avez récupéré une récompense.");
                 RewardsDAO.removeRewardAsync(player.getUniqueId().toString(), reward).thenRun(() -> {
-                    Bukkit.getScheduler().runTask(core, this::open);
+                    core.getScheduler().runAtEntity(player, task -> this.open());
                 });
                 return;
             } else {

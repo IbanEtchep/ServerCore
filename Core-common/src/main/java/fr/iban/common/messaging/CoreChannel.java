@@ -3,6 +3,7 @@ package fr.iban.common.messaging;
 public class CoreChannel {
 
     public static final String SYNC_ACCOUNT_CHANNEL = "SyncAccount";
+    public static final String SYNC_ANNOUNCE_COOLDOWN_CHANNEL = "SyncAnnounceCooldown";
     public static final String REMOVE_PENDING_TP_CHANNEL = "RemovePendingTeleport";
     public static final String ADD_PENDING_TP_CHANNEL = "AddPendingTeleport";
     public static final String REMOVE_TP_REQUEST_CHANNEL = "RemoveTeleportRequest";

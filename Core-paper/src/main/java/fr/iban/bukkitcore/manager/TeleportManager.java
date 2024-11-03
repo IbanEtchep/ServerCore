@@ -20,9 +20,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TeleportManager {
 
@@ -95,12 +96,12 @@ public class TeleportManager {
             } else {
                 player.sendMessage("§aTéléportation dans " + delay + " secondes. §cNe bougez pas !");
                 pendingTeleports.add(player.getUniqueId());
-                Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                plugin.getScheduler().runLater(task -> {
                     if (isTeleportWaiting(player.getUniqueId())) {
                         setLastLocation(player.getUniqueId());
                         PluginMessageHelper.sendPlayerToServer(player, server);
                     }
-                }, delay * 20L);
+                }, delay, TimeUnit.SECONDS);
             }
         }
     }
@@ -168,27 +169,22 @@ public class TeleportManager {
 
         SLocation sloc = teleportToLocation.getLocation();
         Location loc = SLocationUtils.getLocation(sloc);
-        new BukkitRunnable() {
-            int count = 0;
 
-            @Override
-            public void run() {
+        AtomicInteger count = new AtomicInteger();
+        plugin.getScheduler().runTimer(task -> {
+            Player player = Bukkit.getPlayer(teleportToLocation.getUuid());
 
-                Player player = Bukkit.getPlayer(teleportToLocation.getUuid());
-
-                if (player != null) {
-                    tpAsync(player, loc);
-                    cancel();
-                }
-
-                count++;
-
-                if (count > 20) {
-                    cancel();
-                }
-
+            if (player != null) {
+                tpAsync(player, loc);
+                task.cancel();
             }
-        }.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+
+            count.getAndIncrement();
+
+            if (count.get() > 20) {
+                task.cancel();
+            }
+        }, 1L, 1L);
     }
 
     public void performTeleportToPlayer(TeleportToPlayer teleportToPlayer) {
@@ -198,26 +194,21 @@ public class TeleportManager {
             return;
         }
 
-        new BukkitRunnable() {
+        plugin.getScheduler().runTimer(task -> {
+            Player updatedTarget = Bukkit.getPlayer(teleportToPlayer.getTargetId());
+            Player player = Bukkit.getPlayer(teleportToPlayer.getUuid());
 
-            @Override
-            public void run() {
-
-                Player target = Bukkit.getPlayer(teleportToPlayer.getTargetId());
-                Player player = Bukkit.getPlayer(teleportToPlayer.getUuid());
-
-                if (target == null) {
-                    cancel();
-                    return;
-                }
-
-                if (player != null) {
-                    tpAsync(player, target.getLocation());
-                    cancel();
-                }
-
+            if (updatedTarget == null) {
+                task.cancel();
+                return;
             }
-        }.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+
+            if (player != null) {
+                tpAsync(player, updatedTarget.getLocation());
+                task.cancel();
+            }
+
+        }, 1L, 1L);
     }
 
     public void performRandomTeleport(RandomTeleportMessage rtpMessage) {
@@ -232,27 +223,21 @@ public class TeleportManager {
             default -> rtpMessage.getWorld();
         };
 
-        new BukkitRunnable() {
-            int count = 0;
+        AtomicInteger count = new AtomicInteger();
+        plugin.getScheduler().runTimer(task -> {
+            Player player = Bukkit.getPlayer(rtpMessage.getUuid());
 
-            @Override
-            public void run() {
-
-                Player player = Bukkit.getPlayer(rtpMessage.getUuid());
-
-                if (player != null) {
-                    Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + world);
-                    cancel();
-                }
-
-                count++;
-
-                if (count > 200) {
-                    cancel();
-                }
-
+            if (player != null) {
+                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), "rtp player " + player.getName() + " " + world);
+                task.cancel();
             }
-        }.runTaskTimer(CoreBukkitPlugin.getInstance(), 1L, 1L);
+
+            count.getAndIncrement();
+
+            if (count.get() > 200) {
+                task.cancel();
+            }
+        }, 1L, 1L);
 
     }
 

@@ -69,8 +69,10 @@ public class TrustCommandsCMD {
 
     @Subcommand("reload")
     public void reload(BukkitCommandActor sender) {
-        Bukkit.getScheduler().runTask(plugin, trustedCommandsManager::loadTrustedCommands);
-        sender.reply("§aCommandes rechargées.");
+        plugin.getScheduler().runAsync(task -> {
+            trustedCommandsManager.loadTrustedCommands();
+            sender.reply("§aCommandes rechargées.");
+        });
     }
 
 }

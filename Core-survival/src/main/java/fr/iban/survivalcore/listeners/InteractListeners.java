@@ -14,12 +14,6 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 
 public class InteractListeners implements Listener {
 
-	private final SurvivalCorePlugin plugin;
-
-	public InteractListeners(SurvivalCorePlugin plugin) {
-		this.plugin = plugin;
-	}
-
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onInteract(PlayerInteractEvent e) {
 		Player player = e.getPlayer();

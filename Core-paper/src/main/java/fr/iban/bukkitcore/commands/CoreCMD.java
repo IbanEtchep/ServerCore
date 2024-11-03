@@ -2,11 +2,12 @@ package fr.iban.bukkitcore.commands;
 
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.common.messaging.AbstractMessenger;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.bukkit.BukkitCommandActor;
+import revxrsal.commands.bukkit.annotation.CommandPermission;
 
-public class CoreCMD implements CommandExecutor {
+@Command("core")
+public class CoreCMD {
 
     private final CoreBukkitPlugin plugin;
 
@@ -14,20 +15,20 @@ public class CoreCMD implements CommandExecutor {
         this.plugin = plugin;
     }
 
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("reload")) {
-                plugin.reloadConfig();
-                plugin.setServerName(plugin.getConfig().getString("servername"));
-                sender.sendMessage("§apapercore reloaded.");
-            } else if (args[0].equalsIgnoreCase("debug")) {
-                AbstractMessenger messenger = plugin.getMessagingManager().getMessenger();
-                messenger.setDebugMode(!messenger.isDebugMode());
-                sender.sendMessage("debug mode : " + messenger.isDebugMode());
-            }
-        }
-        return false;
+    @Command("reload")
+    @CommandPermission("core.reload")
+    public void reload(BukkitCommandActor sender) {
+        plugin.reloadConfig();
+        plugin.setServerName(plugin.getConfig().getString("servername"));
+        sender.reply("§apapercore reloaded.");
+    }
+
+    @Command("debug")
+    @CommandPermission("core.debug")
+    public void debug(BukkitCommandActor sender) {
+        AbstractMessenger messenger = plugin.getMessagingManager().getMessenger();
+        messenger.setDebugMode(!messenger.isDebugMode());
+        sender.reply("debug mode : " + messenger.isDebugMode());
     }
 
 }

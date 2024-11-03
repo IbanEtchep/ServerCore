@@ -54,8 +54,12 @@ public class ServerSwitchCommands {
 
     @Command("survivalrtp")
     @Cooldown(value = 2, unit = TimeUnit.MINUTES)
-    public void survivalRandomTP(Player player) {
-        plugin.getTeleportManager().randomTeleportToSurvivalServer(player);
+    public void survivalRandomTP(Player player,@Optional String server) {
+        if(server == null) {
+            plugin.getTeleportManager().randomTeleportToSurvivalServer(player);
+        } else {
+            plugin.getTeleportManager().randomTeleport(player, server, "world");
+        }
     }
 
 }

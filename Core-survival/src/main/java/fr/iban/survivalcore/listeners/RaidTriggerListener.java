@@ -11,7 +11,7 @@ import org.bukkit.event.raid.RaidTriggerEvent;
 
 public class RaidTriggerListener implements Listener {
 
-	private Map<UUID, Long> cooldown = new HashMap<>();
+	private final Map<UUID, Long> cooldown = new HashMap<>();
 
 	@EventHandler
 	public void onRaidTrigger(RaidTriggerEvent e) {

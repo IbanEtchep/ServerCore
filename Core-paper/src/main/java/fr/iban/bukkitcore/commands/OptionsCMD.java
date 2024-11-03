@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 
 import fr.iban.bukkitcore.menu.OptionsMenu;
 
+
 public class OptionsCMD implements CommandExecutor {
 
 	@Override

@@ -11,20 +11,7 @@ import org.bukkit.entity.Player;
 
 public class LuckPermsUtils {
 
-	private static LuckPerms luckapi = LuckPermsProvider.get();
-	
-//	public void registerEvents() {
-//        EventBus eventBus = luckapi.getEventBus();
-//        eventBus.subscribe(UserPromoteEvent.class, this::onUserPromote);
-//	}
-	
-//    private void onUserPromote(UserPromoteEvent event) {
-//    	if(event.getTrack().getName().equalsIgnoreCase("joueurs")) {
-//            Bukkit.getScheduler().runTask(Main.getInstance(), () -> {
-//                Bukkit.broadcastMessage(HexColor.FLAT_PINK.getColor() + Bukkit.getPlayer(event.getUser().getUniqueId()).getName() + " a été promu " + event.getGroupTo().get() + "!");
-//            });
-//    	}
-//    }
+	private static final LuckPerms luckapi = LuckPermsProvider.get();
 
 	public void addPermission(Player player, String perm) {
 		User user = loadUser(player);

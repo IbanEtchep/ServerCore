@@ -7,6 +7,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
+import java.util.concurrent.TimeUnit;
+
 public class JoinQuitListeners implements Listener {
 
     private final SurvivalCorePlugin plugin;
@@ -19,7 +21,6 @@ public class JoinQuitListeners implements Listener {
     public void onJoin(PlayerJoinEvent e) {
         Player player = e.getPlayer();
         player.setInvulnerable(true);
-
-        Bukkit.getScheduler().runTaskLater(plugin, () -> player.setInvulnerable(false), 200);
+        plugin.getScheduler().runLater(task -> player.setInvulnerable(false), 10, TimeUnit.SECONDS);
     }
 }

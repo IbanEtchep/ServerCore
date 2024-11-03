@@ -5,15 +5,16 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.jetbrains.annotations.NotNull;
 
 public class BungeeBroadcastCMD implements CommandExecutor {
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
 
         if(args.length >= 1){
             StringBuilder bc = new StringBuilder();
-            for (int i = 0; i < args.length; i++) {
-                bc.append(args[i] + " ");
+            for (String arg : args) {
+                bc.append(arg).append(" ");
             }
             String message = HexColor.translateColorCodes(bc.toString());
             PluginMessageHelper.broadcastMessage(message);

@@ -1,6 +1,8 @@
 package fr.iban.bukkitcore;
 
 import com.earth2me.essentials.Essentials;
+import com.tcoded.folialib.FoliaLib;
+import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.iban.bukkitcore.commands.*;
 import fr.iban.bukkitcore.listeners.*;
 import fr.iban.bukkitcore.manager.*;
@@ -26,6 +28,7 @@ import java.util.logging.Logger;
 public final class CoreBukkitPlugin extends JavaPlugin {
 
     private static CoreBukkitPlugin instance;
+    private FoliaLib foliaLib;
     private String serverName;
     private CoreCommandHandlerVisitor coreCommandHandlerVisitor;
     private TeleportManager teleportManager;
@@ -45,6 +48,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        this.foliaLib = new FoliaLib(this);
         this.serverName = getConfig().getString("servername");
 
         if (getServer().getPluginManager().isPluginEnabled("Essentials")) {
@@ -68,7 +72,7 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         this.ressourcesWorldManager = new RessourcesWorldManager(this);
         this.messagingManager = new MessagingManager(this);
         this.trustedCommandManager = new TrustedCommandsManager();
-        Bukkit.getScheduler().runTaskAsynchronously(this, () -> getTrustedCommandManager().loadTrustedCommands());
+        foliaLib.getScheduler().runAsync(task -> getTrustedCommandManager().loadTrustedCommands());
         messagingManager.init();
         this.playerManager = new BukkitPlayerManager(this);
         this.trustedUserManager = new BukkitTrustedUserManager(this);
@@ -107,13 +111,13 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         commandHandler.register(new TeleportCommands(this));
         commandHandler.register(new TrustCommandsCMD(this));
         commandHandler.register(new ServerSwitchCommands(this));
+        commandHandler.register(new CoreCMD(this));
+        commandHandler.register(new ActionBarCMD(this));
         commandHandler.registerBrigadier();
 
-        getCommand("core").setExecutor(new CoreCMD(this));
-        getCommand("abbc").setExecutor(new ActionBarCMD());
         getCommand("options").setExecutor(new OptionsCMD());
-        getCommand("recompenses").setExecutor(new RecompensesCMD());
-        getCommand("recompenses").setTabCompleter(new RecompensesCMD());
+        getCommand("recompenses").setExecutor(new RecompensesCMD(this));
+        getCommand("recompenses").setTabCompleter(new RecompensesCMD(this));
         getCommand("bungeebroadcast").setExecutor(new BungeeBroadcastCMD());
     }
 
@@ -142,6 +146,10 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     public static CoreBukkitPlugin getInstance() {
         return instance;
+    }
+
+    public FoliaLib getFoliaLib() {
+        return foliaLib;
     }
 
     public String getServerName() {
@@ -202,5 +210,9 @@ public final class CoreBukkitPlugin extends JavaPlugin {
 
     public ServerManager getServerManager() {
         return serverManager;
+    }
+
+    public PlatformScheduler getScheduler() {
+        return foliaLib.getScheduler();
     }
 }
