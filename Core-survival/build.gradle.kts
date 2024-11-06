@@ -17,7 +17,8 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly(project(":CorePaper", "shadow"))
+    implementation(project(":CoreCommon"))
+    compileOnly(project(":CorePaper"))
     compileOnly("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("net.essentialsx:EssentialsX:2.20.0")
@@ -34,5 +35,6 @@ dependencies {
 }
 
 tasks.compileJava {
-    dependsOn(":CorePaper:jar")
+    dependsOn(":CoreCommon:shadowJar")
+    dependsOn(":CorePaper:shadowJar")
 }
