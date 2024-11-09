@@ -109,4 +109,5 @@ run/
 
 build/
 
-.gradle/
+/.gradle/
+/buildSrc/.gradle/
