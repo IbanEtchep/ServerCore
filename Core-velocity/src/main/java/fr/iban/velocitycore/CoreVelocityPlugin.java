@@ -42,8 +42,8 @@ import java.util.TreeMap;
         version = "1.0",
         dependencies = {
                 @Dependency(id = "tab", optional = true),
-                @Dependency(id = "luckperms", optional = false),
-                @Dependency(id = "papiproxybridge", optional = false),
+                @Dependency(id = "luckperms"),
+                @Dependency(id = "papiproxybridge"),
         }
 )
 public class CoreVelocityPlugin {

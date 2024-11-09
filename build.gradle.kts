@@ -1,5 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
     java
     id("io.github.goooler.shadow") version "8.1.7"
@@ -7,9 +5,8 @@ plugins {
 
 allprojects {
     apply(plugin = "java")
-    apply(plugin = "io.github.goooler.shadow")
 
-    group = "fr.iban"
+    group = "fr.iban.servercore"
     version = "1.0"
 
     repositories {
@@ -19,31 +16,18 @@ allprojects {
     }
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+subprojects {
+    tasks.processResources {
+        filesMatching("plugin.yml") {
+            expand(
+                "project_version" to project.version
+            )
+        }
     }
 }
 
-subprojects {
-    tasks.register<Copy>("copyJar") {
-        doFirst {
-            mkdir("../libs/")
-        }
-        from(tasks.named("shadowJar"))
-        into("../libs/")
-    }
-
-    tasks.build {
-        finalizedBy("copyJar")
-    }
-
-    tasks.named<ShadowJar>("shadowJar") {
-        archiveClassifier.set("")
-
-        relocate("com.tcoded.folialib", "fr.iban.servercore.lib.folialib")
-        relocate("com.zaxxer.hikari", "fr.iban.servercore.libs.hikari")
-        relocate("redis.clients.jedis", "fr.iban.servercore.libs.jedis")
-
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
     }
 }

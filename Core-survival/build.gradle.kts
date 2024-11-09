@@ -1,6 +1,10 @@
 /**
  * CoreSurvival
  */
+plugins {
+    id("io.github.goooler.shadow")
+}
+
 repositories {
     mavenCentral()
     mavenLocal()
@@ -17,7 +21,7 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    implementation(project(":CoreCommon"))
+    compileOnly(project(":CoreCommon"))
     compileOnly(project(":CorePaper"))
     compileOnly("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     compileOnly("net.luckperms:api:5.4")
@@ -28,13 +32,32 @@ dependencies {
     compileOnly("fr.iban:Warps:1.0-SNAPSHOT")
     compileOnly("fr.iban:BungeeHomes:1.0")
 
-    compileOnly("com.github.Revxrsal.Lamp:common:3.1.7")
-    compileOnly("com.github.Revxrsal.Lamp:bukkit:3.1.7")
+    compileOnly("com.github.Revxrsal.Lamp:common:3.3.0")
+    compileOnly("com.github.Revxrsal.Lamp:bukkit:3.3.0")
 
-    compileOnly("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
+    implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
+}
+
+tasks.shadowJar {
+    archiveClassifier.set("")
+
+    relocate("com.tcoded.folialib", "fr.iban.servercore.libs.folialib")
 }
 
 tasks.compileJava {
-    dependsOn(":CoreCommon:shadowJar")
     dependsOn(":CorePaper:shadowJar")
+}
+
+
+
+tasks.register<Copy>("copyJar") {
+    doFirst {
+        mkdir("../libs/")
+    }
+    from(tasks.named("shadowJar"))
+    into("../libs/")
+}
+
+tasks.build {
+    finalizedBy("copyJar")
 }

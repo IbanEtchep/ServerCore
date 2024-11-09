@@ -1,6 +1,6 @@
 name: SurvivalCore
-version: ${project.version}
-api-version: 1.16
+version: ${project_version}
+api-version: 1.21
 main: fr.iban.survivalcore.SurvivalCorePlugin
 authors: [Iban]
 description: Core des serveurs en mode survie.

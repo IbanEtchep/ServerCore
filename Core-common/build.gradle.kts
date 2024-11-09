@@ -1,8 +1,8 @@
 /**
  * CoreCommon
  */
-repositories {
-    mavenCentral()
+plugins {
+    id("io.github.goooler.shadow")
 }
 
 dependencies {
