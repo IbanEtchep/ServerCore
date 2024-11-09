@@ -148,10 +148,6 @@ public final class CoreBukkitPlugin extends JavaPlugin {
         return instance;
     }
 
-    public FoliaLib getFoliaLib() {
-        return foliaLib;
-    }
-
     public String getServerName() {
         return serverName;
     }

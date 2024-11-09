@@ -1,5 +1,4 @@
 redis:
-  sync-enabled: false
   host: 172.18.0.1
   port: 6379
   password: null

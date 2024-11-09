@@ -150,7 +150,7 @@ public class ProxyJoinQuitListener {
 
     private String getLastSeen(long time) {
         if (time == 0) return "jamais";
-        PrettyTime prettyTime = new PrettyTime(new Locale("fr"));
+        PrettyTime prettyTime = new PrettyTime(Locale.FRANCE);
         return prettyTime.format(new Date(time));
     }
 

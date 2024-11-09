@@ -1,5 +1,6 @@
 package fr.iban.survivalcore;
 
+import com.tcoded.folialib.FoliaLib;
 import com.tcoded.folialib.impl.PlatformScheduler;
 import fr.iban.bukkitcore.CoreBukkitPlugin;
 import fr.iban.bukkitcore.utils.PluginMessageHelper;
@@ -19,12 +20,15 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
     private static SurvivalCorePlugin instance;
     private Economy econ;
     private AnnounceManager announceManager;
+    private FoliaLib foliaLib;
 
 
     @Override
     public void onEnable() {
         instance = this;
         PluginMessageHelper.registerChannels(this);
+
+        foliaLib = new FoliaLib(this);
 
         saveDefaultConfig();
         setupEconomy();
@@ -106,6 +110,6 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
     }
 
     public PlatformScheduler getScheduler() {
-        return CoreBukkitPlugin.getInstance().getScheduler();
+        return foliaLib.getScheduler();
     }
 }
