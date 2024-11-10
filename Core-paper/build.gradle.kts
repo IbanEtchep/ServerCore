@@ -1,8 +1,3 @@
-import java.util.*
-
-/**
- * CorePaper
- */
 plugins {
     id("io.github.goooler.shadow")
     id("maven-publish")
@@ -18,7 +13,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":common"))
+    implementation(project(":core-common"))
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")
@@ -27,37 +22,50 @@ dependencies {
 
     implementation("com.github.Revxrsal.Lamp:common:3.3.0")
     implementation("com.github.Revxrsal.Lamp:bukkit:3.3.0")
-
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
 }
 
-tasks.shadowJar {
-    archiveClassifier.set("")
-
-    relocate("com.tcoded.folialib", "fr.iban.servercore.libs.folialib")
-    //From common
-    relocate("com.zaxxer.hikari", "fr.iban.servercore.libs.hikari")
-    relocate("redis.clients.jedis", "fr.iban.servercore.libs.jedis")
-}
-
-tasks.register<Copy>("copyJar") {
-    doFirst {
-        mkdir("../libs/")
+tasks {
+    jar {
+        enabled = false
     }
-    from(tasks.named("shadowJar"))
-    into("../libs/")
-}
 
-tasks.build {
-    finalizedBy("copyJar")
+    shadowJar {
+        archiveClassifier.set("")
+
+        relocate("com.tcoded.folialib", "fr.iban.servercore.libs.folialib")
+        relocate("com.zaxxer.hikari", "fr.iban.servercore.libs.hikari")
+        relocate("redis.clients.jedis", "fr.iban.servercore.libs.jedis")
+    }
+
+    register<Copy>("copyJar") {
+        doFirst {
+            mkdir("../libs/")
+        }
+        from(named("shadowJar"))
+        into("../libs/")
+    }
+
+    build {
+        dependsOn(shadowJar)
+        finalizedBy("copyJar")
+    }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = project.name.lowercase(Locale.getDefault())
-            from(components["java"])
+            artifactId = project.name
             artifact(tasks.named("shadowJar"))
+
+            pom {
+                name.set(project.name)
+                description.set("Paper implementation of ServerCore")
+            }
         }
     }
+}
+
+tasks.named("publishMavenPublicationToMavenLocal") {
+    dependsOn(tasks.shadowJar)
 }

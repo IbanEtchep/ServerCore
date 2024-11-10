@@ -1,5 +1,3 @@
-import java.util.*
-
 /**
  * CoreVelocity
  */
@@ -26,7 +24,7 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
-    implementation(project(":common"))
+    implementation(project(":core-common"))
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     implementation("com.github.Revxrsal.Lamp:common:3.3.0")
     implementation("com.github.Revxrsal.Lamp:velocity:3.3.0")
@@ -41,37 +39,54 @@ dependencies {
     compileOnly("net.william278:papiproxybridge:1.5")
 }
 
-tasks.shadowJar {
-    archiveClassifier.set("")
-
-    relocate("dev.dejvokep.boostedyaml", "fr.iban.velocitycore.libs.boostedyaml")
-    relocate("de.themoep.minedown", "fr.iban.velocitycore.libs.minedown")
-    relocate("com.mysql.cj", "fr.iban.velocitycore.libs.mysql")
-    relocate("org.apache.commons.pool2", "fr.iban.velocitycore.libs.commons.pool2")
-
-    //From common
-    relocate("com.zaxxer.hikari", "fr.iban.servercore.libs.hikari")
-    relocate("redis.clients.jedis", "fr.iban.servercore.libs.jedis")
-}
-
-tasks.register<Copy>("copyJar") {
-    doFirst {
-        mkdir("../libs/")
+tasks {
+    jar {
+        enabled = false
     }
-    from(tasks.named("shadowJar"))
-    into("../libs/")
-}
 
-tasks.build {
-    finalizedBy("copyJar")
+    shadowJar {
+        archiveFileName.set("Core-${project.name}-${project.version}.jar")
+        archiveClassifier.set("")
+
+        // Relocations
+        relocate("dev.dejvokep.boostedyaml", "fr.iban.velocitycore.libs.boostedyaml")
+        relocate("de.themoep.minedown", "fr.iban.velocitycore.libs.minedown")
+        relocate("com.mysql.cj", "fr.iban.velocitycore.libs.mysql")
+        relocate("org.apache.commons.pool2", "fr.iban.velocitycore.libs.commons.pool2")
+
+        // From common
+        relocate("com.zaxxer.hikari", "fr.iban.servercore.libs.hikari")
+        relocate("redis.clients.jedis", "fr.iban.servercore.libs.jedis")
+    }
+
+    register<Copy>("copyJar") {
+        doFirst {
+            mkdir("../libs/")
+        }
+        from(named("shadowJar"))
+        into("../libs/")
+    }
+
+    build {
+        dependsOn(shadowJar)
+        finalizedBy("copyJar")
+    }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = project.name.lowercase(Locale.getDefault())
-            from(components["java"])
+            artifactId = project.name
             artifact(tasks.named("shadowJar"))
+
+            pom {
+                name.set(project.name)
+                description.set("Velocity implementation of ServerCore")
+            }
         }
     }
+}
+
+tasks.named("publishMavenPublicationToMavenLocal") {
+    dependsOn(tasks.shadowJar)
 }

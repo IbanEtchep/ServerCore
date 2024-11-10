@@ -1,8 +1,7 @@
-import java.util.*
-
 /**
  * CoreSurvival
  */
+
 plugins {
     id("io.github.goooler.shadow")
     id("maven-publish")
@@ -17,19 +16,18 @@ repositories {
     maven("https://ci.ender.zone/plugin/repository/everything/")
     maven("https://jitpack.io")
     maven("https://maven.playpro.com")
-    maven("https://jitpack.io")
     maven("https://repo.essentialsx.net/releases/")
 }
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly(project(":common"))
-    compileOnly(project(":paper"))
+    compileOnly(project(":core-common"))
+    compileOnly(project(":core-paper"))
     compileOnly("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("net.essentialsx:EssentialsX:2.20.0")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly(files("${projectDir}/lib/BetterRTP-3.6.13.jar")) // Dépendance système pour BetterRTP
+    compileOnly(files("${projectDir}/lib/BetterRTP-3.6.13.jar"))
 
     compileOnly("com.github.Revxrsal.Lamp:common:3.3.0")
     compileOnly("com.github.Revxrsal.Lamp:bukkit:3.3.0")
@@ -37,36 +35,48 @@ dependencies {
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
 }
 
-tasks.shadowJar {
-    archiveClassifier.set("")
-
-    relocate("com.tcoded.folialib", "fr.iban.servercore.libs.folialib")
-}
-
-tasks.compileJava {
-    dependsOn(":paper:shadowJar")
-}
-
-
-
-tasks.register<Copy>("copyJar") {
-    doFirst {
-        mkdir("../libs/")
+tasks {
+    jar {
+        enabled = false
     }
-    from(tasks.named("shadowJar"))
-    into("../libs/")
-}
 
-tasks.build {
-    finalizedBy("copyJar")
+    shadowJar {
+        archiveClassifier.set("")
+        relocate("com.tcoded.folialib", "fr.iban.servercore.libs.folialib")
+    }
+
+    compileJava {
+        dependsOn(":core-paper:shadowJar")
+    }
+
+    register<Copy>("copyJar") {
+        doFirst {
+            mkdir("../libs/")
+        }
+        from(named("shadowJar"))
+        into("../libs/")
+    }
+
+    build {
+        dependsOn(shadowJar)
+        finalizedBy("copyJar")
+    }
 }
 
 publishing {
     publications {
         create<MavenPublication>("maven") {
-            artifactId = project.name.lowercase(Locale.getDefault())
-            from(components["java"])
+            artifactId = project.name
             artifact(tasks.named("shadowJar"))
+
+            pom {
+                name.set(project.name)
+                description.set("Survival implementation of ServerCore")
+            }
         }
     }
+}
+
+tasks.named("publishMavenPublicationToMavenLocal") {
+    dependsOn(tasks.shadowJar)
 }
