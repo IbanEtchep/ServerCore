@@ -44,7 +44,7 @@ tasks.shadowJar {
 }
 
 tasks.compileJava {
-    dependsOn(":CorePaper:shadowJar")
+    dependsOn(":paper:shadowJar")
 }
 
 
