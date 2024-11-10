@@ -39,7 +39,7 @@ import java.util.TreeMap;
 @Plugin(
         id = "corevelocity",
         name = "CoreVelocity",
-        version = "1.0.2",
+        version = "1.0.3",
         dependencies = {
                 @Dependency(id = "tab", optional = true),
                 @Dependency(id = "luckperms"),
