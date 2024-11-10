@@ -1,8 +1,11 @@
+import java.util.*
+
 /**
  * CoreVelocity
  */
 plugins {
     id("io.github.goooler.shadow")
+    id("maven-publish")
 }
 
 repositories {
@@ -61,4 +64,14 @@ tasks.register<Copy>("copyJar") {
 
 tasks.build {
     finalizedBy("copyJar")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            artifactId = project.name.lowercase(Locale.getDefault())
+            from(components["java"])
+            artifact(tasks.named("shadowJar"))
+        }
+    }
 }

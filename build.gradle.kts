@@ -1,12 +1,10 @@
 plugins {
     java
     id("io.github.goooler.shadow") version "8.1.7"
-    `maven-publish`
 }
 
 allprojects {
     apply(plugin = "java")
-    apply(plugin = "maven-publish")
 
     group = "fr.iban.servercore"
     version = "1.0.0"
