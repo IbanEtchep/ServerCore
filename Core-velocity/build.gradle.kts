@@ -26,7 +26,7 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
 
-    implementation(project(":CoreCommon"))
+    implementation(project(":common"))
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     implementation("com.github.Revxrsal.Lamp:common:3.3.0")
     implementation("com.github.Revxrsal.Lamp:velocity:3.3.0")

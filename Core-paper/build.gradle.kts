@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":CoreCommon"))
+    implementation(project(":common"))
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly("com.arcaniax:HeadDatabase-API:1.3.2")

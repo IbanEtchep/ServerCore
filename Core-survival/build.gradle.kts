@@ -23,8 +23,8 @@ repositories {
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
-    compileOnly(project(":CoreCommon"))
-    compileOnly(project(":CorePaper"))
+    compileOnly(project(":common"))
+    compileOnly(project(":paper"))
     compileOnly("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
     compileOnly("net.luckperms:api:5.4")
     compileOnly("net.essentialsx:EssentialsX:2.20.0")
