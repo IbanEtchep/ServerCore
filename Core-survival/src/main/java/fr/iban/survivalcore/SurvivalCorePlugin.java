@@ -43,7 +43,6 @@ public final class SurvivalCorePlugin extends JavaPlugin implements Listener {
                 new InteractListeners(),
                 new ServiceListeners(this),
                 new JoinQuitListeners(this),
-                new PlayerRespawnListener(),
                 new FishingListener(),
                 new CoreMessageListener(this)
         );

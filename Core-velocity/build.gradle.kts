@@ -12,8 +12,11 @@ repositories {
     maven("https://jitpack.io")
     maven("https://repo.opencollab.dev/maven-snapshots/")
     maven("https://repo.viaversion.com")
-    maven("https://repo.minebench.de/")
     maven("https://repo.william278.net/releases/")
+    maven {
+        url = uri("https://repo.minebench.de/")
+        isAllowInsecureProtocol = true
+    }
 }
 
 dependencies {
@@ -25,7 +28,7 @@ dependencies {
     implementation("com.github.Revxrsal.Lamp:common:3.3.0")
     implementation("com.github.Revxrsal.Lamp:velocity:3.3.0")
     implementation("dev.dejvokep:boosted-yaml:1.3.4")
-    implementation("de.themoep:minedown-adventure:1.7.1-SNAPSHOT")
+    implementation("de.themoep:minedown-adventure:1.7.3-SNAPSHOT")
     implementation("mysql:mysql-connector-java:8.0.33")
     implementation("org.apache.commons:commons-pool2:2.12.0")
 
