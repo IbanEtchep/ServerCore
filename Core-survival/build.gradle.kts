@@ -26,7 +26,7 @@ dependencies {
     compileOnly("net.luckperms:api:5.4")
     compileOnly("net.essentialsx:EssentialsX:2.20.0")
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
-    compileOnly(files("${projectDir}/lib/BetterRTP-3.6.1.jar")) // Dépendance système pour BetterRTP
+    compileOnly(files("${projectDir}/lib/BetterRTP-3.6.13.jar")) // Dépendance système pour BetterRTP
 
     compileOnly("com.github.Revxrsal.Lamp:common:3.3.0")
     compileOnly("com.github.Revxrsal.Lamp:bukkit:3.3.0")
