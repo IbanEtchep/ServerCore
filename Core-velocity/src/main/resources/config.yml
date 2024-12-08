@@ -1,4 +1,4 @@
-file-version: 1.0
+file-version: 2
 
 redis:
     host: 172.18.0.1
@@ -33,3 +33,15 @@ messages:
     vote: "url pour voter"
     discord: "url du discord"
     grades: "url des info sur les grades"
+
+announces:
+    interval: 300
+    messages:
+        0:
+            message: "<color:#FF55FF>≫ <color:#FF55FF>Rejoignez-nous sur discord pour suivre toute l'actualité du serveur ! <click:run_command:/discord><hover:show_text:'Cliquez pour ouvrir Discord'><color:#FF55FF><bold>/discord</bold></hover></click> !"
+        1:
+            message: "<color:#FF55FF>≫ <color:#FF55FF>Pensez à voter régulièrement pour soutenir le serveur et gagner des récompenses ! <click:run_command:/vote><hover:show_text:'Cliquez pour voter'><color:#FF55FF><bold>/vote</bold></hover></click> !"
+        2:
+            message: "<color:#FF55FF>≫ <color:#FF55FF>Pensez à visiter notre site. Vous y trouverez le réglement, la boutique, la page de votes,...! <click:run_command:/site><hover:show_text:'Cliquez pour ouvrir le site'><color:#FF55FF><bold>/site</bold></hover></click> !"
+        3:
+            message: "<color:#FF55FF>≫ <color:#FF55FF>Vous pouvez nous aider à financer le serveur en faisant des achats sur la boutique ! <click:run_command:/boutique><hover:show_text:'Cliquez pour ouvrir la boutique'><color:#FF55FF><bold>/boutique</bold></hover></click> !"

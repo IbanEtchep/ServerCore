@@ -14,4 +14,5 @@ public class CoreChannel {
     public static final String LAST_SURVIVAL_SERVER = "LastSurvivalServer";
     public static final String RANDOM_TELEPORT = "RandomTeleportChannel";
     public static final String SYNC_KIT_CLAIM = "SyncKitClaim";
+    public static final String SEND_COMPONENT_MESSAGE_TO_PLAYER = "SendComponentMessageToPlayer";
 }

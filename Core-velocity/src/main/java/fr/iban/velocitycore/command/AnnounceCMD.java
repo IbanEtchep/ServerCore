@@ -4,13 +4,15 @@ import com.velocitypowered.api.proxy.Player;
 import fr.iban.common.data.Account;
 import fr.iban.velocitycore.CoreVelocityPlugin;
 import fr.iban.velocitycore.manager.AccountManager;
-import fr.iban.velocitycore.manager.AnnoncesManager;
+import fr.iban.velocitycore.manager.AutomatedAnnounceManager;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import revxrsal.commands.annotation.*;
+import revxrsal.commands.annotation.Command;
+import revxrsal.commands.annotation.Default;
+import revxrsal.commands.annotation.Description;
+import revxrsal.commands.annotation.Subcommand;
 import revxrsal.commands.velocity.VelocityCommandActor;
 import revxrsal.commands.velocity.VelocityCommandHandler;
-import revxrsal.commands.velocity.annotation.CommandPermission;
 
 @Command("announce")
 @Description("Commandes pour gérer les annonces.")
@@ -35,8 +37,8 @@ public class AnnounceCMD {
     @Subcommand("disable")
     @Description("Désactive une annonce spécifique pour l'utilisateur.")
     public void disableAnnouncement(Player player, @Default("0") int id) {
-        AnnoncesManager announceManager = plugin.getAnnounceManager();
-        if (announceManager.getAnnonces().containsKey(id)) {
+        AutomatedAnnounceManager announceManager = plugin.getAnnounceManager();
+        if (announceManager.getAnnounces().containsKey(id)) {
             AccountManager accountManager = plugin.getAccountManager();
             Account account = accountManager.getAccount(player.getUniqueId());
             if (!account.getBlackListedAnnounces().contains(id)) {

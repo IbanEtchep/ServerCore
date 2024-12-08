@@ -26,8 +26,8 @@ dependencies {
 
     implementation(project(":core-common"))
     implementation("org.ocpsoft.prettytime:prettytime:5.0.9.Final")
-    implementation("com.github.Revxrsal.Lamp:common:3.3.0")
-    implementation("com.github.Revxrsal.Lamp:velocity:3.3.0")
+    implementation("com.github.Revxrsal.Lamp:common:3.3.2")
+    implementation("com.github.Revxrsal.Lamp:velocity:3.3.2")
     implementation("dev.dejvokep:boosted-yaml:1.3.4")
     implementation("de.themoep:minedown-adventure:1.7.3-SNAPSHOT")
     implementation("mysql:mysql-connector-java:8.0.33")
@@ -45,7 +45,6 @@ tasks {
     }
 
     shadowJar {
-        archiveFileName.set("Core-${project.name}-${project.version}.jar")
         archiveClassifier.set("")
 
         // Relocations

@@ -39,7 +39,7 @@ import java.util.TreeMap;
 @Plugin(
         id = "corevelocity",
         name = "CoreVelocity",
-        version = "1.0.3",
+        version = "1.0.4",
         dependencies = {
                 @Dependency(id = "tab", optional = true),
                 @Dependency(id = "luckperms"),
@@ -53,7 +53,7 @@ public class CoreVelocityPlugin {
     private final ProxyServer server;
     private YamlDocument config;
 
-    private AnnoncesManager announceManager;
+    private AutomatedAnnounceManager announceManager;
     private ChatManager chatManager;
     private TeleportManager teleportManager;
     private PlayerManager playerManager;
@@ -104,7 +104,7 @@ public class CoreVelocityPlugin {
         playerManager.clearOnlinePlayersFromDB();
         accountManager = new AccountManager(this);
         chatManager = new ChatManager(this);
-        announceManager = new AnnoncesManager(this);
+        announceManager = new AutomatedAnnounceManager(this);
 
 
         EventManager eventManager = server.getEventManager();
@@ -172,7 +172,7 @@ public class CoreVelocityPlugin {
         return logger;
     }
 
-    public AnnoncesManager getAnnounceManager() {
+    public AutomatedAnnounceManager getAnnounceManager() {
         return announceManager;
     }
 

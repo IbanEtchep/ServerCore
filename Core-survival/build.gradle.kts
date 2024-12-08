@@ -29,8 +29,8 @@ dependencies {
     compileOnly("com.github.MilkBowl:VaultAPI:1.7.1")
     compileOnly(files("${projectDir}/lib/BetterRTP-3.6.13.jar"))
 
-    compileOnly("com.github.Revxrsal.Lamp:common:3.3.0")
-    compileOnly("com.github.Revxrsal.Lamp:bukkit:3.3.0")
+    compileOnly("com.github.Revxrsal.Lamp:common:3.3.2")
+    compileOnly("com.github.Revxrsal.Lamp:bukkit:3.3.2")
 
     implementation("com.github.technicallycoded:FoliaLib:main-SNAPSHOT")
 }

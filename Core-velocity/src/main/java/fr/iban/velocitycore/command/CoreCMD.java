@@ -6,12 +6,13 @@ import fr.iban.velocitycore.CoreVelocityPlugin;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import revxrsal.commands.annotation.*;
+import revxrsal.commands.velocity.VelocityCommandActor;
 import revxrsal.commands.velocity.VelocityCommandHandler;
 import revxrsal.commands.velocity.annotation.CommandPermission;
 
 import java.io.IOException;
 
-@Command("bcore")
+@Command("vcore")
 @CommandPermission("servercore.admin")
 public class CoreCMD {
 
@@ -22,28 +23,29 @@ public class CoreCMD {
     }
 
     @Subcommand("help")
-    @DefaultFor("bcore")
+    @DefaultFor("vcore")
     @Description("Affiche les options de commande pour le serveur.")
-    public void core(Player player) {
+    public void core(VelocityCommandActor actor) {
         Component message = Component.text("Utilisez ", NamedTextColor.GRAY)
-                .append(Component.text("/bcore reload", NamedTextColor.GREEN))
+                .append(Component.text("/vcore reload", NamedTextColor.GREEN))
                 .append(Component.text(" pour recharger la configuration.\n", NamedTextColor.GRAY))
-                .append(Component.text("/bcore debug", NamedTextColor.GREEN))
+                .append(Component.text("/vcore debug", NamedTextColor.GREEN))
                 .append(Component.text(" pour basculer le mode débogage.", NamedTextColor.GRAY));
-        player.sendMessage(message);
+        actor.reply(message);
     }
 
     @Subcommand("reload")
     @Description("Recharge la configuration du serveur.")
-    @Usage("/bcore reload")
-    public void reloadConfig(Player player) throws IOException {
+    @Usage("/vcore reload")
+    public void reloadConfig(VelocityCommandActor actor) throws IOException {
         plugin.getConfig().reload();
-        player.sendMessage(Component.text("La configuration a été rechargée avec succès.", NamedTextColor.GREEN));
+        plugin.getAnnounceManager().reloadAnnounces();
+        actor.reply(Component.text("La configuration a été rechargée avec succès.", NamedTextColor.GREEN));
     }
 
     @Subcommand("debug")
     @Description("Active ou désactive le mode débogage.")
-    @Usage("/bcore debug")
+    @Usage("/vcore debug")
     public void toggleDebug(Player player) {
         AbstractMessenger messenger = plugin.getMessagingManager().getMessenger();
         messenger.setDebugMode(!messenger.isDebugMode());

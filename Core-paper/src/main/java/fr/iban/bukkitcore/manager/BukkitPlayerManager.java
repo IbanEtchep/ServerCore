@@ -5,6 +5,11 @@ import fr.iban.bukkitcore.utils.PluginMessageHelper;
 import fr.iban.common.manager.PlayerManager;
 import fr.iban.common.messaging.CoreChannel;
 import fr.iban.common.messaging.message.PlayerBoolean;
+import fr.iban.common.messaging.message.PlayerStringMessage;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +37,18 @@ public class BukkitPlayerManager extends PlayerManager {
     public void sendMessageRawIfOnline(UUID uuid, String message) {
         if (onlinePlayers.containsKey(uuid)) {
             PluginMessageHelper.sendMessageRaw(onlinePlayers.get(uuid), message);
+        }
+    }
+
+    public void sendMessageIfOnline(UUID uuid, Component message) {
+        Player player = Bukkit.getPlayer(uuid);
+
+        if(player != null) {
+            player.sendMessage(message);
+        }else if (onlinePlayers.containsKey(uuid)) {
+            final String jsonText = JSONComponentSerializer.json().serialize(message);
+            plugin.getMessagingManager()
+                    .sendMessage(CoreChannel.SEND_COMPONENT_MESSAGE_TO_PLAYER, new PlayerStringMessage(uuid, jsonText));
         }
     }
 

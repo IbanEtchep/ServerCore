@@ -13,6 +13,10 @@ import fr.iban.common.teleport.RandomTeleportMessage;
 import fr.iban.common.teleport.TeleportToLocation;
 import fr.iban.common.teleport.TeleportToPlayer;
 import fr.iban.common.teleport.TpRequest;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.json.JSONComponentSerializer;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -24,6 +28,7 @@ public class CoreMessageListener implements Listener {
 
     private final CoreBukkitPlugin plugin;
     private final Gson gson = new Gson();
+    private final JSONComponentSerializer componentSerializer = JSONComponentSerializer.json();
 
     public CoreMessageListener(CoreBukkitPlugin plugin) {
         this.plugin = plugin;
@@ -51,6 +56,7 @@ public class CoreMessageListener implements Listener {
             case CoreChannel.RANDOM_TELEPORT ->
                     plugin.getTeleportManager().performRandomTeleport(message.getMessage(RandomTeleportMessage.class));
             case CoreChannel.SYNC_KIT_CLAIM -> consumeKitClaimMessage(message);
+            case CoreChannel.SEND_COMPONENT_MESSAGE_TO_PLAYER -> consumeComponentToPlayerMessage(message);
         }
     }
 
@@ -91,16 +97,26 @@ public class CoreMessageListener implements Listener {
 
     private void consumeLastSurvivalServerMessage(Message message) {
         PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
-        plugin.getServerManager().setLastSurvivalServer(msg.getUuid(), msg.getString());
+        plugin.getServerManager().setLastSurvivalServer(msg.uuid(), msg.string());
     }
 
     private void consumeKitClaimMessage(Message message) {
         PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
         if (plugin.getEssentials() != null) {
-            User user = plugin.getEssentials().getUser(msg.getUuid());
+            User user = plugin.getEssentials().getUser(msg.uuid());
             if (user == null) return;
             final Calendar time = new GregorianCalendar();
-            user.setKitTimestamp(msg.getString(), time.getTimeInMillis());
+            user.setKitTimestamp(msg.string(), time.getTimeInMillis());
         }
+    }
+
+    private void consumeComponentToPlayerMessage(Message message) {
+        PlayerStringMessage msg = message.getMessage(PlayerStringMessage.class);
+        Player player = Bukkit.getPlayer(msg.uuid());
+
+        if(player == null) return;
+
+        Component component = componentSerializer.deserialize(msg.string());
+        player.sendMessage(component);
     }
 }
