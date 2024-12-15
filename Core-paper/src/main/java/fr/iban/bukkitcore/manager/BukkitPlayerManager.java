@@ -28,18 +28,6 @@ public class BukkitPlayerManager extends PlayerManager {
         CompletableFuture.supplyAsync(this::getPlayerNamesFromDb).thenAccept(this.offlinePlayers::putAll);
     }
 
-    public void sendMessageIfOnline(UUID uuid, String message) {
-        if (onlinePlayers.containsKey(uuid)) {
-            PluginMessageHelper.sendMessage(onlinePlayers.get(uuid), message);
-        }
-    }
-
-    public void sendMessageRawIfOnline(UUID uuid, String message) {
-        if (onlinePlayers.containsKey(uuid)) {
-            PluginMessageHelper.sendMessageRaw(onlinePlayers.get(uuid), message);
-        }
-    }
-
     public void sendMessageIfOnline(UUID uuid, Component message) {
         Player player = Bukkit.getPlayer(uuid);
 

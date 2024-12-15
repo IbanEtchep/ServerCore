@@ -1,7 +1,9 @@
 package fr.iban.bukkitcore.utils;
 
+import net.kyori.adventure.text.Component;
+
 public interface TextCallback {
 	
-	public void call(String text);
+	void call(Component text);
 
 }

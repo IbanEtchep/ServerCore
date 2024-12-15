@@ -29,7 +29,7 @@ public class AsyncChatListener implements Listener {
 		if(plugin.getTextInputs().containsKey(player.getUniqueId())) {
 			plugin.getScheduler().runAtEntity(
 					player,
-					task -> plugin.getTextInputs().get(player.getUniqueId()).call(message)
+					task -> plugin.getTextInputs().get(player.getUniqueId()).call(e.message())
 			);
 			e.setCancelled(true);
 			return;

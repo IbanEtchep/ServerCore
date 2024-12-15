@@ -7,7 +7,7 @@ allprojects {
     apply(plugin = "java")
 
     group = "fr.iban.servercore"
-    version = "1.0.4"
+    version = "1.0.5"
 
     repositories {
         mavenCentral()
